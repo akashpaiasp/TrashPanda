@@ -37,9 +37,9 @@ public class Aim extends CommandBase {
         turretRelativeAngle = Range.clip(turretRelativeAngle, MIN_ANGLE, MAX_ANGLE);
         //turretRelativeAngle = 0;
 
-        r.turret.setTargetDegrees(turretRelativeAngle);
+        r.turret.setTargetDegrees(-turretRelativeAngle);
 
-        r.getTelemetry().addData("Target Degrees", turretRelativeAngle);
+        r.getTelemetry().addData("Target Degrees", -turretRelativeAngle);
 
     }
 

@@ -32,7 +32,7 @@ public class AimLimelight extends CommandBase {
             double angle = r.limelight.getResult().getTx();
             //turretRelativeAngle = 0;
 
-            if (!((r.turret.getTotalDegrees() > 85 && angle < 0) || r.turret.getTotalDegrees() < -85 && angle > 0))
+            if (!((r.turret.getTotalDegrees() > 90 && angle < 0) || r.turret.getTotalDegrees() < -90 && angle > 0))
                 r.turret.updateLL(angle);
         }
 

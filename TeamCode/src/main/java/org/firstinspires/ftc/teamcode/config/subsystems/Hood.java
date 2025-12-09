@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -21,8 +22,11 @@ public class Hood extends SubsystemBase {
 
     //state of the subsystem
     public Servo hood;
-    public double hoodDown = 0.25, hoodMid = 0.5, hoodMidUp = 0.75, hoodUp = 1;
+    public double hoodDown = 0.5, hoodMid = 0.625, hoodMidUp = 0.75, hoodUp = 0.9;
     public static double target = 0.0;
+    public static double hoodIncreaseAmt = 0.02;
+    public static double autoHoodShoot1 = 0.9;
+    public static double autoHoodShoot2 = .9;
 
     public enum HoodState {
         UP,
@@ -47,7 +51,7 @@ public class Hood extends SubsystemBase {
     }
 
     public void init() {
-        setState(HoodState.DOWN);
+        setState(HoodState.UP);
     }
 
 
@@ -82,10 +86,28 @@ public class Hood extends SubsystemBase {
     }
     public void increase() {
         setState(HoodState.MANUAL);
-        target += .1;
+        target += .05;
     }
     public void decrease() {
         setState(HoodState.MANUAL);
-        target -= .1;
+        target -= .05;
+    }
+
+    public void increaseSmall() {
+        setState(HoodState.MANUAL);
+        target += hoodIncreaseAmt;
+    }
+    public void decreaseSmall() {
+        setState(HoodState.MANUAL);
+        target -= hoodIncreaseAmt;
+    }
+    public HoodState getState() {
+        return current;
+    }
+    public double getTarget() {
+        return target;
+    }
+    public void setTarget(double t) {
+        target = Range.clip(t, hoodDown, hoodUp);
     }
 }

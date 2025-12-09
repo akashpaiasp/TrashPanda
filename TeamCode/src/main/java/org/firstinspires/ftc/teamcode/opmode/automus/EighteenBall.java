@@ -1,6 +1,31 @@
 package org.firstinspires.ftc.teamcode.opmode.automus;
 
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.*;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.convertToBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.gate15;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.gateBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.move;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.moveBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup1;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup3;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup3Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.pickup4;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot1;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot215;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot315;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot3Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot4;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot4Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.shoot5;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.startPose;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.strafe1;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.strafe1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.strafe2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.strafe2Blue;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
@@ -19,13 +44,13 @@ import org.firstinspires.ftc.teamcode.config.util.Timer;
 @Autonomous
 @Config
 @Configurable
-public class TwelveBall extends OpMode {
+public class EighteenBall extends OpMode {
     public static double shootHood = 0.9;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Robot robot;
     int done = 0;
-    double onThreshold = .5;
+    double onThreshold = 0;
     double offThreshold = 0.4;
     double moveThreshold = 1;
     boolean doneOff = false;
@@ -147,7 +172,7 @@ public class TwelveBall extends OpMode {
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
 
-                    setPathState(125);
+                    setPathState(13);
                 }
 
             }
@@ -155,17 +180,18 @@ public class TwelveBall extends OpMode {
 
 
             break;
+            /*
 
             case 125:
                 if (!robot.getFollower().isBusy()) {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? gate(robot.getFollower()) : gateBlue(robot.getFollower()), true);
                     setPathState(13);
                 }
-                break;
+                break;*/
 
             case 13:
                 if (!robot.getFollower().isBusy()) {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot2(robot.getFollower()) : shoot2Blue(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot215(robot.getFollower()) : shoot2Blue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     setPathState(14);
@@ -213,6 +239,7 @@ public class TwelveBall extends OpMode {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? strafe1(robot.getFollower()) : strafe1Blue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                    robot.intake.setGateState(Intake.GateState.CLOSED);
                     robot.hood.setTarget(Hood.autoHoodShoot2);
 
                     setPathState(195);
@@ -222,13 +249,18 @@ public class TwelveBall extends OpMode {
             case 195:
                 if (!robot.getFollower().isBusy()) {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup2(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
-                    setPathState(20);
+                    setPathState(1925);
                 }
                 break;
+            case 1925:
+                if (!robot.getFollower().isBusy()) {
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? gate15(robot.getFollower()) : gateBlue(robot.getFollower()), true);
+                    setPathState(20);
+                }
 
             case 20:
                 if (!robot.getFollower().isBusy()) {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot3(robot.getFollower()) : shoot3Blue(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot315(robot.getFollower()) : shoot3Blue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     setPathState(21);
@@ -239,6 +271,7 @@ public class TwelveBall extends OpMode {
             case 21:
                 if (robot.getFollower().getCurrentTValue() > 0.2) {
                     robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+                    robot.intake.setGateState(Intake.GateState.OPEN);
                     setPathState(215);
                 }
                 break;
@@ -339,15 +372,143 @@ public class TwelveBall extends OpMode {
                 if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                     robot.hood.setTarget(Hood.autoHoodShoot2);
                     robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                    robot.intake.setGateState(Intake.GateState.CLOSED);
+                    //robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
+                    setPathState(36);
+                }
+                break; //end of 12 ball
+
+            case 36:
+                if (!robot.getFollower().isBusy()) {
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup4(robot.getFollower()) : pickup3Blue(robot.getFollower()), true);
+                    setPathState(37);
+                }
+
+            case 37:
+                if (!robot.getFollower().isBusy()) {
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?shoot5(robot.getFollower()) : shoot4Blue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
-                    setPathState(36);
+                    setPathState(38);
+
+                }
+                break;
+
+            case 38:
+                if (robot.getFollower().getCurrentTValue() > 0.2) {
+                    robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+                    robot.intake.setGateState(Intake.GateState.OPEN);
+                    setPathState(39);
+                }
+                break;
+            case 39:
+                if (!robot.getFollower().isBusy()) {
+                    setPathState(40);
+                    doneOff = true;
+                }
+                break;
+            case 40:
+                if (robot.getFollower().isBusy()) {
+                    pathTimer.reset();
+                    return;
+                }
+
+                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    if (robot.launcher.shotDetected && !robot.shotFired) {
+                        robot.shotFired = true;
+                        robot.hood.decreaseSmall();
+                    } else if (!robot.launcher.shotDetected) {
+                        robot.shotFired = false;
+                    }
+                }
+                if (pathTimer.getElapsedTimeSeconds() > moveThreshold)
+                    setPathState(41);
+                break;
+
+//end of 15
+
+            case 41:
+                doneNum = 0;
+                if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
+                    robot.hood.setTarget(Hood.autoHoodShoot2);
+                    robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                    robot.intake.setGateState(Intake.GateState.CLOSED);
+                    //robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
+                    setPathState(42);
+                }
+                break; //end of 12 ball
+
+            case 42:
+                if (!robot.getFollower().isBusy()) {
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup4(robot.getFollower()) : pickup3Blue(robot.getFollower()), true);
+                    setPathState(43);
+                }
+
+            case 43:
+                if (!robot.getFollower().isBusy()) {
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?shoot5(robot.getFollower()) : shoot4Blue(robot.getFollower()), true);
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    setPathState(44);
+
+                }
+                break;
+
+            case 44:
+                if (robot.getFollower().getCurrentTValue() > 0.2) {
+                    robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+                    robot.intake.setGateState(Intake.GateState.OPEN);
+                    setPathState(45);
+                }
+                break;
+            case 45:
+                if (!robot.getFollower().isBusy()) {
+                    setPathState(46);
+                    doneOff = true;
+                }
+                break;
+            case 46:
+                if (robot.getFollower().isBusy()) {
+                    pathTimer.reset();
+                    return;
+                }
+
+                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    if (robot.launcher.shotDetected && !robot.shotFired) {
+                        robot.shotFired = true;
+                        robot.hood.decreaseSmall();
+                    } else if (!robot.launcher.shotDetected) {
+                        robot.shotFired = false;
+                    }
+                }
+                if (pathTimer.getElapsedTimeSeconds() > moveThreshold)
+                    setPathState(47);
+                break;
+
+
+
+            case 47:
+                doneNum = 0;
+                if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
+                    robot.hood.setTarget(Hood.autoHoodShoot2);
+                    robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
+                    setPathState(48);
                     robot.turret.setTargetDegrees(0);
                 }
                 break;
 
-            case 36:
+            case 48:
                 break;
 
 

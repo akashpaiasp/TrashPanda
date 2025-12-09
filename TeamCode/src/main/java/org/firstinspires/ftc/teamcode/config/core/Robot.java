@@ -30,16 +30,15 @@ import java.util.List;
 
 @Config
 public class Robot {
-    public Timer specTimer;
     private HardwareMap hw;
     private Telemetry telemetry;
     private Follower follower;
-    private SampleSubsystem sampleSubsystem;
     private Opmode op = TELEOP;
     private double speed = 1.0;
+    public static double turretOffset = 3.8;
 
     public AutoDriving autoDriving;
-    public static Pose p = new Pose(0, 0, Math.toRadians(90));
+    public static Pose p = new Pose(turretOffset, 0, Math.toRadians(90));
     public static Pose autoEndPose = p;
     public Launcher launcher;
     public Turret turret;
@@ -58,8 +57,8 @@ public class Robot {
     public static double goalY = 72;
 
     double centerX = 72, centerY = 72;
-    double rightWallX = 60, rightWallY = 72;  // right wall center
-    double frontWallX = 72, frontWallY = 60;
+    double rightWallX = 65, rightWallY = 72;  // right wall center
+    double frontWallX = 72, frontWallY = 65;
 
     double maxDist = 72;
 
@@ -75,6 +74,16 @@ public class Robot {
     public static boolean auto = false;
 
     public static boolean logData = true;
+
+    public boolean shotFired = false;
+    public boolean justShot = false;
+
+    public int shotNum = -1;
+    public Hood.HoodState lastHood;// = Hood.HoodState.DOWN;
+    public double lastHoodTarget;// = hood.hoodDown;
+    public boolean rBumper = false;
+
+
 
 
     public int flip = 1, tState = -1, sState = -1, spec0State = -1, spec180State = -1, c0State = -1, aFGState = -1, specTransferState = -1, fSAState = -1, sRState = -1, hState = -1;
@@ -142,18 +151,28 @@ public class Robot {
         //Buttons
 
 
-        g1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(new InstantCommand(() -> {
+        g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(new InstantCommand(() -> {
             //launcher.setLauncherState(Launcher.LauncherState.SHOOT);
-            if (launcher.controller.done) {
+            //if (launcher.controller.done) {
+                intakeOff = false;
+                uptakeOff = false;
+                if (!rBumper)
+                    timer.reset();
+                rBumper = true;
                 intake.setUptakeState(Intake.UptakeState.ON);
                 intake.setIntakeState(Intake.IntakeState.INTAKE);
-                led.setState(MyLED.State.GREEN);
-            }
-            else {
+
+
+
+            //    led.setState(MyLED.State.GREEN);
+            //}
+            /*else {
                 intake.setUptakeState(Intake.UptakeState.OFF);
                 intake.setIntakeState(Intake.IntakeState.OFF);
-                led.setState(MyLED.State.YELLOW);
-            }
+            //    led.setState(MyLED.State.YELLOW);
+            //}
+
+             */
             launcherOff = false;
             intakeOff = false;
             uptakeOff = false;
@@ -164,6 +183,12 @@ public class Robot {
             launcherOff = true;
             intakeOff = true;
             uptakeOff = true;
+            rBumper = false;
+            if (shotNum >= 0) {
+                hood.setState(lastHood);
+                hood.setTarget(lastHoodTarget);
+                shotNum = -1;
+            }
         }));
 
         g1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new Fire3(this));
@@ -257,7 +282,7 @@ public class Robot {
         intake.periodic();
         hood.periodic();
         //autoEndPose = follower.getPose().copy();
-        autoEndPose = new Pose(follower.getPose().getX(), follower.getPose().getY(), alliance == Alliance.RED ? follower.getHeading() + Math.toRadians(90) : follower.getHeading() - Math.toRadians(90));
+        autoEndPose = new Pose(-follower.getPose().getY(), follower.getPose().getX() + turretOffset, alliance == Alliance.RED ? follower.getHeading() + Math.toRadians(90) : follower.getHeading() - Math.toRadians(90));
         if (logData) log();
     }
 
@@ -417,6 +442,10 @@ public class Robot {
 
         ekf.predict(v_forward, v_lateral, omega, dt, now, odomX, odomY, odomTheta);
         updateLimelight();
+    }
+
+    public void updateShooting() {
+
     }
 
     public void updateLimelight() {

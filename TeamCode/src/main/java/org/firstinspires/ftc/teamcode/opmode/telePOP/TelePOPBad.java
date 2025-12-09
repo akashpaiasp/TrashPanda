@@ -1,24 +1,31 @@
 package org.firstinspires.ftc.teamcode.opmode.telePOP;
 
-import static org.firstinspires.ftc.teamcode.config.core.Robot.*;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.alliance;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.autoEndPose;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.blueX;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.goalY;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.redX;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.config.commands.*;
+import org.firstinspires.ftc.teamcode.config.commands.Aim;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
-import org.firstinspires.ftc.teamcode.config.util.logging.CSVInterface;
-import org.firstinspires.ftc.teamcode.config.subsystems.*;
+import org.firstinspires.ftc.teamcode.config.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
+import org.firstinspires.ftc.teamcode.config.util.logging.CSVInterface;
 
 @Config
-@TeleOp (name = "TelePOP")
+@Disabled
+@TeleOp (name = "Bad teleop")
 
-public class TelePOP extends LinearOpMode {
+public class TelePOPBad extends LinearOpMode {
     private Robot robot;
     private GamepadEx g1;
     private GamepadEx g2;
@@ -32,7 +39,6 @@ public class TelePOP extends LinearOpMode {
         //Initialize Hardware
         robot = new Robot(hardwareMap, telemetry, Robot.alliance, autoEndPose);
         Robot.auto = false;
-        robot.launcher.teleop = true;
 
         //Initialize Gamepads
         g1 = new GamepadEx(gamepad1);

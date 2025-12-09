@@ -35,9 +35,9 @@ public class Launcher extends SubsystemBase {
 
     //pdfl values tuned in FTC Dashboard
     public static double p = 0.001;
-    public static double d = 0.01;
-    public static double f = 0;
-    public static double l = 0.08;
+    public static double d = .001;
+    public static double f = 0.2;
+    public static double l = 0;
     public static double i = 0.0001;
 
     public static double p2 = 0.0005;
@@ -48,7 +48,8 @@ public class Launcher extends SubsystemBase {
 
 
     public static double target_velocity = 0;
-    public static double tele_target = 4000;
+    public static double tele_target = 4500;
+    public static double auto_target = 4200;
     public static boolean powerMode = false;
     public static boolean pid1 = true;
     public double current_velocity = 0;
@@ -72,6 +73,7 @@ public class Launcher extends SubsystemBase {
     private int delta_pos = 0;
     private boolean ramped = false;
     private int numDone = 0;
+    public boolean shotDetected = false;
 
     public static double boostTime = 0.14;
     public static double RECOVERY_THRESHOLD = 100;
@@ -80,7 +82,7 @@ public class Launcher extends SubsystemBase {
 
     private boolean inBoost = false;
     private boolean inAggressive = false;
-    boolean ready = false;
+    public boolean teleop = false;
 
 
 
@@ -102,7 +104,7 @@ public class Launcher extends SubsystemBase {
 
         //init servos based on their name in the robot's config file
         launcher1 = hardwareMap.get(DcMotorEx.class, "em0");
-        launcher2 = hardwareMap.get(DcMotorEx.class, "cm0");
+        launcher2 = hardwareMap.get(DcMotorEx.class, "em1");
         launcher2.setDirection(DcMotorSimple.Direction.REVERSE);
         launcher1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -148,7 +150,7 @@ public class Launcher extends SubsystemBase {
         }
         else {
             launcher1.setPower(test1);
-            launcher2.setPower(test1);
+            launcher2.setPower(test2);
         }
         if (pid1)
             controller.updateConstants(p, d, f, l, i);
@@ -204,16 +206,17 @@ public class Launcher extends SubsystemBase {
 
     public void periodic() {
         //if (Robot.logData) log();
-        if (current == LauncherState.OUT)
-            target_velocity = tele_target;
-        else if (current == LauncherState.STOP)
+        if (current == LauncherState.OUT) {
+            if (teleop)
+                target_velocity = tele_target;
+            else target_velocity = auto_target;
+        }
+        else if (current == LauncherState.STOP) {
             target_velocity = 0;
-        if(current != LauncherState.STOP)
-            updateShooter();
-        else {
             launcher1.setPower(0);
             launcher2.setPower(0);
         }
+            updateShooter();
 
 
 
@@ -269,21 +272,23 @@ public class Launcher extends SubsystemBase {
         controller.update(current_velocity, target_velocity);
 
         // 1) Detect shot
-        if (!inBoost/* && !inAggressive*/) {
+        //if (!inBoost/* && !inAggressive) {
             double drop = prev_velocity - current_velocity;
-            if (drop > (DROP_THRESHOLD * target_velocity) || current_velocity < target_velocity * FALL_THRESHOLD) {
-                inBoost = true;
-                ;
-                timer.reset();
-            }
-            if (target_velocity < 3800)
+            if (drop > (DROP_THRESHOLD * target_velocity)) { //|| current_velocity < target_velocity * FALL_THRESHOLD) {
+                    shotDetected = true;
+                    timer.reset();
+                }
+            if (shotDetected && timer.getElapsedTimeSeconds() > 0.02)
+                shotDetected = false;
+            if (target_velocity < 3500)
                 controller.updateConstants(p2, d, f, l, i);
             else
                 controller.updateConstants(p, d, f, l, i);
             pdfl = controller.run();
-        }
+        //}
 
         // 2) BOOST PHASE
+    /*
         if (inBoost) {
             launcher1.setPower(1);
             launcher2.setPower(1);
@@ -309,8 +314,14 @@ public class Launcher extends SubsystemBase {
                 pdfl = controller.run();
             } */
         // 4) Set Power (steady state)
+    if (!(current == LauncherState.STOP)) {
         launcher1.setPower(pdfl);
         launcher2.setPower(pdfl);
+    }
+    }
+
+    public void setTarget(double target) {
+        target_velocity = target;
     }
 
     public double tickstoRPM(double velocity) {

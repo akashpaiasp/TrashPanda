@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
     public DcMotorEx intake, uptake;
     public static double launchIntake = 1;
     public static double launchUptake = 1;
-    public static double intakeUptake = .2;
+    public static double intakeUptake = .7;
 
     public static boolean manual = false;
 
@@ -33,21 +33,24 @@ public class Intake extends SubsystemBase {
     public static double gateRPos = 0.5;
 
     private static double
-            lOpen = .5,
-            lClosed = .5,
-            rOpen = .5,
-            rClosed = .5;
+            lOpen = .6,
+            lClosed = .35,
+            rOpen = .42,
+            rClosed = 0.64;
 
     public enum IntakeState {
         OUTTAKE,
         INTAKE,
-        OFF
+        OFF,
+        SLOWOUTTAKE
+
     }
 
     public enum UptakeState {
         ON,
         OFF,
-        SLOW
+        SLOW,
+        BACK
     }
     public enum GateState {
         OPEN,
@@ -70,12 +73,14 @@ public class Intake extends SubsystemBase {
         //pusherM = hardwareMap.get(Servo.class, "cs2");
         //pusherM = hardwareMap.get(Servo.class, "cs3");
 
-        gateL = hardwareMap.get(Servo.class, "cs5");
-        gateR = hardwareMap.get(Servo.class, "cs4");
-        intake = hardwareMap.get(DcMotorEx.class, "em1");
+        gateL = hardwareMap.get(Servo.class, "sh5");
+        gateR = hardwareMap.get(Servo.class, "sh4");
+        intake = hardwareMap.get(DcMotorEx.class, "cm0");
+        uptake = hardwareMap.get(DcMotorEx.class, "cm1");
 
 
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        //intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        uptake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //init servos based on their name in the robot's config file
 
@@ -109,6 +114,9 @@ public class Intake extends SubsystemBase {
             case OUTTAKE:
                 intake.setPower(-1);
                 break;
+            case SLOWOUTTAKE:
+                intake.setPower(-.1);
+                break;
         }
 
         switch (currentUptake) {
@@ -117,21 +125,34 @@ public class Intake extends SubsystemBase {
                 break;
             case ON:
                 uptake.setPower(launchUptake);
+                break;
             case SLOW:
                 uptake.setPower(intakeUptake);
+                break;
+            case BACK:
+                    uptake.setPower(-1);
         }
-        switch (currentGate) {
-            case OPEN:
-                gateL.setPosition(lOpen);
-                gateR.setPosition(rOpen);
-                break;
-            case CLOSED:
-                gateL.setPosition(lOpen);
-                gateR.setPosition(rOpen);
-                break;
+        if(manual) {
+            gateL.setPosition(gateLPos);
+            gateR.setPosition(gateRPos);
+        }
+        else {
+            switch (currentGate) {
+
+                case OPEN:
+                    gateL.setPosition(lOpen);
+                    gateR.setPosition(rOpen);
+                    break;
+                case CLOSED:
+                    gateL.setPosition(lClosed);
+                    gateR.setPosition(rClosed);
+                    break;
+            }
         }
 
         telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("Intake state", currentIntake);
+        telemetry.addData("Uptake state", currentUptake);
     }
 
     public void init() {

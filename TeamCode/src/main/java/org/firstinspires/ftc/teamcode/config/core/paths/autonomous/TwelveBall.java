@@ -9,18 +9,27 @@ import com.pedropathing.paths.PathChain;
 
 public class TwelveBall {
     //Red Poses
-    public static final Pose startPose = new Pose(40.7, -56.5, 0);
+    public static final Pose startPose = new Pose(51.2, -50.2, -0.83);
 
-    private static final Pose shootPose = new Pose(22.82, -29.24, -1.6);
-    private static final Pose pickup1 = new Pose(21.18, -64, -1.588);
-    private static final Pose strafeGate = new Pose(15, -58, -1.588);
-    private static final Pose gate = new Pose(15, -63.5, -1.588);
-    private static final Pose strafe1 = new Pose(0 -29.24, -1.6);
+    private static final Pose shootPose = new Pose(15.5, -22, -1.57);
+    //private static final Pose shootPose2 = new Pose(-0.16, -7.15, -1.567);
+    private static final Pose pickup1 = new Pose(14.6, -48.5, -1.567);
+    private static final Pose strafeGate = new Pose(6.57, -50, -1.554);
+    private static final Pose gate = new Pose(-6, -51.7, -1.56);
+    private static final Pose strafe1 = new Pose(-9.25, -25, -1.58);
 
-    private static final Pose pickup2 = new Pose(0, -66.5, -1.588);
+    private static final Pose pickup2 = new Pose(-9.11, -46, -1.56);
 
-    private static final Pose strafe2 = new Pose(-24.5, -29.24, -1.6);
-    private static final Pose pickup3= new Pose(-24.5, -66.5, -1.588);
+    private static final Pose strafe2 = new Pose(-32.38, -25, -1.57);
+    private static final Pose pickup3= new Pose(-32, -49, -1.59);
+    private static final Pose strafe3 = new Pose(-54, -15, -1.567 - Math.toRadians(45));
+    private static final Pose strafe35 = new Pose(-57, -54, -1.567 - Math.toRadians(45));
+    private static final Pose strafe36 = new Pose(-53, -53, -1.567 - Math.toRadians(80));
+
+
+    private static final Pose pickup4 = new Pose(-57, -57, -1.567- Math.toRadians(80));
+    private static final Pose strafe4 = new Pose(-30, -40, -1.58);
+    private static final Pose pickup5 = new Pose(-30, -40, -1.58);
     private static final Pose move = new Pose(5, -29.24, -1.588);
     private static final Pose startPoseBlue = new Pose(40.19, 56.96, 0.03);
 
@@ -79,6 +88,16 @@ public class TwelveBall {
         return chain;
 
     }
+
+    public static PathChain shoot215(Follower f) {
+        PathChain chain = f.pathBuilder()
+                .addPath(new BezierLine(pickup1, shootPose))
+                .setLinearHeadingInterpolation(pickup1.getHeading(), shootPose.getHeading())
+                .build();
+
+        return chain;
+
+    }
     public static PathChain strafe1(Follower f) {
         PathChain chain = f.pathBuilder()
                 .addPath(new BezierLine(shootPose, strafe1))
@@ -97,10 +116,29 @@ public class TwelveBall {
         return chain;
 
     }
+
+    public static PathChain gate15(Follower f) {
+        PathChain chain = f.pathBuilder()
+                .addPath(new BezierCurve(pickup2, gate))
+                .setLinearHeadingInterpolation(pickup2.getHeading(), gate.getHeading())
+                .build();
+
+        return chain;
+
+    }
     public static PathChain shoot3(Follower f) {
         PathChain chain = f.pathBuilder()
                 .addPath(new BezierCurve(pickup2, shootPose))
                 .setLinearHeadingInterpolation(pickup2.getHeading(), shootPose.getHeading())
+                .build();
+
+        return chain;
+
+    }
+    public static PathChain shoot315(Follower f) {
+        PathChain chain = f.pathBuilder()
+                .addPath(new BezierCurve(gate, shootPose))
+                .setLinearHeadingInterpolation(gate.getHeading(), shootPose.getHeading())
                 .build();
 
         return chain;
@@ -128,6 +166,53 @@ public class TwelveBall {
         PathChain chain = f.pathBuilder()
                 .addPath(new BezierLine(pickup3, shootPose))
                 .setLinearHeadingInterpolation(pickup3.getHeading(), shootPose.getHeading())
+                .build();
+
+        return chain;
+
+    }
+    public static PathChain pickup4(Follower f) {
+        PathChain chain = f.pathBuilder()
+
+                .addPath(new BezierLine(shootPose, strafe3))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), strafe3.getHeading())
+                .addPath(new BezierLine(strafe3, strafe35))
+                .setLinearHeadingInterpolation(strafe3.getHeading(), strafe35.getHeading())
+                .addPath(new BezierLine(strafe35, strafe36))
+                .setLinearHeadingInterpolation(strafe35.getHeading(), strafe36.getHeading())
+                .addPath(new BezierLine(strafe36, pickup4))
+                .setLinearHeadingInterpolation(strafe36.getHeading(), pickup4.getHeading())
+                .build();
+
+        return chain;
+
+    }
+
+    public static PathChain shoot5(Follower f) {
+        PathChain chain = f.pathBuilder()
+                .addPath(new BezierLine(pickup4, shootPose))
+                .setLinearHeadingInterpolation(pickup4.getHeading(), shootPose.getHeading())
+                .build();
+
+        return chain;
+
+    }
+    public static PathChain pickup5(Follower f) {
+        PathChain chain = f.pathBuilder()
+                .addPath(new BezierLine(shootPose, strafe4))
+                .setLinearHeadingInterpolation(shootPose.getHeading(), strafe4.getHeading())
+                .addPath(new BezierLine(strafe4, pickup5))
+                .setLinearHeadingInterpolation(strafe4.getHeading(), pickup5.getHeading())
+                .build();
+
+        return chain;
+
+    }
+
+    public static PathChain shoot6(Follower f) {
+        PathChain chain = f.pathBuilder()
+                .addPath(new BezierLine(pickup5, shootPose))
+                .setLinearHeadingInterpolation(pickup5.getHeading(), shootPose.getHeading())
                 .build();
 
         return chain;
