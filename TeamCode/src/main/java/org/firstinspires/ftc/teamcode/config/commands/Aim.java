@@ -32,10 +32,17 @@ public class Aim extends CommandBase {
         double vy = r.getFollower().getVelocity().getYComponent();
         double va = 0;//r.getFollower().getAngularVelocity();
 
-
-        double dx = targetX - r.getFollower().getPose().getX() + vx * flightTime;
-        double dy = targetY - r.getFollower().getPose().getY() + vy * flightTime;
-        double robotHeading = Math.toDegrees(r.getAlliance() == Alliance.RED ? r.getFollower().getPose().getHeading() + flightTime * va: r.getFollower().getPose().getHeading() + Math.toRadians(180) + flightTime * va);
+        double dx;
+        double dy;
+        if (Robot.alliance == Alliance.RED) {
+            dx = targetX - r.getFollower().getPose().getX() - vx * flightTime;
+            dy = targetY - r.getFollower().getPose().getY() - vy * flightTime;
+        }
+        else {
+            dx = -(targetX - r.getFollower().getPose().getX() - vx * flightTime);
+            dy = targetY + r.getFollower().getPose().getY() - vy * flightTime;
+        }
+        double robotHeading = Math.toDegrees(r.getAlliance() == Alliance.RED ? r.getFollower().getPose().getHeading() - flightTime * va: r.getFollower().getPose().getHeading() + Math.toRadians(180) + flightTime * va);
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
 

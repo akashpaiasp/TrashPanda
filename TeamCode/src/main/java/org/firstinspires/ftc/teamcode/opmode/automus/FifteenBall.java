@@ -30,7 +30,7 @@ public class FifteenBall extends OpMode {
     double moveThreshold = 1.25;
     boolean doneOff = false;
     double doneNum = 0;
-    double outtakeTIme = .1;
+    double outtakeTIme = 0;
     double lastMoveTime = 5.2;
     int doneThreshold = 4;
 

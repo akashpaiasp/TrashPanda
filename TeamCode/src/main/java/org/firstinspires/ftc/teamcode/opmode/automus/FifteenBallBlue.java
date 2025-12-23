@@ -56,9 +56,10 @@ public class FifteenBallBlue extends OpMode {
     double moveThreshold = 1.25;
     boolean doneOff = false;
     double doneNum = 0;
-    double outtakeTIme = .1;
-    double lastMoveTime = 5.2;
+    double outtakeTIme = 0;
+    double lastMoveTime = 3;
     int doneThreshold = 4;
+    double gateTime = 2.5;
 
 
     public void autonomousPathUpdate() {
@@ -68,7 +69,7 @@ public class FifteenBallBlue extends OpMode {
         switch (pathState) {
             case 00: //preload & set max power
                 robot.getFollower().setMaxPower(1);
-                robot.turret.setTargetDegrees(robot.getAlliance() == Alliance.RED ? -53 : 53);
+                robot.turret.setTargetDegrees(robot.getAlliance() == Alliance.RED ? -47 : 47);
                 robot.hood.setTarget(Hood.autoHoodShoot2);
                 setPathState(10);
                 break;
@@ -261,13 +262,13 @@ public class FifteenBallBlue extends OpMode {
                     setPathState(1975);
                 }
             case 1975:
-                if (!robot.getFollower().isBusy() || pathTimer.getElapsedTimeSeconds() > 1) {
+                if (!robot.getFollower().isBusy() || pathTimer.getElapsedTimeSeconds() > gateTime) {
                     setPathState(20);
                 }
                 break;
 
             case 20:
-                if (pathTimer.getElapsedTimeSeconds() > .3) {
+                if (pathTimer.getElapsedTimeSeconds() > 0.3) {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot315(robot.getFollower()) : shoot315Blue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
@@ -408,7 +409,7 @@ public class FifteenBallBlue extends OpMode {
 
             case 375:
                 if (pathTimer.getElapsedTimeSeconds() > .3) {
-                    robot.intake.setIntakeState(Intake.IntakeState.SLOWOUTTAKE);
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     pathTimer.reset();
                     robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
                     robot.intake.setGateState(Intake.GateState.OPEN);

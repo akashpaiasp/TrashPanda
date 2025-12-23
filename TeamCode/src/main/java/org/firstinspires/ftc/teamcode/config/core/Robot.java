@@ -60,6 +60,10 @@ public class Robot {
     double rightWallX = 65, rightWallY = 72;  // right wall center
     double frontWallX = 72, frontWallY = 65;
 
+    double centerXBlue = 72,
+     rightWallXBlue = 65,
+     frontWallXBlue = 72;
+
     double maxDist = 72;
     public static double goalDist = 52;
     public static double farLaunchDist = 100;
@@ -287,9 +291,9 @@ public class Robot {
         hood.periodic();
         //autoEndPose = follower.getPose().copy();
         if (alliance == Alliance.RED)
-            autoEndPose = new Pose(-follower.getPose().getY(), follower.getPose().getX() + turretOffset, alliance == Alliance.RED ? follower.getHeading() + Math.toRadians(90) : follower.getHeading() - Math.toRadians(90));
+            autoEndPose = new Pose(-follower.getPose().getY() + turretOffset, follower.getPose().getX(), follower.getHeading() + Math.toRadians(90));
         else
-            autoEndPose = new Pose(-follower.getPose().getX() + turretOffset, follower.getPose().getY(), alliance == Alliance.RED ? follower.getHeading() + Math.toRadians(90) : follower.getHeading() - Math.toRadians(90));
+            autoEndPose = new Pose(follower.getPose().getY() + turretOffset, follower.getPose().getX(),  follower.getHeading() - Math.toRadians(90));
         if (logData) log();
     }
 
@@ -459,7 +463,7 @@ public class Robot {
         }
         else if (getDistanceFromGoal() > goalDist) {
             Launcher.tele_target = 4200;
-            Hood.hoodIncreaseAmt = 0.02;
+            Hood.hoodIncreaseAmt = 0.01;
             hood.setTarget(Hood.hoodUp);
         }
         else {
@@ -485,17 +489,25 @@ public class Robot {
     }
 
     public double getDistanceFromGoal() {
-        double goalX = alliance == Alliance.RED ? redX : Robot.blueX;
-        double dx = goalX - follower.getPose().getX();
-        double dy = goalY - follower.getPose().getY();
-        return Math.sqrt(dx*dx + dy*dy);
+        if (alliance == Alliance.RED) {
+            double goalX = redX;
+            double dx = goalX - follower.getPose().getX();
+            double dy = goalY - follower.getPose().getY();
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        else  {
+            double goalX = redX;
+            double dx = goalX - follower.getPose().getX();
+            double dy = -goalY - follower.getPose().getY();
+            return Math.sqrt(dx * dx + dy * dy);
+        }
     }
 
     public void updateGoalCoords() {
         double t;  // blend factor
         double robotY = follower.getPose().getY();
         double robotX = follower.getPose().getX();
-        if (alliance == Alliance.RED) {
+        //if (alliance == Alliance.RED) {
             if (robotY > robotX) {
                 // --- LEFT SIDE OF DIAGONAL → use distance from FRONT edge (y=72)
                 double dist = Math.abs(72 - robotY);  // 0 at edge, maxDist at diagonal
@@ -514,15 +526,15 @@ public class Robot {
                 redX = lerp(centerX, rightWallX, t);
                 goalY = lerp(centerY, rightWallY, t);
             }
-        }
+        /*}
         else {
-            if (robotY > -robotX) {
+            if (robotY > robotX) {
                 // --- LEFT SIDE OF DIAGONAL → use distance from FRONT edge (y=72)
                 double dist = Math.abs(72 - robotY);  // 0 at edge, maxDist at diagonal
                 t = 1.0 - (dist / maxDist);
                 t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(-centerX, -frontWallX, t);
+                redX = lerp(centerX, frontWallX, t);
                 goalY = lerp(centerY, frontWallY, t);
 
             } else {
@@ -531,10 +543,10 @@ public class Robot {
                 t = 1.0 - (dist / maxDist);
                 t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(-centerX, -rightWallX, t);
-                goalY = lerp(centerY, rightWallY, t);
+                blueX = lerp(centerX, rightWallX, t);
+                goalY = lerp(-centerY, -rightWallY, t);
             }
-        }
+        } */
     }
 
     private static double lerp(double a, double b, double t) {

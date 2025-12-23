@@ -26,6 +26,8 @@ public class TelePOP extends LinearOpMode {
     public Timer loopTimer = new Timer();
     private double lastTime = 0, currentTime = 0;
     public static boolean manualMode = false;
+    public static boolean useTurret = true;
+    public boolean pressingC = false;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -98,8 +100,17 @@ public class TelePOP extends LinearOpMode {
             else {
                 robot.outtake = false;
             }
-
-            new Aim(robot, alliance == Alliance.RED ? redX : blueX, goalY).execute();
+            if (useTurret)
+                new Aim(robot, alliance == Alliance.RED ? redX : redX, alliance == Alliance.RED ? goalY : goalY).execute();
+            else
+                robot.turret.setTargetDegrees(0);
+            if (gamepad1.circle && !pressingC) {
+                pressingC = true;
+                useTurret = !useTurret;
+            }
+            else if (!gamepad1.circle) {
+                pressingC = false;
+            }
             //}
 
             if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper) {
@@ -199,6 +210,8 @@ public class TelePOP extends LinearOpMode {
             telemetry.addData("x" , robot.getFollower().getPose().getX());
             telemetry.addData("y" , robot.getFollower().getPose().getY());
             telemetry.addData("heading" , robot.getFollower().getPose().getHeading());
+            telemetry.addData("GoalX", redX);
+            telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
 
         }
         CSVInterface.log();

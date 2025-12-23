@@ -14,50 +14,50 @@ public class TwelveBall {
     private static final Pose shootPose = new Pose(15.5, -22, -1.57);
     private static final Pose pickup1 = new Pose(14.6, -48.5, -1.567);
     private static final Pose strafeGate = new Pose(6.57, -50, -1.554);
-    private static final Pose gate = new Pose(-6, -51.7, -1.56);
+    private static final Pose gate = new Pose(-6, -53, -1.56);
     private static final Pose strafe1 = new Pose(-9.25, -25, -1.58);
-    private static final Pose pickup2 = new Pose(-9.11, -46, -1.56);
+    private static final Pose pickup2 = new Pose(-9.11, -50, -1.56);
     private static final Pose strafe2 = new Pose(-32.38, -25, -1.57);
-    private static final Pose pickup3 = new Pose(-33.5, -51.5, -1.59);
-    private static final Pose strafe3 = new Pose(-54, -15, -1.567 - Math.toRadians(45));
+    private static final Pose pickup3 = new Pose(-33.5, -53, -1.59);
+    private static final Pose strafe3 = new Pose(-54, -50, -1.567 - Math.toRadians(45));
     private static final Pose strafe35 = new Pose(-57, -54, -1.567 - Math.toRadians(45));
-    private static final Pose strafe36 = new Pose(-53, -53, -1.567 - Math.toRadians(80));
+    private static final Pose strafe36 = new Pose(-53, -53, -1.567 - Math.toRadians(90));
 
     private static final Pose strafeGate18 = new Pose(-.8, -45.1, -.94);
     private static final Pose openGate18 = new Pose(0, -49.7, -1.05);
     private static final Pose moveToIntake18 = new Pose(-21.4, -51.1, -1.05);
     private static final Pose intakeGate18 = new Pose(-20.42, -55.92, -1.05);
 
-    private static final Pose pickup4 = new Pose(-57, -57, -1.567 - Math.toRadians(80));
+    private static final Pose pickup4 = new Pose(-57, -57, -1.567 - Math.toRadians(90));
     private static final Pose strafe4 = new Pose(-30, -40, -1.58);
     private static final Pose pickup5 = new Pose(-30, -40, -1.58);
     private static final Pose move = new Pose(5, -29.24, -1.588);
 
     // Blue Poses
-    public static final Pose startPoseBlue = new Pose(50.58, 47.68, 0.81);//convertToBlue(startPose);
+    public static final Pose startPoseBlue = new Pose(51.8, 50.3, 0.81);//convertToBlue(startPose);
 
     private static final Pose shootPoseBlue = new Pose(13.7, 14.7, 1.55);//convertToBlue(shootPose);
-    private static final Pose pickup1Blue = new Pose(14.55, 51.31, 1.55);//convertToBlue(pickup1);
-    private static final Pose strafeGateBlue = convertToBlue(strafeGate);
+    private static final Pose pickup1Blue = new Pose(14.55, 53, 1.55);//convertToBlue(pickup1);
+    private static final Pose strafeGateBlue = new Pose(-13, 46, 1.54);
     private static final Pose strafe1Blue = new Pose(-10.89, 14.44, 1.56);//convertToBlue(strafe1); //12, -22, 1.48
     //pickup second set
-    private static final Pose pickup2Blue = new Pose(-8.5, 53, 1.54);
+    private static final Pose pickup2Blue = new Pose(-10, 60, 1.54);
     //hit the gate
-    private static final Pose gateBlue = new Pose(-6.9, 56, 1.55);//convertToBlue(gate);
+    private static final Pose gateBlue = new Pose(6, 55, 1.55);//convertToBlue(gate);
     private static final Pose strafe2Blue = new Pose(-33.24, 15.29, 1.55);//convertToBlue(strafe2);
-    private static final Pose pickup3Blue = new Pose(-34, 58.8, 1.574);//convertToBlue()//convertToBlue(pickup3);
+    private static final Pose pickup3Blue = new Pose(-34, 58.5, 1.574);//convertToBlue()//convertToBlue(pickup3);
     /*
     private static final Pose strafe3Blue = new Pose(-15.7, 58.4, 2.183);//(-7.77, 27.5, 2.13);//convertToBlue(strafe3);
     private static final Pose strafe35Blue = new Pose(-55.76, 58.66, 2.19);//(-15.7, 58.4, 2.183);//convertToBlue(strafe35);
     private static final Pose strafe36Blue = new Pose(-59, 55, 1.56);
 
      */
-    private static final Pose strafe3Blue = new Pose(-56.7, 13.22, 2.123);//(-7.77, 27.5, 2.13);//convertToBlue(strafe3);
+    private static final Pose strafe3Blue = new Pose(-56.7, 50, 2.123);//(-7.77, 27.5, 2.13);//convertToBlue(strafe3);
     private static final Pose strafe35Blue = new Pose(-56.3, 58, 2.36);//(-15.7, 58.4, 2.183);//convertToBlue(strafe35);
-    private static final Pose strafe36Blue = new Pose(-61.45, 45.22, 1.56);
+    private static final Pose strafe36Blue = new Pose(-61.45, 55, 1.56);
 
     //private static final Pose pickup4Blue = new Pose(-59, 60, 1.56);//convertToBlue(pickup4);
-    public static final Pose pickup4Blue = new Pose(-61.45, 58.8, 1.56);
+    public static final Pose pickup4Blue = new Pose(-61.45, 63, 1.56);
     private static final Pose strafe4Blue = convertToBlue(strafe4);
     private static final Pose pickup5Blue = convertToBlue(pickup5);
     private static final Pose moveBlue = new Pose(0, 30, 1.56);
@@ -290,8 +290,10 @@ public class TwelveBall {
 
     public static PathChain gate15Blue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierCurve(pickup2Blue, gateBlue))
-                .setLinearHeadingInterpolation(pickup2Blue.getHeading(), gateBlue.getHeading())
+                .addPath(new BezierCurve(pickup2Blue, strafeGateBlue))
+                .setLinearHeadingInterpolation(pickup2Blue.getHeading(), strafeGateBlue.getHeading())
+                .addPath(new BezierCurve(strafeGateBlue, gateBlue))
+                .setLinearHeadingInterpolation(strafeGateBlue.getHeading(), gateBlue.getHeading())
                 .build();
     }
 
