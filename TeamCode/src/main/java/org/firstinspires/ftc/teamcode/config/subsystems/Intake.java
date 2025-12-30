@@ -151,6 +151,7 @@ public class Intake extends SubsystemBase {
         }
 
         telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("Uptake amps", uptake.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("Intake state", currentIntake);
         telemetry.addData("Uptake state", currentUptake);
     }

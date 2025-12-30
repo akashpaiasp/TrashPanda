@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
@@ -228,6 +229,7 @@ public class Launcher extends SubsystemBase {
         telemetry.addData("Current Velocity", current_velocity);
         telemetry.addData("Done", controller.done);
         telemetry.addData("Num Done", numDone);
+        telemetry.addData("Current", launcher1.getCurrent(CurrentUnit.AMPS));
 
 
     }

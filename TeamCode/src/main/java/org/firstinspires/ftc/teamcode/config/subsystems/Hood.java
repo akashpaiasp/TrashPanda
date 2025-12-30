@@ -18,14 +18,15 @@ such as a claw or a lift.
 
 public class Hood extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
+    //efficiency - 0.809
     private MultipleTelemetry telemetry;
 
     //state of the subsystem
     public Servo hood;
-    public static double hoodDown = 0.5;
+    public static double hoodDown = 0.5; //23.9
     public double hoodMid = 0.625;
-    public double hoodMidUp = 0.75;
-    public static double hoodUp = 0.9;
+    public double hoodMidUp = 0.75; //64(hoodPos-0.5) + 23.9 //6.4
+    public static double hoodUp = 0.9; //49.5
     public static double target = 0.0;
     public static double hoodIncreaseAmt = 0.02;
     public static double autoHoodShoot1 = 0.9;
@@ -111,6 +112,7 @@ public class Hood extends SubsystemBase {
         return target;
     }
     public void setTarget(double t) {
+        setState(HoodState.MANUAL);
         target = Range.clip(t, hoodDown, hoodUp);
     }
 }

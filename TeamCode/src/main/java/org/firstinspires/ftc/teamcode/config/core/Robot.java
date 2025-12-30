@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.config.commands.*;
 import org.firstinspires.ftc.teamcode.config.core.paths.AutoDriving;
 import org.firstinspires.ftc.teamcode.config.core.util.*;
+import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
 import org.firstinspires.ftc.teamcode.config.util.PoseEkf;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
@@ -36,14 +37,24 @@ public class Robot {
     private Opmode op = TELEOP;
     private double speed = 1.0;
     public static double turretOffset = 3.8;
+    public static double r = 1;
+    public static boolean showTelemetry = true;
 
-    public AutoDriving autoDriving;
-    public static Pose p = new Pose(turretOffset, 0, Math.toRadians(90));
+
+    public AutoDriving b;
+    //90 - x : -3.8, y : 0
+    //0 - x : 0, y : -3.8
+    //-90 - x : -3.8, y : 0
+    //180 - x : 0, y : 3.8
+    public static Pose p = new Pose(0, 0, Math.toRadians(90));
+
     public static Pose autoEndPose = p.copy();
     public Launcher launcher;
     public Turret turret;
     public Hood hood;
     public MyLED led;
+
+    public KinematicsCalculator k;
     public boolean slowMode;
     public Limelight limelight;
     public DriveTrain driveTrain;
@@ -51,14 +62,22 @@ public class Robot {
     public boolean robotCentric = false;
     public static Alliance alliance = Alliance.RED;
 
-    public static double redX = 72;
-    public static double blueX = -72;
 
-    public static double goalY = 72;
 
-    double centerX = 72, centerY = 72;
-    double rightWallX = 65, rightWallY = 72;  // right wall center
-    double frontWallX = 72, frontWallY = 65;
+    public static double centerX = 67, centerY = 67;
+    public static double centerX2 = 67, centerY2 = 67;
+    public static double goalY = centerY;
+    public static double redX = centerX;
+    public static double blueX = -80;
+
+    public static boolean manualR = false;
+
+
+
+
+    //double centerX = redX, centerY = goalY;
+    double rightWallX = centerX - 7, rightWallY = centerY;  // right wall center
+    double frontWallX = centerX, frontWallY = centerY - 7;
 
     double centerXBlue = 72,
      rightWallXBlue = 65,
@@ -85,10 +104,12 @@ public class Robot {
     public boolean justShot = false;
 
     public int shotNum = -1;
-    public Hood.HoodState lastHood;// = Hood.HoodState.DOWN;
-    public double lastHoodTarget;// = hood.hoodDown;
     public boolean rBumper = false;
     public boolean outtake = true;
+    public boolean validLaunch = false;
+    public double turretX, turretY;
+    public static double flightTime = 0.31;
+    int i = 3;
 
 
 
@@ -151,23 +172,34 @@ public class Robot {
         turret.spin.partial_rotations = 0;
         turret.spin.full_rotations = 0;
         Logger.first = true;
+
+        k = new KinematicsCalculator(getDistanceFromGoal());
+
     }
 
     //Teleop Controls here
     public void dualControls(GamepadEx g1, GamepadEx g2) {
         //Buttons
+        g1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(() -> {
+            showTelemetry = !showTelemetry;
+        }));
 
-
-        g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(new InstantCommand(() -> {
+        (g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).or(g1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER))).whenActive(new InstantCommand(() -> {
             //launcher.setLauncherState(Launcher.LauncherState.SHOOT);
             //if (launcher.controller.done) {
-                intakeOff = false;
-                uptakeOff = false;
-                if (!rBumper)
-                    timer.reset();
-                rBumper = true;
-                intake.setUptakeState(Intake.UptakeState.ON);
-                intake.setIntakeState(Intake.IntakeState.INTAKE);
+                if (validLaunch) {
+                    intake.setUptakeState(Intake.UptakeState.ON);
+                    intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    intakeOff = false;
+                    uptakeOff = false;
+                }
+                else {
+                    intake.setUptakeState(Intake.UptakeState.OFF);
+                    intake.setIntakeState(Intake.IntakeState.OFF);
+                    intakeOff = true;
+                    uptakeOff = true;
+                }
+
 
 
 
@@ -181,25 +213,17 @@ public class Robot {
 
              */
             launcherOff = false;
-            intakeOff = false;
-            uptakeOff = false;
 
 
         }));
-        g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenInactive(new InstantCommand(() -> {
+        (g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).and(g1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER))).whenInactive(new InstantCommand(() -> {
             launcherOff = true;
             intakeOff = true;
             uptakeOff = true;
             rBumper = false;
-            /*
-            if (shotNum >= 0) {
-                hood.setState(lastHood);
-                hood.setTarget(lastHoodTarget);
-                shotNum = -1;
-            } */
         }));
 
-        g1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new Fire3(this));
+        //g1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new Fire3(this));
 
         /*
         g1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).and(g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)).negate().whenActive(new InstantCommand(() -> {
@@ -282,18 +306,21 @@ public class Robot {
     }
 
     public void aPeriodic() {
-        telemetry.addData("path", follower.getCurrentPath());
+        //telemetry.addData("path", follower.getCurrentPath());
+        updateGoalCoords();
+        updateRobotCoords();
+        updateShooting();
         follower.update();
-        telemetry.update();
+        //telemetry.update();
         turret.periodic();
         launcher.periodic();
         intake.periodic();
         hood.periodic();
         //autoEndPose = follower.getPose().copy();
         if (alliance == Alliance.RED)
-            autoEndPose = new Pose(-follower.getPose().getY() + turretOffset, follower.getPose().getX(), follower.getHeading() + Math.toRadians(90));
+            autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(), follower.getHeading());
         else
-            autoEndPose = new Pose(follower.getPose().getY() + turretOffset, follower.getPose().getX(),  follower.getHeading() - Math.toRadians(90));
+            autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(),  follower.getHeading() - Math.toRadians(90));
         if (logData) log();
     }
 
@@ -307,8 +334,10 @@ public class Robot {
 
     public void tPeriodic() {
         updateGoalCoords();
+        updateRobotCoords();
         follower.update();
-        telemetry.update();
+        if (showTelemetry)
+            telemetry.update();
         if (logData) log();
 
         //turret.periodic();
@@ -456,6 +485,30 @@ public class Robot {
     }
 
     public void updateShooting() {
+        double d = getDistanceFromGoal();
+        if (!manualR) {
+            if(d > 100) r = 1.1;
+            else r = 0.85;
+        }
+        k.setDistance(d * r);
+        Launcher.tele_target = k.getRPM();
+        Launcher.auto_target = k.getRPM();
+        double hoodPos = k.getHood(launcher.current_velocity);
+        if (hoodPos > 0) {
+            validLaunch = true;
+            hood.setTarget(hoodPos);
+        }
+        else {
+            validLaunch = false;
+        }
+
+
+
+
+
+
+        //Old shooting code
+        /*
         if (getDistanceFromGoal() > farLaunchDist) {
             Launcher.tele_target = 5200;
             Hood.hoodIncreaseAmt = 0;
@@ -471,6 +524,7 @@ public class Robot {
             Hood.hoodIncreaseAmt = 0;
             hood.setTarget(Hood.hoodDown);
         }
+        */
 
     }
 
@@ -488,17 +542,29 @@ public class Robot {
         }
     }
 
+    public void updateRobotCoords() {
+        turretX = follower.getPose().getX() - turretOffset * Math.sin(follower.getPose().getHeading());
+        turretY = follower.getPose().getY() - turretOffset * Math.cos(follower.getPose().getHeading());
+    }
+
     public double getDistanceFromGoal() {
+        rightWallX = centerX - 7;
+        rightWallY = centerY;  // right wall center
+        frontWallX = centerX;
+        frontWallY = centerY - 7;
+        goalY = centerY;
+        double vx = follower.getVelocity().getXComponent();
+        double vy = follower.getVelocity().getYComponent();
         if (alliance == Alliance.RED) {
-            double goalX = redX;
-            double dx = goalX - follower.getPose().getX();
-            double dy = goalY - follower.getPose().getY();
+            double goalX = centerX;
+            double dx = goalX - turretX - vx * flightTime;
+            double dy = goalY - turretY - vx * flightTime;
             return Math.sqrt(dx * dx + dy * dy);
         }
         else  {
-            double goalX = redX;
-            double dx = goalX - follower.getPose().getX();
-            double dy = -goalY - follower.getPose().getY();
+            double goalX = centerX;
+            double dx = goalX - turretX - vx * flightTime;
+            double dy = -goalY - turretY - vx * flightTime;
             return Math.sqrt(dx * dx + dy * dy);
         }
     }
@@ -514,8 +580,8 @@ public class Robot {
                 t = 1.0 - (dist / maxDist);
                 t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(centerX, frontWallX, t);
-                goalY = lerp(centerY, frontWallY, t);
+                redX = lerp(centerX, centerX2, t);
+                goalY = lerp(centerY, centerY2, t);
 
             } else {
                 // --- RIGHT SIDE OF DIAGONAL → use distance from RIGHT edge (x=72)
@@ -523,8 +589,8 @@ public class Robot {
                 t = 1.0 - (dist / maxDist);
                 t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(centerX, rightWallX, t);
-                goalY = lerp(centerY, rightWallY, t);
+                redX = lerp(centerX, centerX2, t);
+                goalY = lerp(centerY, centerX2, t);
             }
         /*}
         else {

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.config.commands.*;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
+import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
 import org.firstinspires.ftc.teamcode.config.util.logging.CSVInterface;
 import org.firstinspires.ftc.teamcode.config.subsystems.*;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
@@ -89,7 +90,7 @@ public class TelePOP extends LinearOpMode {
             }
 
 
-            if(!gamepad1.right_bumper && ! (gamepad1.right_trigger > 0.3) && ! (gamepad1.left_trigger > 0.3) && !gamepad1.square) {
+            if(!gamepad1.left_bumper && !gamepad1.right_bumper && ! (gamepad1.right_trigger > 0.3) && ! (gamepad1.left_trigger > 0.3) && !gamepad1.square) {
                 robot.intakeOff = true;
                 robot.uptakeOff = true;
             }
@@ -113,7 +114,7 @@ public class TelePOP extends LinearOpMode {
             }
             //}
 
-            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper) {
+            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper) {
                 robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
                 robot.intake.setGateState(Intake.GateState.OPEN);
             }
@@ -121,7 +122,9 @@ public class TelePOP extends LinearOpMode {
                 robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
             }
 
-            if (!robot.shotFired && robot.launcher.shotDetected) {
+
+            //old hood logic
+            /*if (!robot.shotFired && robot.launcher.shotDetected) {
                 robot.shotFired = true;
                 if (gamepad2.right_bumper) {
                     robot.shotNum++;
@@ -136,7 +139,7 @@ public class TelePOP extends LinearOpMode {
                     robot.lastHoodTarget = robot.hood.getTarget();
                 }
 
-            }
+            } */
             //Runs all gamepad triggers
             CommandScheduler.getInstance().run();
 
@@ -207,6 +210,8 @@ public class TelePOP extends LinearOpMode {
                 robot.driveTrain.rf.setPower(rightFrontPower * scaleFactor);
                 robot.driveTrain.lr.setPower(leftBackPower * scaleFactor);
                 robot.driveTrain.rr.setPower(rightBackPower * scaleFactor); */
+            telemetry.addData("turret x" , robot.turretX);
+            telemetry.addData("turret y" , robot.turretY);
             telemetry.addData("x" , robot.getFollower().getPose().getX());
             telemetry.addData("y" , robot.getFollower().getPose().getY());
             telemetry.addData("heading" , robot.getFollower().getPose().getHeading());

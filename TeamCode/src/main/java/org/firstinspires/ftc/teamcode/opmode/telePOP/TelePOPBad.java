@@ -102,22 +102,8 @@ public class TelePOPBad extends LinearOpMode {
                 robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
             }
 
-            if (!robot.shotFired && robot.launcher.shotDetected) {
-                robot.shotFired = true;
-                if (gamepad2.right_bumper) {
-                    robot.shotNum++;
-                    robot.hood.decreaseSmall();
-                }
 
-            }
-            else if (!robot.launcher.shotDetected) {
-                robot.shotFired = false;
-                if (robot.shotNum == -1) {
-                    robot.lastHood = robot.hood.getState();
-                    robot.lastHoodTarget = robot.hood.getTarget();
-                }
 
-            }
             //Runs all gamepad triggers
             CommandScheduler.getInstance().run();
 

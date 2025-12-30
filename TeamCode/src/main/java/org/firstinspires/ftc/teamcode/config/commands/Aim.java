@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.commands;
 
+import static org.firstinspires.ftc.teamcode.config.core.Robot.flightTime;
+
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
@@ -11,7 +13,7 @@ public class Aim extends CommandBase {
     private double targetX;
     private double targetY;
     public static double fudgeFactor = 0;
-    public static double flightTime = 0.5;
+
 
     private static final double MIN_ANGLE = -90; // turret left limit
     private static final double MAX_ANGLE = 90;  // turret right limit
@@ -35,14 +37,14 @@ public class Aim extends CommandBase {
         double dx;
         double dy;
         if (Robot.alliance == Alliance.RED) {
-            dx = targetX - r.getFollower().getPose().getX() - vx * flightTime;
-            dy = targetY - r.getFollower().getPose().getY() - vy * flightTime;
+            dx = targetX - r.getFollower().getPose().getX();
+            dy = targetY - r.getFollower().getPose().getY();
         }
         else {
-            dx = -(targetX - r.getFollower().getPose().getX() - vx * flightTime);
-            dy = targetY + r.getFollower().getPose().getY() - vy * flightTime;
+            dx = -(targetX - r.getFollower().getPose().getX());
+            dy = targetY + r.getFollower().getPose().getY();
         }
-        double robotHeading = Math.toDegrees(r.getAlliance() == Alliance.RED ? r.getFollower().getPose().getHeading() - flightTime * va: r.getFollower().getPose().getHeading() + Math.toRadians(180) + flightTime * va);
+        double robotHeading = Math.toDegrees(r.getAlliance() == Alliance.RED ? r.getFollower().getPose().getHeading(): r.getFollower().getPose().getHeading() + Math.toRadians(180));
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
 
