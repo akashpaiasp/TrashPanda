@@ -167,4 +167,8 @@ public class Intake extends SubsystemBase {
     public void log(){
         Logger.logData(LogType.INTAKE_POWER, String.valueOf(intake.getPower()));
     }
+
+    public UptakeState getUptakeState() {
+        return currentUptake;
+    }
 }

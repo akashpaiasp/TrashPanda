@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.opmode.telePOP;
 
 import static org.firstinspires.ftc.teamcode.config.core.Robot.*;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -20,6 +22,7 @@ import org.firstinspires.ftc.teamcode.config.util.Timer;
 @TeleOp (name = "TelePOP")
 
 public class TelePOP extends LinearOpMode {
+    //private MultipleTelemetry telemetry;
     private Robot robot;
     private GamepadEx g1;
     private GamepadEx g2;
@@ -34,8 +37,11 @@ public class TelePOP extends LinearOpMode {
 
         CommandScheduler.getInstance().reset();
 
+        //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         //Initialize Hardware
         robot = new Robot(hardwareMap, telemetry, Robot.alliance, autoEndPose);
+        robot.getFollower().setStartingPose(p);
         Robot.auto = false;
         robot.launcher.teleop = true;
 
@@ -60,20 +66,24 @@ public class TelePOP extends LinearOpMode {
             telemetry.addData("Loop Time", currentTime - lastTime);
             telemetry.addData("Distance From Goal", robot.getDistanceFromGoal());
             telemetry.addData("Shot Num", robot.shotNum);
-            telemetry.addData("xVel", robot.getFollower().getVelocity().getXComponent());
-            telemetry.addData("yVel", robot.getFollower().getVelocity().getYComponent());
-            telemetry.addData("xVel", robot.getFollower().getAngularVelocity());
+            telemetry.addData("Intake Done", robot.intakeDone());
 
             //Update everything
             robot.tPeriodic();
 
 
             if (gamepad1.right_trigger > 0.3) {
-                robot.uptakeOff = false;
                 robot.intakeOff = false;
                 robot.intake.setGateState(Intake.GateState.CLOSED);
                 robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                if (!robot.intakeDone()) {
+                    robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                    robot.uptakeOff = false;
+                }
+                else {
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    robot.uptakeOff = true;
+                }
             }
             else if (gamepad1.left_trigger > 0.3) {
                 //robot.uptakeOff = true;
@@ -102,7 +112,7 @@ public class TelePOP extends LinearOpMode {
                 robot.outtake = false;
             }
             if (useTurret)
-                new Aim(robot, alliance == Alliance.RED ? redX : redX, alliance == Alliance.RED ? goalY : goalY).execute();
+                new Aim(robot, alliance == Alliance.RED ? redX : blueX, goalY).execute();
             else
                 robot.turret.setTargetDegrees(0);
             if (gamepad1.circle && !pressingC) {
@@ -121,6 +131,8 @@ public class TelePOP extends LinearOpMode {
             else {
                 robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
             }
+
+                robot.shotStarted = gamepad1.left_bumper || gamepad2.right_bumper;
 
 
             //old hood logic
@@ -152,7 +164,8 @@ public class TelePOP extends LinearOpMode {
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
-                    robot.robotCentric
+                    robot.robotCentric,
+                    robot.getAlliance() == Alliance.RED ? 0 : Math.PI
             );
             // } else {
             // robot.getFollower().setTeleOpDrive(0, 0, 0, 0);

@@ -3,11 +3,15 @@ package org.firstinspires.ftc.teamcode.config.util;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.subsystems.Hood;
+import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
 import org.opencv.core.Mat;
 @Config
 public class KinematicsCalculator {
     public static final double y_exit_in = 13.528;          // shooter exit height
+    public static  double targetAuto = 35;
+    public static  double targetTele = 33;
     public static  double y_target_in = 33;          // goal height
     public static final double d_flywheel_in = 2.835;       // flywheel diameter
     public static final double r_flywheel_in = d_flywheel_in / 2.0;
@@ -57,14 +61,15 @@ public class KinematicsCalculator {
                     (2.0 * Math.pow(Math.cos(thetaRad2), 2.0) *
                             (distance * Math.tan(thetaRad2) + y_exit_m - y_target_m))
             );
-            if (distance > inchesToMeters(35))
+            if (distance > inchesToMeters(25))
                 vel = Math.max(vel1, vel2);
             else
-                vel = rpmToVel(3100);
+                vel = rpmToVel(3000);
             return velToRpm(vel);
         }
 
     public double getHood(double currentRPM) {
+        if (distance < inchesToMeters(25)) return Hood.hoodDown;
         double v0 = rpmToVel(currentRPM);
 
         // Quadratic coefficients in tan(theta)

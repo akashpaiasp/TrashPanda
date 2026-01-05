@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.commands;
 
 import static org.firstinspires.ftc.teamcode.config.core.Robot.flightTime;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.processNoiseHeading;
 
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.CommandBase;
@@ -36,15 +37,12 @@ public class Aim extends CommandBase {
 
         double dx;
         double dy;
-        if (Robot.alliance == Alliance.RED) {
-            dx = targetX - r.getFollower().getPose().getX();
-            dy = targetY - r.getFollower().getPose().getY();
-        }
-        else {
-            dx = -(targetX - r.getFollower().getPose().getX());
-            dy = targetY + r.getFollower().getPose().getY();
-        }
-        double robotHeading = Math.toDegrees(r.getAlliance() == Alliance.RED ? r.getFollower().getPose().getHeading(): r.getFollower().getPose().getHeading() + Math.toRadians(180));
+
+        double x = r.turretX;
+        double y = r.turretY;
+        dx = targetX - x;
+        dy = targetY - y;
+        double robotHeading = Math.toDegrees(r.getFollower().getHeading());
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
 

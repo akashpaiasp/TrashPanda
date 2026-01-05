@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.config.core;
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.seattlesolvers.solverslib.command.InstantCommand;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.config.commands.*;
 import org.firstinspires.ftc.teamcode.config.core.paths.AutoDriving;
@@ -32,6 +34,7 @@ import java.util.List;
 @Config
 public class Robot {
     private HardwareMap hw;
+    //private MultipleTelemetry telemetry;
     private Telemetry telemetry;
     private Follower follower;
     private Opmode op = TELEOP;
@@ -41,7 +44,7 @@ public class Robot {
     public static boolean showTelemetry = true;
 
 
-    public AutoDriving b;
+    public AutoDriving autoDrive;
     //90 - x : -3.8, y : 0
     //0 - x : 0, y : -3.8
     //-90 - x : -3.8, y : 0
@@ -68,9 +71,12 @@ public class Robot {
     public static double centerX2 = 67, centerY2 = 67;
     public static double goalY = centerY;
     public static double redX = centerX;
-    public static double blueX = -80;
+    public static double blueX = -centerX;
 
     public static boolean manualR = false;
+    public static boolean manualRPM = false;
+    public boolean shotStarted = false;
+    public static Pose shootPose;
 
 
 
@@ -108,7 +114,7 @@ public class Robot {
     public boolean outtake = true;
     public boolean validLaunch = false;
     public double turretX, turretY;
-    public static double flightTime = 0.31;
+    public static double flightTime = .5;
     int i = 3;
 
 
@@ -127,7 +133,9 @@ public class Robot {
 
     public double now = 0.0, last = 0.0, dt = 0.0;
 
-    public Robot(HardwareMap hw, Telemetry telemetry, Alliance alliance, Pose startPose) {
+    /*
+
+    public Robot(HardwareMap hw, MultipleTelemetry telemetry, Alliance alliance, Pose startPose) {
         List<LynxModule> allHubs = hw.getAll(LynxModule.class);
 
         for (LynxModule hub : allHubs) {
@@ -162,6 +170,59 @@ public class Robot {
         driveTrain = new DriveTrain(hw, telemetry);
         intake = new Intake(hw, telemetry);
         led = new MyLED(hw, telemetry);
+        //limelight = new Limelight(hw, telemetry);
+        //limelight.update();
+
+        //aInitLoop = false;
+        // telemetry.addData("Start Pose", p);
+        init();
+        turret.spin.numRotations = 0;
+        turret.spin.partial_rotations = 0;
+        turret.spin.full_rotations = 0;
+        Logger.first = true;
+
+        k = new KinematicsCalculator(getDistanceFromGoal());
+
+    } */
+
+    public Robot(HardwareMap hw, Telemetry telemetry, Alliance alliance, Pose startPose) {
+        List<LynxModule> allHubs = hw.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
+
+        this.op = AUTONOMOUS;
+        this.hw = hw;
+        this.telemetry = telemetry;
+        Robot.alliance = alliance;
+        p = startPose.copy();
+
+
+        follower = Constants.createFollower(hw);
+
+        //follower.setStartingPose(startPose);
+        follower.update();
+
+
+        timer.reset();
+
+
+        ekf = new PoseEkf(
+                p.getX(), p.getY(),
+                processNoiseXY, processNoiseHeading,
+                visionNoiseXY, visionNoiseHeading
+        );
+
+        launcher = new Launcher(hw, telemetry);
+        turret = new Turret(hw, telemetry);
+        hood = new Hood(hw, telemetry);
+        driveTrain = new DriveTrain(hw, telemetry);
+        intake = new Intake(hw, telemetry);
+        led = new MyLED(hw, telemetry);
+
+        autoDrive = new AutoDriving(follower, telemetry);
         //limelight = new Limelight(hw, telemetry);
         //limelight.update();
 
@@ -283,6 +344,9 @@ public class Robot {
         g2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
             hood.decrease();
         }));
+        g1.getGamepadButton(GamepadKeys.Button.X).whenPressed(new InstantCommand(() -> {
+            autoDrive.toGate();
+        }));
 
 
 
@@ -311,22 +375,19 @@ public class Robot {
         updateRobotCoords();
         updateShooting();
         follower.update();
-        //telemetry.update();
-        turret.periodic();
-        launcher.periodic();
-        intake.periodic();
-        hood.periodic();
         //autoEndPose = follower.getPose().copy();
         if (alliance == Alliance.RED)
             autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(), follower.getHeading());
         else
-            autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(),  follower.getHeading() - Math.toRadians(90));
+            autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(),  follower.getHeading());
         if (logData) log();
+        telemetry.update();
     }
 
     public void aInitLoop(GamepadEx g1) {
         telemetry.addData("Alliance", alliance);
         telemetry.update();
+        follower.update();
         g1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(() -> {
             alliance = Alliance.BLUE;
         }));
@@ -336,6 +397,7 @@ public class Robot {
         updateGoalCoords();
         updateRobotCoords();
         follower.update();
+        autoDrive.update();
         if (showTelemetry)
             telemetry.update();
         if (logData) log();
@@ -389,7 +451,7 @@ public class Robot {
             setAlliance(Alliance.RED);
         else
             setAlliance(Alliance.BLUE);
-        follower.setPose(new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getPose().getHeading() + Math.toRadians(180)));
+        //follower.setPose(new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getPose().getHeading() + Math.toRadians(180)));
     }
 
     public void resetPose() {
@@ -485,22 +547,39 @@ public class Robot {
     }
 
     public void updateShooting() {
-        double d = getDistanceFromGoal();
-        if (!manualR) {
-            if(d > 100) r = 1.1;
-            else r = 0.85;
-        }
-        k.setDistance(d * r);
-        Launcher.tele_target = k.getRPM();
-        Launcher.auto_target = k.getRPM();
-        double hoodPos = k.getHood(launcher.current_velocity);
-        if (hoodPos > 0) {
-            validLaunch = true;
-            hood.setTarget(hoodPos);
-        }
+        double d;
+        //if (launcher.teleop) {
+            KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
+            d = getDistanceFromGoal();
+
+            if (!manualR) {
+                r = .44;
+                /*if (d > 120) r = 1.1;
+                else if (d > 50) {
+                    r = 0.0001375 * d * d - 0.020225 * d + 1.56475;
+                } else r = .5; */
+            }
+            k.setDistance(d * r);
+            if (!manualRPM)
+                Launcher.tele_target = k.getRPM();
+        /*
+        else
+            Launcher.tele_target = Launcher.target_velocity; */
+            Launcher.auto_target = k.getRPM();
+            double hoodPos = k.getHood(launcher.current_velocity);
+            if (hoodPos > 0) {
+                validLaunch = true;
+                if (!shotStarted)
+                    hood.setTarget(hoodPos);
+            } else {
+                validLaunch = false;
+            }
+       // }
+        /*
         else {
-            validLaunch = false;
-        }
+            Launcher.auto_target = 4400;
+            hood.setTarget(.9);
+        } */
 
 
 
@@ -543,8 +622,8 @@ public class Robot {
     }
 
     public void updateRobotCoords() {
-        turretX = follower.getPose().getX() - turretOffset * Math.sin(follower.getPose().getHeading());
-        turretY = follower.getPose().getY() - turretOffset * Math.cos(follower.getPose().getHeading());
+        turretX = follower.getPose().getX() - turretOffset * Math.cos(follower.getPose().getHeading());
+        turretY = follower.getPose().getY() - turretOffset * Math.sin(follower.getPose().getHeading());
     }
 
     public double getDistanceFromGoal() {
@@ -553,18 +632,18 @@ public class Robot {
         frontWallX = centerX;
         frontWallY = centerY - 7;
         goalY = centerY;
-        double vx = follower.getVelocity().getXComponent();
-        double vy = follower.getVelocity().getYComponent();
+        double vx = 0;//follower.getVelocity().getXComponent();
+        double vy = 0;//follower.getVelocity().getYComponent();
         if (alliance == Alliance.RED) {
             double goalX = centerX;
             double dx = goalX - turretX - vx * flightTime;
-            double dy = goalY - turretY - vx * flightTime;
+            double dy = goalY - turretY - vy * flightTime;
             return Math.sqrt(dx * dx + dy * dy);
         }
         else  {
-            double goalX = centerX;
+            double goalX = blueX;
             double dx = goalX - turretX - vx * flightTime;
-            double dy = -goalY - turretY - vx * flightTime;
+            double dy = goalY - turretY - vx * flightTime;
             return Math.sqrt(dx * dx + dy * dy);
         }
     }
@@ -590,7 +669,7 @@ public class Robot {
                 t = Math.min(1.0, Math.max(0.0, t));
 
                 redX = lerp(centerX, centerX2, t);
-                goalY = lerp(centerY, centerX2, t);
+                goalY = lerp(centerY, centerY2, t);
             }
         /*}
         else {
@@ -631,6 +710,10 @@ public class Robot {
                 intakeOff = true;
             }
         }
+    }
+
+    public boolean intakeDone() {
+        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > 3 || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > 1.5;
     }
 
 
