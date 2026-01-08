@@ -31,16 +31,19 @@ public class EighteenBall extends OpMode {
     private int pathState;
     private Robot robot;
     int done = 0;
-    double onThreshold = .3;
+    boolean two = false;
+    double onThreshold = .5;
+    double onThresholdTwo = .5;
+
     double offThreshold = .2;
-    double moveThreshold = 2.5;
+    double moveThreshold = 3.5;
     double moveIntakeThreshold = 1.8;
     boolean doneOff = false;
     double doneNum = 0;
     double outtakeTIme = .15;
     double lastMoveTime = 5.2;
     double intakeTime = 2;
-    double checkTIme = .25;
+    double checkTIme = .31;
     int doneThreshold = 4;
     double dist;
     boolean time = false;
@@ -176,7 +179,7 @@ public class EighteenBall extends OpMode {
 
             case 1202:
                 doneNum = 0;
-                    robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                    //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? strafe1(robot.getFollower()) : strafe1Blue(robot.getFollower()), true);
@@ -194,12 +197,14 @@ public class EighteenBall extends OpMode {
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup1(robot.getFollower()) : pickup1Blue(robot.getFollower()));
+                    two = true;
                     setPathState(1204);
                 }
 
                 break;
             case 1204:
-                if (robot.getFollower().isBusy() && !intakeDone()){
+                robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+                if (robot.getFollower().isBusy() ){
                     pathTimer.reset();
                     return;
                 }
@@ -228,7 +233,7 @@ public class EighteenBall extends OpMode {
                 }
                 
 
-                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                if (pathTimer.getElapsedTimeSeconds() > onThresholdTwo) {
                     if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.ON); }
                     robot.shotStarted = true;
@@ -253,6 +258,7 @@ public class EighteenBall extends OpMode {
 
 
             case 12: {
+                two = false;
                 doneNum = 0;
                     robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
@@ -468,7 +474,7 @@ public class EighteenBall extends OpMode {
                */
             case 19:
                 aim1 = true;
-                if (robot.getFollower().isBusy()  && !intakeDone()){
+                if (robot.getFollower().isBusy()  ){
                     pathTimer.reset();
                     return;
                 }
@@ -547,7 +553,7 @@ public class EighteenBall extends OpMode {
 
 
             case 271:
-                if (robot.getFollower().isBusy() && !intakeDone()) {
+                if (robot.getFollower().isBusy() ) {
                     pathTimer.reset();
                     return;
                 }
@@ -681,8 +687,11 @@ public class EighteenBall extends OpMode {
             //pathTimer.reset();
             return false;
         }
-        if (pathTimer.getElapsedTimeSeconds() < checkTIme + onThreshold) return false;
-        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < 1 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 1.5)) {
+        if (!two)
+            if (pathTimer.getElapsedTimeSeconds() < checkTIme + onThreshold) return false;
+        else
+            if (pathTimer.getElapsedTimeSeconds() < checkTIme + onThresholdTwo) return false;
+        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < 1 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 3)) {
             aimTurret = false;
             return true;
         }

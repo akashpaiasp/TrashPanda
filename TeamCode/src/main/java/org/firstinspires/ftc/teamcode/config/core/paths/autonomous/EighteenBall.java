@@ -86,7 +86,7 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2, strafeGate))
                 .setLinearHeadingInterpolation(shootPose2.getHeading(), strafeGate.getHeading())
                 .addPath(new BezierLine(strafeGate, gate))
-                .setBrakingStart(.8)
+                .setBrakingStart(.67)
                 .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
                 .build();
     }

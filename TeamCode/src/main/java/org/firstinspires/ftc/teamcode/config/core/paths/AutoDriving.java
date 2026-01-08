@@ -20,13 +20,36 @@ public class AutoDriving {
         autoDrive = false;
     }
     //Define Poses
-    Pose point1 = new Pose(0, 0);
-    Pose point2 = new Pose(10, 10);
-
+    Pose shoot = new Pose(15, 17, .62);
+    Pose shootBlue = new Pose(-51, 17, .62 - Math.PI);
     //Run Paths
     public void toGate() {
         autoDrive = true;
         f.followPath(getGatePath());
+    }
+
+    public void toShoot() {
+        autoDrive = true;
+        f.followPath(getShootPath());
+    }
+
+
+    public PathChain getShootPath() {
+        Pose p = f.getPose();
+
+        if (Robot.alliance == Alliance.RED) {
+
+            return f.pathBuilder()
+                    .addPath(new BezierLine(p, shoot))
+                    .setLinearHeadingInterpolation(p.getHeading(), shoot.getHeading())
+                    .build();
+        }
+        else {
+            return f.pathBuilder()
+                    .addPath(new BezierLine(p, shootBlue))
+                    .setLinearHeadingInterpolation(p.getHeading(), shootBlue.getHeading())
+                    .build();
+        }
     }
 
 

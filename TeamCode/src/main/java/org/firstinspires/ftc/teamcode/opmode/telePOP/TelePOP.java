@@ -105,7 +105,7 @@ public class TelePOP extends LinearOpMode {
                 robot.uptakeOff = true;
             }
 
-            if (gamepad1.square) {
+            if (gamepad1.triangle) {
                 robot.outtake1();
             }
             else {
@@ -130,6 +130,40 @@ public class TelePOP extends LinearOpMode {
             }
             else {
                 robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+            }
+
+            if (robot.validLaunch) {
+                gamepad1.rumble(50);
+                gamepad2.rumble(50);
+            }
+
+            if (gamepad2.right_bumper || gamepad1.left_bumper) {
+                if (robot.getDistanceFromGoal() < 100) {
+                    robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intakeOff = false;
+                    robot.uptakeOff = false;
+                }
+                else {
+                    if (robot.validLaunch) {
+                        robot.intake.setUptakeState(Intake.UptakeState.ON);
+                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                        robot.intakeOff = false;
+                        robot.uptakeOff = false;
+                    }
+                    else {
+                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intakeOff = true;
+                        robot.uptakeOff = true;
+                    }
+                }
+                /*else {
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                    robot.intakeOff = true;
+                    robot.uptakeOff = true;
+                }*/
             }
 
                 robot.shotStarted = gamepad1.left_bumper || gamepad2.right_bumper;

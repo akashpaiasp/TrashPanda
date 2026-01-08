@@ -35,16 +35,16 @@ public class Launcher extends SubsystemBase {
     public PDFLController controller;
 
     //pdfl values tuned in FTC Dashboard
-    public static double p = 0.001;
-    public static double d = .001;
-    public static double f = 0.2;
+    public static double p = 0.007;
+    public static double d = 0.01;
+    public static double f = 0.13;
     public static double l = 0;
-    public static double i = 0.0001;
+    public static double i = 0.00035;
 
-    public static double p2 = 0.0005;
-    public static double d2 = d / 2.5;
-    public static double f2 = 0;
-    public static double l2 = 0.08;
+    public static double p2 = 0.007;
+    public static double d2 = 0.01;
+    public static double f2 = 0.13;
+    public static double l2 = 0;
     public static double i2 = 0;
 
 

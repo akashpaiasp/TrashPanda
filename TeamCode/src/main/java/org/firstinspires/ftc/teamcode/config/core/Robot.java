@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.config.core;
 
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
 
+import android.graphics.Interpolator;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.math.Vector;
@@ -12,6 +14,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.util.LUT;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -41,7 +44,7 @@ public class Robot {
     private double speed = 1.0;
     public static double turretOffset = 3.8;
     public static double r = 1;
-    public static boolean showTelemetry = true;
+    public static boolean showTelemetry = false;
 
 
     public AutoDriving autoDrive;
@@ -68,7 +71,7 @@ public class Robot {
 
 
     public static double centerX = 67, centerY = 67;
-    public static double centerX2 = 67, centerY2 = 67;
+    public static double centerX2 = centerX, centerY2 = centerY;
     public static double goalY = centerY;
     public static double redX = centerX;
     public static double blueX = -centerX;
@@ -245,7 +248,7 @@ public class Robot {
             showTelemetry = !showTelemetry;
         }));
 
-        (g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).or(g1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER))).whenActive(new InstantCommand(() -> {
+        /*(g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).or(g1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER))).whenActive(new InstantCommand(() -> {
             //launcher.setLauncherState(Launcher.LauncherState.SHOOT);
             //if (launcher.controller.done) {
                 if (validLaunch) {
@@ -272,11 +275,11 @@ public class Robot {
             //    led.setState(MyLED.State.YELLOW);
             //}
 
-             */
+
             launcherOff = false;
 
 
-        }));
+        })); */
         (g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).and(g1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER))).whenInactive(new InstantCommand(() -> {
             launcherOff = true;
             intakeOff = true;
@@ -344,8 +347,14 @@ public class Robot {
         g2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
             hood.decrease();
         }));
-        g1.getGamepadButton(GamepadKeys.Button.X).whenPressed(new InstantCommand(() -> {
+        g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             autoDrive.toGate();
+        }));
+        g1.getGamepadButton(GamepadKeys.Button.X).whenPressed(new InstantCommand(() -> {
+            autoDrive.toShoot();
+        }));
+        g1.getGamepadButton(GamepadKeys.Button.TRIANGLE).whenPressed(new InstantCommand(() -> {
+            autoDrive.off();
         }));
 
 
@@ -376,12 +385,10 @@ public class Robot {
         updateShooting();
         follower.update();
         //autoEndPose = follower.getPose().copy();
-        if (alliance == Alliance.RED)
-            autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(), follower.getHeading());
-        else
-            autoEndPose = new Pose(follower.getPose().getY(), follower.getPose().getX(),  follower.getHeading());
+        autoEndPose = new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
         if (logData) log();
-        telemetry.update();
+        if (showTelemetry)
+            telemetry.update();
     }
 
     public void aInitLoop(GamepadEx g1) {
@@ -553,12 +560,10 @@ public class Robot {
             d = getDistanceFromGoal();
 
             if (!manualR) {
-                r = .44;
-                /*if (d > 120) r = 1.1;
-                else if (d > 50) {
-                    r = 0.0001375 * d * d - 0.020225 * d + 1.56475;
-                } else r = .5; */
+                if (d > 120) r = .9;
+                else r = .64;
             }
+
             k.setDistance(d * r);
             if (!manualRPM)
                 Launcher.tele_target = k.getRPM();
@@ -569,8 +574,13 @@ public class Robot {
             double hoodPos = k.getHood(launcher.current_velocity);
             if (hoodPos > 0) {
                 validLaunch = true;
-                if (!shotStarted)
-                    hood.setTarget(hoodPos);
+                if (!shotStarted) {
+                    if (getDistanceFromGoal() < 100)
+                        hood.setTarget(hoodPos);
+                    else {
+                        hood.setTarget(Hood.hoodUp);
+                    }
+                }
             } else {
                 validLaunch = false;
             }
@@ -653,23 +663,30 @@ public class Robot {
         double robotY = follower.getPose().getY();
         double robotX = follower.getPose().getX();
         //if (alliance == Alliance.RED) {
-            if (robotY > robotX) {
-                // --- LEFT SIDE OF DIAGONAL → use distance from FRONT edge (y=72)
-                double dist = Math.abs(72 - robotY);  // 0 at edge, maxDist at diagonal
-                t = 1.0 - (dist / maxDist);
-                t = Math.min(1.0, Math.max(0.0, t));
+            if (getDistanceFromGoal() < 100) {
+                if (robotY > robotX) {
+                    // --- LEFT SIDE OF DIAGONAL → use distance from FRONT edge (y=72)
+                    double dist = Math.abs(72 - robotY);  // 0 at edge, maxDist at diagonal
+                    t = 1.0 - (dist / maxDist);
+                    t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(centerX, centerX2, t);
-                goalY = lerp(centerY, centerY2, t);
+                    redX = lerp(centerX, centerX2, t);
+                    goalY = lerp(centerY, centerY2, t);
 
-            } else {
-                // --- RIGHT SIDE OF DIAGONAL → use distance from RIGHT edge (x=72)
-                double dist = Math.abs(72 - robotX);  // same logic
-                t = 1.0 - (dist / maxDist);
-                t = Math.min(1.0, Math.max(0.0, t));
+                } else {
+                    // --- RIGHT SIDE OF DIAGONAL → use distance from RIGHT edge (x=72)
+                    double dist = Math.abs(72 - robotX);  // same logic
+                    t = 1.0 - (dist / maxDist);
+                    t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(centerX, centerX2, t);
-                goalY = lerp(centerY, centerY2, t);
+                    redX = lerp(centerX, centerX2, t);
+                    goalY = lerp(centerY, centerY2, t);
+                }
+            }
+            else {
+                redX = 72;
+                blueX = 72;
+                goalY = 72;
             }
         /*}
         else {
