@@ -1,5 +1,15 @@
+/**
+ * This config file stores all constants necessary for operation of the robot
+ * that use Pedro Pathing. This is used to create a Follower object that can easily
+ * be used to path the robot.
+ * Constants were either calculated or measured.
+ *
+ * @author Akash Pai - 506 Pandara
+ */
+
 package org.firstinspires.ftc.teamcode.config.pedro;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
@@ -14,6 +24,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+@Config
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(11.7)
