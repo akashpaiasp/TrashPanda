@@ -1,4 +1,10 @@
-//sample code so far for limelight 3A - stolen from samples
+/**
+ * This is a subsystem file for the Limelight camera. This gives telemetry functionality to
+ * the limelight, as well as additional access features, such as pipeline control.
+ *
+ * @author Akash Pai - 506 Pandara
+ * @author Alexander Wojtulewski - 506 Pandara
+ */
 
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
@@ -17,45 +23,52 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D; // ? needed ?
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-//subsystem of the limelight 3A
 public class Limelight extends SubsystemBase {
-    //for telemetry of the limelight
+    //Telemetry = text that is printed on the driver station while the robot is running
     private MultipleTelemetry telemetry;
 
-    //limelight class - should probably figure out whats inside
     private Limelight3A limelight;
 
-    public Limelight(HardwareMap hardwareMap, Telemetry telemetry) {
-        //links to limelight - need to make sure it connect properly
-        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+    //stores result of limelight
+    private LLResult result;
 
+    public Limelight(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         limelight = hardwareMap.get(Limelight3A.class, "ll");
 
-        //default pipeline - can be changed later
+        //default pipeline
+        //8 = red goal, 7 = obeselisque, 6 = blue goal
         setPipeline(8);
 
-        //8 = red goal, 7 = obeselisque, 6 = blue goal
-
-        //I think this is the best place to put this function.
         limelight.start();
     }
 
-    private LLResult result;
-
+    /**
+     * Starts the Limelight if it is stopped
+     */
     public void startLimelight() {
         limelight.start();
     }
 
+    /**
+     * Stops limelight camera
+     */
     public void stopLimelight() {
         limelight.stop();
     }
 
-    //pipelines define a current mode for the limelight; example: AprilTags / Color Tracking - coded externally on
-    // the Web interface - I need to do more research but this is the gist
+    /**
+     * Pipelines define a current mode for the limelight; example: AprilTags / Color Tracking - coded
+     * externally on the Web interface.
+     * This function changes the pipeline mode of the limelight camera
+     *
+     * @param pipelineIndex - Index of Limelight pipeline
+     */
     public void setPipeline(int pipelineIndex) {
         limelight.pipelineSwitch(pipelineIndex);
     }
 
+    @Override
     public void periodic() {
         /*
         updateTelemetry();
@@ -66,7 +79,10 @@ public class Limelight extends SubsystemBase {
         return result.getCaptureLatency() + result.getTargetingLatency();
     }
 
-    //bascially copied code
+    /**
+     * Updates all telemetry values of the limelight for testing and fetches limelight
+     * result and status.
+     */
     public void updateTelemetry() {
         LLStatus status = limelight.getStatus();
         telemetry.addData("Name", "%s",
@@ -98,19 +114,26 @@ public class Limelight extends SubsystemBase {
         //telemetry.update();
     }
 
-
-    //update limelight based off of imu heading, makes 3d localization more accurate.
+    /**
+     * Updates the limelight's state to receive the most recent result. This update is
+     * based on the IMU heading, which makes 3d localization more accurate.
+     */
     public void update() {
         result = limelight.getLatestResult();
     }
 
+    /**
+     * @return current limelight data (May need to be manually updated)
+     */
     public LLResult getResult() {
         return result;
     }
 
+    /**
+     * @return Bot pose based on the limelight's algorithm using the internal 3d map
+     */
     public Pose3D botPose() {
         return result.getBotpose_MT2();
     }
-
 
 }
