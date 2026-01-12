@@ -1,3 +1,10 @@
+/**
+ * This is a subsystem file for the LED light that illuminates on the back of the robot.
+ *
+ * @author Akash Pai - 506 Pandara
+ * @InMaintaince - Currently not used, but potentially future use
+ */
+
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -8,25 +15,19 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-
-/*Sample subsystem class. Subsystems are anything on the robot that is not the drive train
-such as a claw or a lift.
-*/
 public class MyLED extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     private MultipleTelemetry telemetry;
 
-    //state of the subsystem
+    //possible states of subsystem
     public enum State {
         RED,
         GREEN,
         YELLOW,
         OFF
-
-
     }
     private State currentState = State.OFF;
-
+    //LEDs on the robot
     private LED red, green;
 
     public MyLED(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -63,17 +64,19 @@ public class MyLED extends SubsystemBase {
         }
     }
 
+    /**
+     *
+     * @return State of LED (Red, Green, or Off)
+     */
     public State getState() {
         return currentState;
     }
 
-    //methods to change the state
-
-    /*Periodic method gets run in a loop during auto and teleop.
-    The telemetry gets updated constantly so you can see the status of the subsystems */
+    /**
+     * Periodic method gets run in a loop during auto and teleop. The telemetry is updated
+     * constantly so you can see the status of the subsystems
+     **/
     public void periodic() {
         telemetry.addData("LED", getState());
-
-
     }
 }

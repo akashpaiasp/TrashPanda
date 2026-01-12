@@ -63,7 +63,6 @@ public class Robot {
     public KinematicsCalculator k;
     public boolean slowMode;
     public Limelight limelight;
-    public DriveTrain driveTrain;
     public Intake intake;
     public boolean robotCentric = false;
     public static Alliance alliance = Alliance.RED;
@@ -221,7 +220,6 @@ public class Robot {
         launcher = new Launcher(hw, telemetry);
         turret = new Turret(hw, telemetry);
         hood = new Hood(hw, telemetry);
-        driveTrain = new DriveTrain(hw, telemetry);
         intake = new Intake(hw, telemetry);
         led = new MyLED(hw, telemetry);
 
