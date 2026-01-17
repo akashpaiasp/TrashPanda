@@ -83,7 +83,7 @@ public class Launcher extends SubsystemBase {
 
     private boolean inBoost = false;
     private boolean inAggressive = false;
-    public boolean teleop = false;
+    public static boolean teleop = false;
 
 
 
@@ -116,8 +116,6 @@ public class Launcher extends SubsystemBase {
         controller.reset();
         timer.reset();
     }
-
-    //Call this method to open/close the servos
 
     /*Periodic method gets run in a loop during auto and teleop.
     The telemetry gets updated constantly so you can see the status of the subsystems */
@@ -218,10 +216,6 @@ public class Launcher extends SubsystemBase {
             launcher2.setPower(0);
         }
             updateShooter();
-
-
-
-        // Clamp power between -1 and 1
 
 
 

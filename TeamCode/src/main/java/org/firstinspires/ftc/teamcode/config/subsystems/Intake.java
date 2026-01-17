@@ -14,9 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 
-/*Subsystem class. Subsystems are anything on the robot that is not the drive train
-such as a claw or a lift.
-*/
+
 @Config
 public class Intake extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running

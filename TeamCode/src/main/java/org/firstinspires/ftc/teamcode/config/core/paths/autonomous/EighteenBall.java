@@ -17,16 +17,18 @@ public class EighteenBall {
 
     private static final Pose shootPose = new Pose(12, 12, 0);
     public static final Pose shootPose2 = new Pose(16, 5, Math.toRadians(-15));
+    public static final Pose shootPose3 = new Pose(11, 5, Math.toRadians(-15));
     private static final Pose moveToShoot = new Pose(24, 0, Math.toRadians(0));
     private static final Pose strafe1 = new Pose(30, -11.7, 0);
     private static final Pose pickup2 = new Pose(50, -11.7, 0); //second spike mark
     private static final Pose pickup1 = new Pose(50, 12, 0); //first spike mark
 
     public static final Pose strafeGate = new Pose(40, -10, 0.59);
-    public static final Pose gate = new Pose(60, -12.5, 0.6487);
+    public static final Pose gate = new Pose(58, -11.4, 0.6487);
+    public static final Pose gateBlue = new Pose(-59, -10, 2.55);
     private static final Pose strafe2 = new Pose(30, -36, 0);
     private static final Pose pickup3 = new Pose(53, -36, 0);
-    private static final Pose move = new Pose(24, 0, 0.77);
+    private static final Pose move = new Pose(24, 0, shootPose3.getHeading());
 
     // Blue Poses
     public static final Pose startPoseBlue = convertToBlue(startPose);//new Pose(49.6, 49.9, 0.77);
@@ -38,7 +40,7 @@ public class EighteenBall {
     private static final Pose pickup2Blue = convertToBlue(pickup2);//new Pose(50, -11.7, 0); //second spike mark
     private static final Pose pickup1Blue = convertToBlue(pickup1);//new Pose(50, 12, 0); //first spike mark
     public static final Pose strafeGateBlue = convertToBlue(strafeGate);//new Pose(40, -10, 0.59);
-    public static final Pose gateBlue = convertToBlue(gate);//new Pose(60, -12.5, 0.6487);
+    //public static final Pose gateBlue = convertToBlue(gate);//new Pose(60, -12.5, 0.6487);
     private static final Pose strafe2Blue = convertToBlue(strafe2);//new Pose(30, -36, 0);
     private static final Pose pickup3Blue = convertToBlue(pickup3);//new Pose(53, -36, 0);
     private static final Pose moveBlue = convertToBlue(move);//new Pose(24, 0, 0.77);
@@ -86,7 +88,7 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2, strafeGate))
                 .setLinearHeadingInterpolation(shootPose2.getHeading(), strafeGate.getHeading())
                 .addPath(new BezierLine(strafeGate, gate))
-                .setBrakingStart(.67)
+                .setBrakingStart(.8)
                 .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
                 .build();
     }
@@ -168,8 +170,8 @@ public class EighteenBall {
 
     public static PathChain shoot4(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(pickup3, shootPose2))
-                .setLinearHeadingInterpolation(pickup3.getHeading(), shootPose2.getHeading())
+                .addPath(new BezierLine(pickup3, shootPose3))
+                .setLinearHeadingInterpolation(pickup3.getHeading(), shootPose3.getHeading())
                 .setTValueConstraint(shootConstraint)
                 .setTimeoutConstraint(tConstraint)
                 .setBrakingStrength(braking)
@@ -179,8 +181,8 @@ public class EighteenBall {
 
     public static PathChain move(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2, move))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(), move.getHeading())
+                .addPath(new BezierLine(shootPose3, move))
+                .setLinearHeadingInterpolation(shootPose3.getHeading(), move.getHeading())
                 .build();
     }
 

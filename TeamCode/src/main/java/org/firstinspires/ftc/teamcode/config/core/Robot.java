@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.*;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
+import org.firstinspires.ftc.teamcode.opmode.automus.EighteenBall;
 
 import java.util.List;
 
@@ -45,6 +46,7 @@ public class Robot {
     public static double turretOffset = 3.8;
     public static double r = 1;
     public static boolean showTelemetry = false;
+    public boolean rev = false;
 
 
     public AutoDriving autoDrive;
@@ -69,11 +71,12 @@ public class Robot {
 
 
 
-    public static double centerX = 67, centerY = 67;
+    public static double centerX = 67, centerY = 67, centerXBlue = -67;
     public static double centerX2 = centerX, centerY2 = centerY;
     public static double goalY = centerY;
     public static double redX = centerX;
-    public static double blueX = -centerX;
+    public static double blueX = centerXBlue;
+    public static double goalX = centerX;
 
     public static boolean manualR = false;
     public static boolean manualRPM = false;
@@ -87,9 +90,6 @@ public class Robot {
     double rightWallX = centerX - 7, rightWallY = centerY;  // right wall center
     double frontWallX = centerX, frontWallY = centerY - 7;
 
-    double centerXBlue = 72,
-     rightWallXBlue = 65,
-     frontWallXBlue = 72;
 
     double maxDist = 72;
     public static double goalDist = 52;
@@ -285,7 +285,9 @@ public class Robot {
             rBumper = false;
         }));
 
-        //g1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new Fire3(this));
+        g1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
+            resetPose();
+        }));
 
         /*
         g1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).and(g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)).negate().whenActive(new InstantCommand(() -> {
@@ -383,7 +385,11 @@ public class Robot {
         updateShooting();
         follower.update();
         //autoEndPose = follower.getPose().copy();
-        autoEndPose = new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
+        if (alliance == Alliance.RED)
+            autoEndPose = new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
+        else
+            autoEndPose = new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getHeading());
+
         if (logData) log();
         if (showTelemetry)
             telemetry.update();
@@ -460,36 +466,7 @@ public class Robot {
     }
 
     public void resetPose() {
-
-        double x, y, heading;
-        Pose f = follower.getPose();
-        if (f.getHeading() > Math.toRadians(45)) {
-            if (f.getHeading() > Math.toRadians(135))
-                heading = Math.toRadians(180);
-            else
-                heading = Math.toRadians(90);
-        }
-        else {
-            if (f.getHeading() < Math.toRadians(-45)) {
-                if (f.getHeading() < -135)
-                    heading = Math.toRadians(-180);
-                else
-                    heading = Math.toRadians(-90);
-            }
-            else
-                heading = 0;
-        }
-        if (f.getX() < 0) {
-            x = cornerBlueBack.getX();
-            y = cornerBlueBack.getY();
-        }
-
-        else {
-            x = cornerRedBack.getX();
-            y = cornerRedBack.getY();
-        }
-        //follower.setPose(new Pose(x, y, heading));
-        follower.setPose(new Pose(0, 0, follower.getHeading()));
+        follower.setPose(new Pose(0, 0, Math.toRadians(90)));
     }
 
     public void log() {
@@ -552,13 +529,14 @@ public class Robot {
     }
 
     public void updateShooting() {
+        flightTime = k.getFlightTime();
         double d;
         //if (launcher.teleop) {
             KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
             d = getDistanceFromGoal();
 
             if (!manualR) {
-                if (d > 120) r = .9;
+                if (d > 120) r = .8;
                 else r = .64;
             }
 
@@ -570,14 +548,31 @@ public class Robot {
             Launcher.tele_target = Launcher.target_velocity; */
             Launcher.auto_target = k.getRPM();
             double hoodPos = k.getHood(launcher.current_velocity);
+            if (!Launcher.teleop) {
+                if (EighteenBall.firstCouple) {
+                    if (alliance == Alliance.RED)
+                        hoodPos -= 0;
+                    else {
+                        hoodPos -= 0;
+                    }
+                }
+                else
+                    if (alliance == Alliance.RED)
+                        hoodPos += 0;
+                    else
+                        hoodPos += 0;
+            }
             if (hoodPos > 0) {
                 validLaunch = true;
                 if (!shotStarted) {
-                    if (getDistanceFromGoal() < 100)
+                    if (d < 100)
                         hood.setTarget(hoodPos);
                     else {
                         hood.setTarget(Hood.hoodUp);
                     }
+                }
+                else if (d > 100) {
+                    hood.setTarget(hoodPos);
                 }
             } else {
                 validLaunch = false;
@@ -640,20 +635,10 @@ public class Robot {
         frontWallX = centerX;
         frontWallY = centerY - 7;
         goalY = centerY;
-        double vx = 0;//follower.getVelocity().getXComponent();
-        double vy = 0;//follower.getVelocity().getYComponent();
-        if (alliance == Alliance.RED) {
-            double goalX = centerX;
-            double dx = goalX - turretX - vx * flightTime;
+        double vx = KinematicsCalculator.inchesToMeters(follower.getVelocity().getXComponent());
+        double vy = KinematicsCalculator.inchesToMeters(follower.getVelocity().getYComponent());            double dx = goalX - turretX - vx * flightTime;
             double dy = goalY - turretY - vy * flightTime;
             return Math.sqrt(dx * dx + dy * dy);
-        }
-        else  {
-            double goalX = blueX;
-            double dx = goalX - turretX - vx * flightTime;
-            double dy = goalY - turretY - vx * flightTime;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
     }
 
     public void updateGoalCoords() {
@@ -662,30 +647,22 @@ public class Robot {
         double robotX = follower.getPose().getX();
         //if (alliance == Alliance.RED) {
             if (getDistanceFromGoal() < 100) {
-                if (robotY > robotX) {
-                    // --- LEFT SIDE OF DIAGONAL → use distance from FRONT edge (y=72)
-                    double dist = Math.abs(72 - robotY);  // 0 at edge, maxDist at diagonal
-                    t = 1.0 - (dist / maxDist);
-                    t = Math.min(1.0, Math.max(0.0, t));
-
-                    redX = lerp(centerX, centerX2, t);
-                    goalY = lerp(centerY, centerY2, t);
-
-                } else {
-                    // --- RIGHT SIDE OF DIAGONAL → use distance from RIGHT edge (x=72)
-                    double dist = Math.abs(72 - robotX);  // same logic
-                    t = 1.0 - (dist / maxDist);
-                    t = Math.min(1.0, Math.max(0.0, t));
-
-                    redX = lerp(centerX, centerX2, t);
-                    goalY = lerp(centerY, centerY2, t);
-                }
+                redX = 67;
+                blueX = -67;
+                goalY = 67;
             }
             else {
                 redX = 72;
-                blueX = 72;
+                blueX = -72;
                 goalY = 72;
             }
+
+        if (alliance == Alliance.RED) {
+            goalX = redX;
+        }
+        else {
+            goalX = blueX;
+        }
         /*}
         else {
             if (robotY > robotX) {
@@ -728,7 +705,7 @@ public class Robot {
     }
 
     public boolean intakeDone() {
-        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > 3 || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > 1.5;
+        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > 2.4;
     }
 
 

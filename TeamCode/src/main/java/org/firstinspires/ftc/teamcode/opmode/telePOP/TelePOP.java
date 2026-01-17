@@ -79,10 +79,12 @@ public class TelePOP extends LinearOpMode {
                 if (!robot.intakeDone()) {
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                     robot.uptakeOff = false;
+                    robot.rev = false;
                 }
                 else {
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     robot.uptakeOff = true;
+                    robot.rev = true;
                 }
             }
             else if (gamepad1.left_trigger > 0.3) {
@@ -112,7 +114,7 @@ public class TelePOP extends LinearOpMode {
                 robot.outtake = false;
             }
             if (useTurret)
-                new Aim(robot, alliance == Alliance.RED ? redX : blueX, goalY).execute();
+                new Aim(robot, goalX, goalY).execute();
             else
                 robot.turret.setTargetDegrees(0);
             if (gamepad1.circle && !pressingC) {
@@ -124,7 +126,7 @@ public class TelePOP extends LinearOpMode {
             }
             //}
 
-            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper) {
+            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper || robot.rev) {
                 robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
                 robot.intake.setGateState(Intake.GateState.OPEN);
             }

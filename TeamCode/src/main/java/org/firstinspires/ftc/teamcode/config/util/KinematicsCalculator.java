@@ -34,6 +34,8 @@ public class KinematicsCalculator {
     public static boolean manual_angle = false;
 
     private double distance;
+    private double RPM = 0;
+    private double angleDeg = 45;
 
 
     public KinematicsCalculator(double distanceToGoal){
@@ -49,8 +51,8 @@ public class KinematicsCalculator {
     public double getRPM() {
         double vel;
             double thetaRad1, thetaRad2;
-            thetaRad1 = Math.toRadians(max_angle - 3.5);
-            thetaRad2 = Math.toRadians(min_angle + 3.5);
+            thetaRad1 = Math.toRadians(max_angle - 1);
+            thetaRad2 = Math.toRadians(min_angle + 1);
 
             double vel1 = Math.sqrt(g * distance * distance /
                     (2.0 * Math.pow(Math.cos(thetaRad1), 2.0) *
@@ -61,7 +63,7 @@ public class KinematicsCalculator {
                     (2.0 * Math.pow(Math.cos(thetaRad2), 2.0) *
                             (distance * Math.tan(thetaRad2) + y_exit_m - y_target_m))
             );
-            if (distance > inchesToMeters(25))
+            if (distance > inchesToMeters(35))
                 vel = Math.max(vel1, vel2);
             else
                 vel = rpmToVel(3000);
@@ -69,6 +71,7 @@ public class KinematicsCalculator {
         }
 
     public double getHood(double currentRPM) {
+        RPM = currentRPM;
         if (distance < inchesToMeters(25)) return Hood.hoodDown;
         double v0 = rpmToVel(currentRPM);
 
@@ -97,6 +100,7 @@ public class KinematicsCalculator {
         if (thetaDeg < min_angle || thetaDeg > max_angle) {
             return -1;
         }
+        angleDeg = thetaDeg;
 
         return thetaToHood(thetaDeg);
     }
@@ -104,7 +108,7 @@ public class KinematicsCalculator {
 
 
 
-    private static double inchesToMeters(double inches) {
+    public static double inchesToMeters(double inches) {
         return inches * 0.0254;
     }
 
@@ -123,5 +127,17 @@ public class KinematicsCalculator {
 
     public static double hoodToTheta(double hood) {
         return Range.clip(94.452 - 64 * hood, min_angle, max_angle);
+    }
+
+    public  double getFlightTime() {
+        return .5;
+        /*
+        double theta = Math.toRadians(angleDeg);
+        double v0 = velToRpm(RPM);
+
+        double v_horizontal = v0 * Math.cos(theta);
+        double ft = distance / v_horizontal;
+        if (Double.isNaN(ft)) return 0;
+        return ft; */
     }
 }

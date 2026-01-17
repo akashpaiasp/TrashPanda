@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.config.commands;
 
+import static org.firstinspires.ftc.teamcode.config.core.Robot.auto;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.flightTime;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.processNoiseHeading;
 
@@ -8,6 +9,8 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
+import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
 
 public class Aim extends CommandBase {
     private Robot r;
@@ -18,6 +21,7 @@ public class Aim extends CommandBase {
 
     private static final double MIN_ANGLE = -90; // turret left limit
     private static final double MAX_ANGLE = 90;  // turret right limit
+    public static double autoFudge = 3;
     public Aim(Robot r, double targetX, double targetY) {
         this.r = r;
         this.targetX = targetX;
@@ -31,8 +35,8 @@ public class Aim extends CommandBase {
          * Clamps to [-90°, +90°].
          */
 
-        double vx = r.getFollower().getVelocity().getXComponent();
-        double vy = r.getFollower().getVelocity().getYComponent();
+        double vx = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
+        double vy = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
         double va = 0;//r.getFollower().getAngularVelocity();
 
         double dx;
@@ -40,13 +44,21 @@ public class Aim extends CommandBase {
 
         double x = r.turretX;
         double y = r.turretY;
-        dx = targetX - x;
-        dy = targetY - y;
+        dx = targetX - x - vx * flightTime;
+        dy = targetY - y - vy * flightTime;
         double robotHeading = Math.toDegrees(r.getFollower().getHeading());
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
+        double turretRelativeAngle;
 
-        double turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + fudgeFactor) ;
+        if (r.launcher.teleop)
+             turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + fudgeFactor) ;
+        else {
+            if (Robot.alliance == Alliance.RED)
+                turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + autoFudge *1.8);
+            else
+                turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading - autoFudge * 1.8);
+        }
 
         turretRelativeAngle = Range.clip(turretRelativeAngle, MIN_ANGLE, MAX_ANGLE);
         //turretRelativeAngle = 0;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.automus;
 
 import static org.firstinspires.ftc.teamcode.config.core.Robot.alliance;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.blueX;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.goalX;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.goalY;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.redX;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.*;
@@ -32,18 +33,19 @@ public class EighteenBall extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = .5;
-    double onThresholdTwo = .5;
+    double onThreshold = .3;
+    double onThresholdTwo = .3;
 
-    double offThreshold = .2;
-    double moveThreshold = 3.5;
-    double moveIntakeThreshold = 1.8;
+    double offThreshold = .1;
+    double moveThreshold = 1.8;
+    double moveIntakeThreshold = 1.3;
+    public static boolean firstCouple = true;
     boolean doneOff = false;
     double doneNum = 0;
     double outtakeTIme = .15;
     double lastMoveTime = 5.2;
     double intakeTime = 2;
-    double checkTIme = .31;
+    double checkTime = .15;
     int doneThreshold = 4;
     double dist;
     boolean time = false;
@@ -60,8 +62,13 @@ public class EighteenBall extends OpMode {
 
     public void autonomousPathUpdate() {
 
-        if (aimTurret) new Aim(robot, alliance == Alliance.RED ? redX : blueX, goalY).execute();
-        else robot.turret.setTargetDegrees(-62);
+        if (aimTurret) new Aim(robot, goalX, goalY).execute();
+        else {
+            if (robot.getAlliance() == Alliance.RED)
+                robot.turret.setTargetDegrees(-62);
+            else
+                robot.turret.setTargetDegrees(62);
+        }
         //if (aim1) robot.turret.setTargetDegrees(-62);
         //else robot.turret.setTargetDegrees(-45);
 
@@ -85,7 +92,8 @@ public class EighteenBall extends OpMode {
                 break;
             case 1025:
                 if (robot.getFollower().getCurrentTValue() > .8) {
-                    //aimTurret = true;
+                    if (alliance == Alliance.BLUE)
+                        aimTurret = true;
                     setPathState(1201);
                 }
                 break;
@@ -155,8 +163,8 @@ public class EighteenBall extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                    robot.intake.setUptakeState(Intake.UptakeState.ON); }
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.ON);
                     robot.shotStarted = true;
                 }
                 if (doneDone) {
@@ -179,6 +187,7 @@ public class EighteenBall extends OpMode {
 
             case 1202:
                 doneNum = 0;
+                firstCouple = false;
                     //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
@@ -218,7 +227,7 @@ public class EighteenBall extends OpMode {
                 break;
 
             case 1205:
-                if (robot.getFollower().getCurrentTValue() > 0) {
+                if (robot.getFollower().getCurrentTValue() > 0.2) {
                     robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
                     robot.intake.setGateState(Intake.GateState.OPEN);
                     aimTurret = true;
@@ -234,8 +243,9 @@ public class EighteenBall extends OpMode {
                 
 
                 if (pathTimer.getElapsedTimeSeconds() > onThresholdTwo) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                    robot.intake.setUptakeState(Intake.UptakeState.ON); }
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.ON);
+
                     robot.shotStarted = true;
                 }
                 if (doneDone) {
@@ -568,6 +578,7 @@ public class EighteenBall extends OpMode {
                     robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
                     robot.intake.setGateState(Intake.GateState.OPEN);
                     aimTurret = true;
+                    two = true;
                     setPathState(273);
                 }
                 break;
@@ -577,7 +588,7 @@ public class EighteenBall extends OpMode {
                     return;
                 }
                 
-                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                if (pathTimer.getElapsedTimeSeconds() > onThresholdTwo) {
                     if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.ON); }
                     robot.shotStarted = true;
@@ -599,7 +610,8 @@ public class EighteenBall extends OpMode {
 
             case 275:
                 if (!robot.getFollower().isBusy()) {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
+                    //if (robot.getAlliance() == Alliance.BLUE)
+                        robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
                     setPathState(28);
                 }
 
@@ -632,6 +644,7 @@ public class EighteenBall extends OpMode {
 
     @Override
     public void init () {
+        firstCouple = true;
         CommandScheduler.getInstance().reset();
         //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         robot = new Robot(hardwareMap, telemetry, Alliance.RED, startPose);
@@ -687,19 +700,19 @@ public class EighteenBall extends OpMode {
             //pathTimer.reset();
             return false;
         }
-        if (!two)
-            if (pathTimer.getElapsedTimeSeconds() < checkTIme + onThreshold) return false;
-        else
-            if (pathTimer.getElapsedTimeSeconds() < checkTIme + onThresholdTwo) return false;
-        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < 1 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 3)) {
+        //if (!two)
+            if (pathTimer.getElapsedTimeSeconds() < checkTime + onThreshold) return false;
+        //else
+          //  if (pathTimer.getElapsedTimeSeconds() < checkTime + onThresholdTwo + .15) return false;
+        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8)) {
             aimTurret = false;
             return true;
         }
         else return false;
     }
     public boolean intakeDone() {
-        if (pathTimer.getElapsedTimeSeconds() < checkTIme) return false;
-        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > 1.8);
+        if (pathTimer.getElapsedTimeSeconds() < checkTime) return false;
+        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > 2.4);
     }
 
     public void launch3() {
