@@ -45,7 +45,10 @@ public class KinematicsCalculator {
 
     public void setDistance(double distance) {
         this.distance = inchesToMeters(distance);
-        y_target_m = inchesToMeters(y_target_in);
+        if (distance > inchesToMeters(35))
+            y_target_m = inchesToMeters(y_target_in);
+        else
+            y_target_m = inchesToMeters(y_target_in + 10);
     }
 
     public double getRPM() {
@@ -66,7 +69,7 @@ public class KinematicsCalculator {
             if (distance > inchesToMeters(35))
                 vel = Math.max(vel1, vel2);
             else
-                vel = rpmToVel(3000);
+                vel = Math.min(vel1, vel2);//rpmToVel(3000);
             return velToRpm(vel);
         }
 
@@ -130,14 +133,14 @@ public class KinematicsCalculator {
     }
 
     public  double getFlightTime() {
-        return .5;
-        /*
+        //return .5;
+
         double theta = Math.toRadians(angleDeg);
-        double v0 = velToRpm(RPM);
+        double v0 = rpmToVel(RPM);
 
         double v_horizontal = v0 * Math.cos(theta);
         double ft = distance / v_horizontal;
         if (Double.isNaN(ft)) return 0;
-        return ft; */
+        return ft;
     }
 }

@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.config.core;
 
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
 
-import android.graphics.Interpolator;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.seattlesolvers.solverslib.command.InstantCommand;
@@ -14,7 +11,6 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.util.LUT;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -45,7 +41,17 @@ public class Robot {
     private double speed = 1.0;
     public static double turretOffset = 3.8;
     public static double r = 1;
+
+    //Booleans to change on FTCDash
     public static boolean showTelemetry = false;
+    public static boolean hoodAdjustment = false;
+    public static boolean rapidFireFar = true;
+    public static boolean autoShoot = false;
+    public static boolean keepShooterOn = true;
+
+    public static double robot_length = 8.5; //actual robot length is 9, decreasing it means more robot has to be in zone in order to shoot
+
+    public double robotX = 0, robotY = 0;
     public boolean rev = false;
 
 
@@ -60,7 +66,7 @@ public class Robot {
     public Launcher launcher;
     public Turret turret;
     public Hood hood;
-    public MyLED led;
+    public LED led;
 
     public KinematicsCalculator k;
     public boolean slowMode;
@@ -68,6 +74,7 @@ public class Robot {
     public Intake intake;
     public boolean robotCentric = false;
     public static Alliance alliance = Alliance.RED;
+    public static Zone zone = Zone.NONE;
 
 
 
@@ -221,7 +228,7 @@ public class Robot {
         turret = new Turret(hw, telemetry);
         hood = new Hood(hw, telemetry);
         intake = new Intake(hw, telemetry);
-        led = new MyLED(hw, telemetry);
+        led = new LED(hw, telemetry);
 
         autoDrive = new AutoDriving(follower, telemetry);
         //limelight = new Limelight(hw, telemetry);
@@ -532,7 +539,7 @@ public class Robot {
         flightTime = k.getFlightTime();
         double d;
         //if (launcher.teleop) {
-            KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
+            //KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
             d = getDistanceFromGoal();
 
             if (!manualR) {
@@ -564,15 +571,13 @@ public class Robot {
             }
             if (hoodPos > 0) {
                 validLaunch = true;
-                if (!shotStarted) {
+                if (!shotStarted || hoodAdjustment) {
                     if (d < 100)
                         hood.setTarget(hoodPos);
                     else {
-                        hood.setTarget(Hood.hoodUp);
+                        hood.setTarget(hoodPos);
+                        //hood.setTarget(Hood.hoodUp);
                     }
-                }
-                else if (d > 100) {
-                    hood.setTarget(hoodPos);
                 }
             } else {
                 validLaunch = false;
@@ -625,20 +630,20 @@ public class Robot {
     }
 
     public void updateRobotCoords() {
-        turretX = follower.getPose().getX() - turretOffset * Math.cos(follower.getPose().getHeading());
-        turretY = follower.getPose().getY() - turretOffset * Math.sin(follower.getPose().getHeading());
+        robotX = follower.getPose().getX();
+        robotY = follower.getPose().getY();
+        turretX = robotX - turretOffset * Math.cos(follower.getPose().getHeading());
+        turretY = robotY - turretOffset * Math.sin(follower.getPose().getHeading());
     }
 
     public double getDistanceFromGoal() {
-        rightWallX = centerX - 7;
-        rightWallY = centerY;  // right wall center
-        frontWallX = centerX;
-        frontWallY = centerY - 7;
         goalY = centerY;
         double vx = KinematicsCalculator.inchesToMeters(follower.getVelocity().getXComponent());
-        double vy = KinematicsCalculator.inchesToMeters(follower.getVelocity().getYComponent());            double dx = goalX - turretX - vx * flightTime;
-            double dy = goalY - turretY - vy * flightTime;
-            return Math.sqrt(dx * dx + dy * dy);
+        double vy = KinematicsCalculator.inchesToMeters(follower.getVelocity().getYComponent());
+        double dx = goalX - turretX - vx * flightTime;
+        double dy = goalY - turretY - vy * flightTime;
+
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     public void updateGoalCoords() {
@@ -702,6 +707,60 @@ public class Robot {
                 intakeOff = true;
             }
         }
+    }
+
+    public boolean isInLaunchZone() {
+        double theta = follower.getHeading() - Math.PI / 2;
+        double h = robot_length / 2.0;
+        double forwardX = Math.cos(theta);
+        double forwardY = Math.sin(theta);
+        double lateralX = -Math.sin(theta);
+        double lateralY = Math.cos(theta);
+
+        double flX = robotX + h * forwardX + h * lateralX;
+        double flY = robotY + h * forwardY + h * lateralY;
+        Pose fl = new Pose(flX, flY);
+
+        double frX = robotX + h * forwardX - h * lateralX;
+        double frY = robotY + h * forwardY - h * lateralY;
+        Pose fr = new Pose(frX, frY);
+
+        double blX = robotX - h * forwardX + h * lateralX;
+        double blY = robotY - h * forwardY + h * lateralY;
+        Pose bl = new Pose(blX, blY);
+
+        double brX = robotX - h * forwardX - h * lateralX;
+        double brY = robotY - h * forwardY - h * lateralY;
+        Pose br = new Pose(brX, brY);
+
+        if (inCloseZone(fl) || inCloseZone(fr) || inCloseZone(bl) || inCloseZone(br)) {
+            zone = Zone.CLOSE;
+            return true;
+        }
+        else if (inFarZone(fl) || inFarZone(fr) || inFarZone(bl) || inFarZone(br)) {
+            zone = Zone.FAR;
+            return true;
+        }
+        else {
+            zone = Zone.NONE;
+            return false;
+        }
+
+
+    }
+
+
+
+    public boolean inCloseZone(Pose pose) {
+        double x = pose.getX();
+        double y = pose.getY();
+        return y > x && y > -x && y > 0;
+    }
+
+    public boolean inFarZone(Pose pose) {
+        double x = pose.getX();
+        double y = pose.getY();
+        return y < x - 48 && y < -x - 48 && y < -48;
     }
 
     public boolean intakeDone() {

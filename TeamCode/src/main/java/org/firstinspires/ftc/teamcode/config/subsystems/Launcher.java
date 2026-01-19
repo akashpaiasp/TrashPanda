@@ -52,6 +52,7 @@ public class Launcher extends SubsystemBase {
     public static double tele_target = 4500;
     public static double auto_target = 4000;
     public static boolean powerMode = false;
+    public static boolean bangBang = false;
     public static boolean pid1 = true;
     public double current_velocity = 0;
     public double prev_velocity = 0;
@@ -221,9 +222,9 @@ public class Launcher extends SubsystemBase {
 
         telemetry.addData("Target Velocity", target_velocity);
         telemetry.addData("Current Velocity", current_velocity);
-        telemetry.addData("Done", controller.done);
-        telemetry.addData("Num Done", numDone);
-        telemetry.addData("Current", launcher1.getCurrent(CurrentUnit.AMPS));
+        //telemetry.addData("Done", controller.done);
+        //telemetry.addData("Num Done", numDone);
+        telemetry.addData("Launcher Current", launcher1.getCurrent(CurrentUnit.AMPS));
 
 
     }
@@ -311,8 +312,20 @@ public class Launcher extends SubsystemBase {
             } */
         // 4) Set Power (steady state)
     if (!(current == LauncherState.STOP)) {
-        launcher1.setPower(pdfl);
-        launcher2.setPower(pdfl);
+        if (!bangBang) {
+            launcher1.setPower(pdfl);
+            launcher2.setPower(pdfl);
+        }
+        else {
+            if (target_velocity > current_velocity) {
+                launcher1.setPower(1);
+                launcher2.setPower(1);
+            }
+            else {
+                launcher1.setPower(0);
+                launcher2.setPower(0);
+            }
+        }
     }
     }
 

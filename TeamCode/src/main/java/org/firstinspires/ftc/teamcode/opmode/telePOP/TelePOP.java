@@ -63,11 +63,6 @@ public class TelePOP extends LinearOpMode {
                 robot.updateShooting();
             lastTime = currentTime;
             currentTime = loopTimer.getElapsedTime();
-            telemetry.addData("Loop Time", currentTime - lastTime);
-            telemetry.addData("Distance From Goal", robot.getDistanceFromGoal());
-            telemetry.addData("Shot Num", robot.shotNum);
-            telemetry.addData("Intake Done", robot.intakeDone());
-
             //Update everything
             robot.tPeriodic();
 
@@ -102,7 +97,7 @@ public class TelePOP extends LinearOpMode {
             }
 
 
-            if(!gamepad1.left_bumper && !gamepad1.right_bumper && ! (gamepad1.right_trigger > 0.3) && ! (gamepad1.left_trigger > 0.3) && !gamepad1.square) {
+            if(!gamepad1.left_bumper && !gamepad1.right_bumper && ! (gamepad1.right_trigger > 0.3) && ! (gamepad1.left_trigger > 0.3) && !gamepad1.square && !(autoShoot && robot.isInLaunchZone())) {
                 robot.intakeOff = true;
                 robot.uptakeOff = true;
             }
@@ -126,9 +121,10 @@ public class TelePOP extends LinearOpMode {
             }
             //}
 
-            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper || robot.rev) {
+            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper || robot.rev || keepShooterOn) {
                 robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
-                robot.intake.setGateState(Intake.GateState.OPEN);
+                if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper)
+                    robot.intake.setGateState(Intake.GateState.OPEN);
             }
             else {
                 robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
@@ -139,8 +135,9 @@ public class TelePOP extends LinearOpMode {
                 gamepad2.rumble(50);
             }
 
-            if (gamepad2.right_bumper || gamepad1.left_bumper) {
-                if (robot.getDistanceFromGoal() < 100) {
+            if (gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone()) && (robot.validLaunch || robot.shotStarted))) {
+                //change this value to add wait for RPM in far launch
+                if (!rapidFireFar && robot.getDistanceFromGoal() < 100) { //100
                     robot.intake.setUptakeState(Intake.UptakeState.ON);
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intakeOff = false;
@@ -170,24 +167,6 @@ public class TelePOP extends LinearOpMode {
 
                 robot.shotStarted = gamepad1.left_bumper || gamepad2.right_bumper;
 
-
-            //old hood logic
-            /*if (!robot.shotFired && robot.launcher.shotDetected) {
-                robot.shotFired = true;
-                if (gamepad2.right_bumper) {
-                    robot.shotNum++;
-                    robot.hood.decreaseSmall();
-                }
-
-            }
-            else if (!robot.launcher.shotDetected) {
-                robot.shotFired = false;
-                if (robot.shotNum == -1) {
-                    robot.lastHood = robot.hood.getState();
-                    robot.lastHoodTarget = robot.hood.getTarget();
-                }
-
-            } */
             //Runs all gamepad triggers
             CommandScheduler.getInstance().run();
 
@@ -259,6 +238,8 @@ public class TelePOP extends LinearOpMode {
                 robot.driveTrain.rf.setPower(rightFrontPower * scaleFactor);
                 robot.driveTrain.lr.setPower(leftBackPower * scaleFactor);
                 robot.driveTrain.rr.setPower(rightBackPower * scaleFactor); */
+            telemetry.addData("Loop Time", currentTime - lastTime);
+            telemetry.addData("Distance From Goal", robot.getDistanceFromGoal());
             telemetry.addData("turret x" , robot.turretX);
             telemetry.addData("turret y" , robot.turretY);
             telemetry.addData("x" , robot.getFollower().getPose().getX());
@@ -266,7 +247,7 @@ public class TelePOP extends LinearOpMode {
             telemetry.addData("heading" , robot.getFollower().getPose().getHeading());
             telemetry.addData("GoalX", redX);
             telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
-
+            telemetry.addData("Robot zone", zone);
         }
         CSVInterface.log();
     }

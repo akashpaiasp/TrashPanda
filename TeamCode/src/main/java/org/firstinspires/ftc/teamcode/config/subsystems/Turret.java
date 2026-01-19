@@ -122,7 +122,7 @@ public class Turret extends SubsystemBase {
         telemetry.addData("turret target", target);
         telemetry.addData("turret power", power);
         telemetry.addData("turret volts", spin.getVolts());
-        telemetry.addData("Use Limelight", limelightMode);
+        //telemetry.addData("Use Limelight", limelightMode);
 
     }
 

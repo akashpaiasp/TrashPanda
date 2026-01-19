@@ -31,12 +31,14 @@ public class Aim extends CommandBase {
     @Override
     public void execute() {
         /*
-         * Calculates the turret angle relative to the robot's front (degrees).
+         * Calculates the turret angle  relative to the robot's front (degrees).
          * Clamps to [-90°, +90°].
          */
 
-        double vx = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
-        double vy = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
+        double vxTemp = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
+        double vx = Double.isNaN(vxTemp) ? vxTemp : 0;
+        double vyTemp = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
+        double vy = Double.isNaN(vyTemp) ? vyTemp : 0;
         double va = 0;//r.getFollower().getAngularVelocity();
 
         double dx;
