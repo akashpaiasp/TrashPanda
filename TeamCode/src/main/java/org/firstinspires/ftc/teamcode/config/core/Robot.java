@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.teamcode.config.commands.*;
+//import org.firstinspires.ftc.teamcode.config.commands.*;
 import org.firstinspires.ftc.teamcode.config.core.paths.AutoDriving;
 import org.firstinspires.ftc.teamcode.config.core.util.*;
 import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
@@ -346,7 +346,7 @@ public class Robot {
             turret.spin.full_rotations++;
         }));
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
-            Aim.fudgeFactor = 0;
+            //Aim.fudgeFactor = 0;
         }));
         g2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(new InstantCommand(() -> {
             hood.increase();

@@ -36,9 +36,9 @@ public class Aim extends CommandBase {
          */
 
         double vxTemp = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
-        double vx = Double.isNaN(vxTemp) ? vxTemp : 0;
+        double vx = Double.isNaN(vxTemp) ? 0 : vxTemp;
         double vyTemp = KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
-        double vy = Double.isNaN(vyTemp) ? vyTemp : 0;
+        double vy = Double.isNaN(vyTemp) ? 0 : vyTemp;
         double va = 0;//r.getFollower().getAngularVelocity();
 
         double dx;
