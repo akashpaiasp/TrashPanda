@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode.automus;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.*;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.bylazar.configurables.annotations.Configurable;
+//import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.config.util.Timer;
 
 @Autonomous
 @Config
-@Configurable
+//@Configurable
 public class TwelveBallNoGate extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;

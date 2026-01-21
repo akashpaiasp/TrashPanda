@@ -133,7 +133,8 @@ public class KinematicsCalculator {
     }
 
     public  double getFlightTime() {
-        //return .5;
+        return 0;
+        /*
 
         double theta = Math.toRadians(angleDeg);
         double v0 = rpmToVel(RPM);
@@ -141,6 +142,6 @@ public class KinematicsCalculator {
         double v_horizontal = v0 * Math.cos(theta);
         double ft = distance / v_horizontal;
         if (Double.isNaN(ft)) return 0;
-        return ft;
+        return ft; */
     }
 }

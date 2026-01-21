@@ -30,7 +30,7 @@ import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.Twelve
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwelveBall.strafe2Blue;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.bylazar.configurables.annotations.Configurable;
+//import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.config.util.Timer;
 
 @Autonomous
 @Config
-@Configurable
+//@Configurable
 public class FifteenBallBlue extends OpMode {
     public static double shootHood = 0.9;
     private Timer pathTimer, actionTimer, opmodeTimer;

@@ -8,7 +8,7 @@ import static org.firstinspires.ftc.teamcode.config.core.Robot.redX;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.*;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.bylazar.configurables.annotations.Configurable;
+//import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.config.util.Timer;
 
 @Autonomous (name = "Big Smapple")
 @Config
-@Configurable
+//@Configurable
 public class EighteenBall extends OpMode {
     //private MultipleTelemetry telemetry;
     private Timer pathTimer, actionTimer, opmodeTimer;
