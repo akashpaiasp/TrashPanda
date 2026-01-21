@@ -5,6 +5,9 @@ import com.pedropathing.geometry.*;
 import com.pedropathing.paths.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.config.core.Robot;
+import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.*;
 
 //Paths for automatic driving in teleop
 public class AutoDriving {
@@ -17,23 +20,61 @@ public class AutoDriving {
         autoDrive = false;
     }
     //Define Poses
-    Pose point1 = new Pose(0, 0);
-    Pose point2 = new Pose(10, 10);
-
+    Pose shoot = new Pose(15, 17, .62);
+    Pose shootBlue = new Pose(-51, 17, .62 - Math.PI);
     //Run Paths
-    public void toCenter() {
-        Path center = new Path(new BezierLine(
-                f.getPose(), point1
-        ));
-        center.setConstantHeadingInterpolation(Math.toRadians(-45));
-        f.followPath(center);
+    public void toGate() {
+        autoDrive = true;
+        f.followPath(getGatePath());
     }
 
-    public void toSide() {
-        Path side = new Path(new BezierLine(
-                f.getPose(), point2
-        ));
+    public void toShoot() {
+        autoDrive = true;
+        f.followPath(getShootPath());
+    }
 
+
+    public PathChain getShootPath() {
+        Pose p = f.getPose();
+
+        if (Robot.alliance == Alliance.RED) {
+
+            return f.pathBuilder()
+                    .addPath(new BezierLine(p, shoot))
+                    .setLinearHeadingInterpolation(p.getHeading(), shoot.getHeading())
+                    .build();
+        }
+        else {
+            return f.pathBuilder()
+                    .addPath(new BezierLine(p, shootBlue))
+                    .setLinearHeadingInterpolation(p.getHeading(), shootBlue.getHeading())
+                    .build();
+        }
+    }
+
+
+    public PathChain getGatePath() {
+        Pose p = f.getPose();
+
+        if (Robot.alliance == Alliance.RED) {
+
+            return f.pathBuilder()
+                    .addPath(new BezierLine(p, strafeGate))
+                    .setLinearHeadingInterpolation(p.getHeading(), strafeGate.getHeading())
+                    .addPath(new BezierLine(strafeGate, gate))
+                    .setBrakingStart(.8)
+                    .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
+                    .build();
+        }
+        else {
+            return f.pathBuilder()
+                    .addPath(new BezierLine(p, strafeGateBlue))
+                    .setLinearHeadingInterpolation(p.getHeading(), strafeGateBlue.getHeading())
+                    .addPath(new BezierLine(strafeGateBlue, gateBlue))
+                    .setBrakingStart(.8)
+                    .setLinearHeadingInterpolation(strafeGateBlue.getHeading(), gateBlue.getHeading())
+                    .build();
+        }
     }
 
 
@@ -54,5 +95,6 @@ public class AutoDriving {
     public void telemetry() {
         telemetry.addData("Auto Drive", autoDrive ? "ON" : "OFF");
     }
+
 
 }

@@ -14,9 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 
-/*Subsystem class. Subsystems are anything on the robot that is not the drive train
-such as a claw or a lift.
-*/
+
 @Config
 public class Intake extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
@@ -130,7 +128,7 @@ public class Intake extends SubsystemBase {
                 uptake.setPower(intakeUptake);
                 break;
             case BACK:
-                    uptake.setPower(-1);
+                uptake.setPower(-1);
         }
         if(manual) {
             gateL.setPosition(gateLPos);
@@ -152,8 +150,8 @@ public class Intake extends SubsystemBase {
 
         telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("Uptake amps", uptake.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("Intake state", currentIntake);
-        telemetry.addData("Uptake state", currentUptake);
+        //telemetry.addData("Intake state", currentIntake);
+        //telemetry.addData("Uptake state", currentUptake);
     }
 
     public void init() {
@@ -166,5 +164,9 @@ public class Intake extends SubsystemBase {
 
     public void log(){
         Logger.logData(LogType.INTAKE_POWER, String.valueOf(intake.getPower()));
+    }
+
+    public UptakeState getUptakeState() {
+        return currentUptake;
     }
 }

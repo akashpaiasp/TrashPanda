@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.LED;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -12,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 /*Sample subsystem class. Subsystems are anything on the robot that is not the drive train
 such as a claw or a lift.
 */
-public class MyLED extends SubsystemBase {
+public class LED extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     private MultipleTelemetry telemetry;
 
@@ -27,15 +26,15 @@ public class MyLED extends SubsystemBase {
     }
     private State currentState = State.OFF;
 
-    private LED red, green;
+    private com.qualcomm.robotcore.hardware.LED red, green;
 
-    public MyLED(HardwareMap hardwareMap, Telemetry telemetry) {
+    public LED(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         //init servos based on their name in the robot's config file
-        red = hardwareMap.get(LED.class, "ed6");
-        green = hardwareMap.get(LED.class, "ed7");
+        red = hardwareMap.get(com.qualcomm.robotcore.hardware.LED.class, "ed6");
+        green = hardwareMap.get(com.qualcomm.robotcore.hardware.LED.class, "ed7");
     }
 
     //Call this method to open/close the servos

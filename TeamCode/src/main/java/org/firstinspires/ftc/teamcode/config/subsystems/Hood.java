@@ -18,7 +18,6 @@ such as a claw or a lift.
 
 public class Hood extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
-    //efficiency - 0.809
     private MultipleTelemetry telemetry;
 
     //state of the subsystem

@@ -35,16 +35,16 @@ public class Launcher extends SubsystemBase {
     public PDFLController controller;
 
     //pdfl values tuned in FTC Dashboard
-    public static double p = 0.001;
-    public static double d = .001;
-    public static double f = 0.2;
+    public static double p = 0.007;
+    public static double d = 0.01;
+    public static double f = 0.13;
     public static double l = 0;
-    public static double i = 0.0001;
+    public static double i = 0.00035;
 
-    public static double p2 = 0.0005;
-    public static double d2 = d / 2.5;
-    public static double f2 = 0;
-    public static double l2 = 0.08;
+    public static double p2 = 0.007;
+    public static double d2 = 0.01;
+    public static double f2 = 0.13;
+    public static double l2 = 0;
     public static double i2 = 0;
 
 
@@ -52,6 +52,7 @@ public class Launcher extends SubsystemBase {
     public static double tele_target = 4500;
     public static double auto_target = 4000;
     public static boolean powerMode = false;
+    public static boolean bangBang = false;
     public static boolean pid1 = true;
     public double current_velocity = 0;
     public double prev_velocity = 0;
@@ -83,7 +84,7 @@ public class Launcher extends SubsystemBase {
 
     private boolean inBoost = false;
     private boolean inAggressive = false;
-    public boolean teleop = false;
+    public static boolean teleop = false;
 
 
 
@@ -116,8 +117,6 @@ public class Launcher extends SubsystemBase {
         controller.reset();
         timer.reset();
     }
-
-    //Call this method to open/close the servos
 
     /*Periodic method gets run in a loop during auto and teleop.
     The telemetry gets updated constantly so you can see the status of the subsystems */
@@ -217,19 +216,15 @@ public class Launcher extends SubsystemBase {
             launcher1.setPower(0);
             launcher2.setPower(0);
         }
-            updateShooter();
-
-
-
-        // Clamp power between -1 and 1
+        updateShooter();
 
 
 
         telemetry.addData("Target Velocity", target_velocity);
         telemetry.addData("Current Velocity", current_velocity);
-        telemetry.addData("Done", controller.done);
-        telemetry.addData("Num Done", numDone);
-        telemetry.addData("Current", launcher1.getCurrent(CurrentUnit.AMPS));
+        //telemetry.addData("Done", controller.done);
+        //telemetry.addData("Num Done", numDone);
+        telemetry.addData("Launcher Current", launcher1.getCurrent(CurrentUnit.AMPS));
 
 
     }
@@ -275,18 +270,18 @@ public class Launcher extends SubsystemBase {
 
         // 1) Detect shot
         //if (!inBoost/* && !inAggressive) {
-            double drop = prev_velocity - current_velocity;
-            if (drop > (DROP_THRESHOLD * target_velocity)) { //|| current_velocity < target_velocity * FALL_THRESHOLD) {
-                    shotDetected = true;
-                    timer.reset();
-                }
-            if (shotDetected && timer.getElapsedTimeSeconds() > 0.02)
-                shotDetected = false;
-            if (target_velocity < 3500)
-                controller.updateConstants(p2, d, f, l, i);
-            else
-                controller.updateConstants(p, d, f, l, i);
-            pdfl = controller.run();
+        double drop = prev_velocity - current_velocity;
+        if (drop > (DROP_THRESHOLD * target_velocity)) { //|| current_velocity < target_velocity * FALL_THRESHOLD) {
+            shotDetected = true;
+            timer.reset();
+        }
+        if (shotDetected && timer.getElapsedTimeSeconds() > 0.02)
+            shotDetected = false;
+        if (target_velocity < 3500)
+            controller.updateConstants(p2, d, f, l, i);
+        else
+            controller.updateConstants(p, d, f, l, i);
+        pdfl = controller.run();
         //}
 
         // 2) BOOST PHASE
@@ -316,10 +311,22 @@ public class Launcher extends SubsystemBase {
                 pdfl = controller.run();
             } */
         // 4) Set Power (steady state)
-    if (!(current == LauncherState.STOP)) {
-        launcher1.setPower(pdfl);
-        launcher2.setPower(pdfl);
-    }
+        if (!(current == LauncherState.STOP)) {
+            if (!bangBang) {
+                launcher1.setPower(pdfl);
+                launcher2.setPower(pdfl);
+            }
+            else {
+                if (target_velocity > current_velocity) {
+                    launcher1.setPower(1);
+                    launcher2.setPower(1);
+                }
+                else {
+                    launcher1.setPower(0);
+                    launcher2.setPower(0);
+                }
+            }
+        }
     }
 
     public void setTarget(double target) {

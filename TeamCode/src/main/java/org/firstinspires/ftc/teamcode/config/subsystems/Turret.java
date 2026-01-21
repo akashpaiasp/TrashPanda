@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
@@ -23,14 +25,14 @@ public class Turret extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     public static double power = 0;
 
-    public static double offset = 37;
+    public static double offset = -140;
     //61.7, 14.9
     //public static boolean powerMode = false;
 
     // public static double turretPosConstant = 0.51;
     // public boolean first = false;
 
-    public static double p = 0.01, i = 0, d = .2, f = 0, l = 0.045;
+    public static double p = 0.01, i = 0, d = 0.4, f = 0, l = 0.045;
     public static double p2 = 0.005, i2 = 0, d2 = 1, f2 = 0, l2 = 0.005;
     public static double deadZone = 0.6;
 
@@ -45,6 +47,7 @@ public class Turret extends SubsystemBase {
 
     private MultipleTelemetry telemetry;
     public AxonContinuous spin;
+    public CRServo spin2;
     //public Servo spin;
 
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -53,13 +56,14 @@ public class Turret extends SubsystemBase {
 
         spin = new AxonContinuous(hardwareMap, "sh1", "ca1");
         spin.getC().setDirection(DcMotorSimple.Direction.REVERSE);
+        spin2 = hardwareMap.get(CRServo.class, "sh0");
+        spin2.setDirection(DcMotorSimple.Direction.REVERSE);
         //spin = hardwareMap.get(Servo.class, "sh2");
         controller = new PDFLController(p, d, f, l, i);
         controller.setDeadZone(deadZone);
-        llcontroller = new PDFLController(p2, d2, f2, l2, i2);{
-            //init telemetry
-            this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        }
+        llcontroller = new PDFLController(p2, d2, f2, l2, i2);
+        //init telemetry
+        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     public void periodicTest() {
@@ -72,6 +76,7 @@ public class Turret extends SubsystemBase {
         power = Range.clip(power, -1, 1);
 
         spin.setPower(power);
+        spin2.setPower(power);
         controller.setDeadZone(deadZone);
 
         telemetry.addData("Rise Time", controller.getRiseTime());
@@ -89,6 +94,7 @@ public class Turret extends SubsystemBase {
         spin.calculate();
 
         spin.setPower(power);
+        spin2.setPower(power);
 
         telemetry.addData("Raw", spin.getVolts());
         telemetry.addData("Rotations", spin.getNumRotations());
@@ -111,11 +117,12 @@ public class Turret extends SubsystemBase {
         power = Range.clip(power, -1, 1);
 
         spin.setPower(power);
+        spin2.setPower(power);
 
         telemetry.addData("turret target", target);
         telemetry.addData("turret power", power);
         telemetry.addData("turret volts", spin.getVolts());
-        telemetry.addData("Use Limelight", limelightMode);
+        //telemetry.addData("Use Limelight", limelightMode);
 
     }
 
