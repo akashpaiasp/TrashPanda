@@ -90,6 +90,8 @@ public class Robot {
     public boolean shotStarted = false;
     public static Pose shootPose;
 
+    public static boolean robotCentricDrive = false;
+
 
 
 
@@ -122,7 +124,8 @@ public class Robot {
     public boolean rBumper = false;
     public boolean outtake = true;
     public boolean validLaunch = false;
-    public double turretX, turretY;
+    public  double turretX;
+    public  double turretY;
     public static double flightTime = .5;
     int i = 3;
 
@@ -430,7 +433,7 @@ public class Robot {
     }
 
     public void tStart() {
-        follower.startTeleopDrive();
+        follower.startTeleopDrive(true);
     }
 
     public void stop() {
@@ -647,10 +650,6 @@ public class Robot {
     }
 
     public void updateGoalCoords() {
-        double t;  // blend factor
-        double robotY = follower.getPose().getY();
-        double robotX = follower.getPose().getX();
-        //if (alliance == Alliance.RED) {
         if (getDistanceFromGoal() < 100) {
             redX = 67;
             blueX = -67;
@@ -668,27 +667,8 @@ public class Robot {
         else {
             goalX = blueX;
         }
-        /*}
-        else {
-            if (robotY > robotX) {
-                // --- LEFT SIDE OF DIAGONAL → use distance from FRONT edge (y=72)
-                double dist = Math.abs(72 - robotY);  // 0 at edge, maxDist at diagonal
-                t = 1.0 - (dist / maxDist);
-                t = Math.min(1.0, Math.max(0.0, t));
 
-                redX = lerp(centerX, frontWallX, t);
-                goalY = lerp(centerY, frontWallY, t);
-
-            } else {
-                // --- RIGHT SIDE OF DIAGONAL → use distance from RIGHT edge (x=72)
-                double dist = Math.abs(-72 - robotX);  // same logic
-                t = 1.0 - (dist / maxDist);
-                t = Math.min(1.0, Math.max(0.0, t));
-
-                blueX = lerp(centerX, rightWallX, t);
-                goalY = lerp(-centerY, -rightWallY, t);
-            }
-        } */
+        turret.updateAiming(goalX, goalY, new Pose(turretX, turretY, follower.getHeading()));
     }
 
     private static double lerp(double a, double b, double t) {

@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
+import static org.firstinspires.ftc.teamcode.config.core.Robot.flightTime;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,6 +15,8 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
+import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
+import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.util.AxonContinuous;
@@ -25,7 +30,7 @@ public class Turret extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     public static double power = 0;
 
-    public static double offset = -140;
+    public static double offset = -4;
     //61.7, 14.9
     //public static boolean powerMode = false;
 
@@ -41,9 +46,17 @@ public class Turret extends SubsystemBase {
 
     public static double target = 0.0;
     public static double GEAR_RATIO = 66.0/115.0;
-    public double current;
-    public boolean limelightMode = false;
+    private double targetX;
+    private double targetY;
+    private Pose botPose;
+    public static double fudgeFactor = 0;
+    public static boolean useTurret = true;
 
+
+    private static final double MIN_ANGLE = -90; // turret left limit
+    private static final double MAX_ANGLE = 90;  // turret right limit
+    public static double autoFudge = 3;
+    public double current;
 
     private MultipleTelemetry telemetry;
     public AxonContinuous spin;
@@ -107,6 +120,7 @@ public class Turret extends SubsystemBase {
 
     public void periodic() {
         //if (Robot.logData) log();
+        aim();
         spin.calculate();
         current = -(Math.round(getTotalDegrees() * 10.0)) / 10.0;
         controller.update(current, target);
@@ -179,16 +193,78 @@ public class Turret extends SubsystemBase {
         target = targetDeg;
     }
 
+    public void updateAiming(double targetX, double targetY, Pose botPose) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.botPose = botPose;
+    }
+
+
+
+    public void aim() {
+        /*
+         * Calculates the turret angle  relative to the robot's front (degrees).
+         * Clamps to [-90°, +90°].
+         */
+
+        double vxTemp = 0;//KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
+        double vx = Double.isNaN(vxTemp) ? 0 : vxTemp;
+        double vyTemp = 0;//KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
+        double vy = Double.isNaN(vyTemp) ? 0 : vyTemp;
+        double va = 0;//r.getFollower().getAngularVelocity();
+
+        double dx;
+        double dy;
+
+        double x = botPose.getX();
+        double y = botPose.getY();
+        dx = targetX - x - vx * flightTime;
+        dy = targetY - y - vy * flightTime;
+        double robotHeading = Math.toDegrees(botPose.getHeading());
+
+        double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
+        double turretRelativeAngle;
+
+        if (Launcher.teleop)
+            turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + fudgeFactor) ;
+        else {
+            if (Robot.alliance == Alliance.RED)
+                turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + autoFudge *1.8);
+            else
+                turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading - autoFudge * 1.8);
+        }
+
+        turretRelativeAngle = Range.clip(turretRelativeAngle, MIN_ANGLE, MAX_ANGLE);
+        //turretRelativeAngle = 0;
+        if (useTurret)
+            setTargetDegrees(-turretRelativeAngle);
+        else
+            setTargetDegrees(0);
+
+        telemetry.addData("Target Degrees", -turretRelativeAngle);
+
+    }
+
+
+
+
+
+    private double wrapTo180(double angle) {
+        angle %= 360;
+        if (angle > 180) angle -= 360;
+        if (angle < -180) angle += 360;
+        return angle;
+    }
+    public void updateLL(double d) {
+        llcontroller.update(d, 1);
+    }
+
     public void log() {
         Logger.logData(LogType.TURRET_TARGET, String.valueOf(target));
         Logger.logData(LogType.TURRET_VOLTS, String.valueOf(spin.getVolts()));
         Logger.logData(LogType.TURRET_PREV, String.valueOf(spin.lastVoltage));
         Logger.logData(LogType.TURRET_FULL_ROTS, String.valueOf(spin.full_rotations));
 
-    }
-
-    public void updateLL(double d) {
-        llcontroller.update(d, 1);
     }
 
 }

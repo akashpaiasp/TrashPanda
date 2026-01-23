@@ -82,7 +82,7 @@ public class AutoDriving {
 
     public void off() {
         autoDrive = false;
-        f.startTeleopDrive();
+        f.startTeleopDrive(true);
     }
 
     public void update() {

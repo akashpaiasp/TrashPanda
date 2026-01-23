@@ -68,8 +68,10 @@ public class KinematicsCalculator {
         );
         if (distance > inchesToMeters(35))
             vel = Math.max(vel1, vel2);
-        else
-            vel = Math.min(vel1, vel2);//rpmToVel(3000);
+        else {
+            vel = //Math.min(vel1, vel2);
+            rpmToVel(3500);
+        }
         return velToRpm(vel);
     }
 
@@ -104,8 +106,9 @@ public class KinematicsCalculator {
             return -1;
         }
         angleDeg = thetaDeg;
-
-        return thetaToHood(thetaDeg);
+        if (distance > inchesToMeters(35))
+            return thetaToHood(thetaDeg);
+        return Hood.hoodDown;
     }
 
 

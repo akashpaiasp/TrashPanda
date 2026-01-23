@@ -30,7 +30,6 @@ public class TelePOP extends LinearOpMode {
     public Timer loopTimer = new Timer();
     private double lastTime = 0, currentTime = 0;
     public static boolean manualMode = false;
-    public static boolean useTurret = true;
     public boolean pressingC = false;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -108,13 +107,13 @@ public class TelePOP extends LinearOpMode {
             else {
                 robot.outtake = false;
             }
-            if (useTurret)
+            /*if (useTurret)
                 new Aim(robot, goalX, goalY).execute();
             else
-                robot.turret.setTargetDegrees(0);
+                robot.turret.setTargetDegrees(0); */
             if (gamepad1.circle && !pressingC) {
                 pressingC = true;
-                useTurret = !useTurret;
+                Turret.useTurret = !Turret.useTurret;
             }
             else if (!gamepad1.circle) {
                 pressingC = false;
