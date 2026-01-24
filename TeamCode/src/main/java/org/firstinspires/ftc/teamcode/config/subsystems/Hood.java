@@ -25,7 +25,7 @@ public class Hood extends SubsystemBase {
     public static double hoodDown = 0.5; //23.9
     public double hoodMid = 0.625;
     public double hoodMidUp = 0.75; //64(hoodPos-0.5) + 23.9 //6.4
-    public static double hoodUp = 0.9; //49.5
+    public static double hoodUp = 0.95; //49.5
     public static double target = 0.0;
     public static double hoodIncreaseAmt = 0.02;
     public static double autoHoodShoot1 = 0.9;

@@ -23,10 +23,10 @@ public class KinematicsCalculator {
 
     // Converted constants (meters)
     public static final double y_exit_m = inchesToMeters(y_exit_in);
-    public static  double y_target_m = inchesToMeters(y_target_in);
+    public static double y_target_m = inchesToMeters(y_target_in);
     public static final double r_flywheel_m = inchesToMeters(r_flywheel_in);
     public static final double max_angle = 61;
-    public static final double min_angle = 40;
+    public static final double min_angle = 33.7;
 
     public static double max_rpm = 5100.0;
     public static double min_rpm = 2500.0;
