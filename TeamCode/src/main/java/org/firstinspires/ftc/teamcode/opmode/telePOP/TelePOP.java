@@ -31,6 +31,8 @@ public class TelePOP extends LinearOpMode {
     private double lastTime = 0, currentTime = 0;
     public static boolean manualMode = false;
     public boolean pressingC = false;
+    public boolean pressingRT = false;
+    public int shotNum = 0;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -65,8 +67,14 @@ public class TelePOP extends LinearOpMode {
             //Update everything
             robot.tPeriodic();
 
+            if (robot.has4()) {
+                robot.outtake1();
+                pressingRT = false;
+            }
+
 
             if (gamepad1.right_trigger > 0.3) {
+                pressingRT = true;
                 robot.intakeOff = false;
                 robot.intake.setGateState(Intake.GateState.CLOSED);
                 robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
@@ -81,6 +89,7 @@ public class TelePOP extends LinearOpMode {
                     robot.rev = true;
                 }
             }
+
             else if (gamepad1.left_trigger > 0.3) {
                 //robot.uptakeOff = true;
                 robot.intakeOff = false;
@@ -101,7 +110,7 @@ public class TelePOP extends LinearOpMode {
                 robot.uptakeOff = true;
             }
 
-            if (gamepad1.triangle) {
+            if (gamepad2.square) {
                 robot.outtake1();
             }
             else {
@@ -134,34 +143,34 @@ public class TelePOP extends LinearOpMode {
                 gamepad2.rumble(50);
             }
 
-            if (gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone()) && (robot.validLaunch || robot.shotStarted))) {
+            if ((gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone())))) { //&& (robot.validLaunch || robot.shotStarted))) {
                 //change this value to add wait for RPM in far launch
-                if (!rapidFireFar && robot.getDistanceFromGoal() < 100) { //100
-                    robot.intake.setUptakeState(Intake.UptakeState.ON);
-                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                    robot.intakeOff = false;
-                    robot.uptakeOff = false;
-                }
-                else {
-                    if (robot.validLaunch) {
+                if (true || (robot.notMoving() && robot.turret.atTarget())) {
+                    if (robot.getDistanceFromGoal() < 100) { //100
                         robot.intake.setUptakeState(Intake.UptakeState.ON);
                         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intakeOff = false;
                         robot.uptakeOff = false;
+                    } else {
+                        if (robot.validLaunch || (robot.shotStarted && rapidFireFar)) {
+                            robot.intake.setUptakeState(Intake.UptakeState.ON);
+                            robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                            robot.intakeOff = false;
+                            robot.uptakeOff = false;
+                        } else {
+                            robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                            robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                            robot.intakeOff = true;
+                            robot.uptakeOff = true;
+                        }
                     }
-                    else {
+                }
+                else {
                         robot.intake.setUptakeState(Intake.UptakeState.OFF);
                         robot.intake.setIntakeState(Intake.IntakeState.OFF);
                         robot.intakeOff = true;
                         robot.uptakeOff = true;
-                    }
                 }
-                /*else {
-                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                    robot.intakeOff = true;
-                    robot.uptakeOff = true;
-                }*/
             }
 
             robot.shotStarted = gamepad1.left_bumper || gamepad2.right_bumper;
@@ -173,14 +182,15 @@ public class TelePOP extends LinearOpMode {
 
 
             //Driving (driver 1)
-            //if (!gamepad2.right_bumper) {
-            robot.getFollower().setTeleOpDrive(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
-                    robot.robotCentric,
-                    robot.getAlliance() == Alliance.RED ? 0 : Math.PI
-            );
+            //if ((!gamepad2.right_bumper && !gamepad1.left_bumper) || robot.shotDone()) {
+                robot.getFollower().setTeleOpDrive(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x,
+                        robot.robotCentric,
+                        robot.getAlliance() == Alliance.RED ? 0 : Math.PI
+                );
+          //  }
             // } else {
             // robot.getFollower().setTeleOpDrive(0, 0, 0, 0);
             //  }
@@ -247,6 +257,7 @@ public class TelePOP extends LinearOpMode {
             telemetry.addData("GoalX", redX);
             telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
             telemetry.addData("Robot zone", zone);
+            telemetry.addData("X vel", robot.getFollower().getVelocity().getXComponent());
         }
         CSVInterface.log();
     }

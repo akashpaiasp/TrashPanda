@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -48,6 +49,8 @@ public class Robot {
     public static boolean rapidFireFar = true;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
+    public static boolean manualAngle = false;
+    public static boolean manualFlightTime = false;
 
     public static double robot_length = 8.5; //actual robot length is 9, decreasing it means more robot has to be in zone in order to shoot
 
@@ -392,7 +395,8 @@ public class Robot {
         //telemetry.addData("path", follower.getCurrentPath());
         updateGoalCoords();
         updateRobotCoords();
-        updateShooting();
+        if (!EighteenBall.sotm || launcher.teleop)
+            updateShooting();
         follower.update();
         //autoEndPose = follower.getPose().copy();
         if (alliance == Alliance.RED)
@@ -539,7 +543,8 @@ public class Robot {
     }
 
     public void updateShooting() {
-        flightTime = k.getFlightTime();
+        if (!manualFlightTime)
+            flightTime = k.getFlightTime();
         double d;
         //if (launcher.teleop) {
         //KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
@@ -548,6 +553,10 @@ public class Robot {
         if (!manualR) {
             if (d > 120) r = .8;
             else r = .64;
+        }
+
+        if (!manualAngle) {
+            KinematicsCalculator.min_angle = Range.clip( -0.214286 * d +56.857144, 35, 45);
         }
 
         k.setDistance(d * r);
@@ -618,6 +627,89 @@ public class Robot {
 
     }
 
+    public void updateShooting(double d) {
+        if (!manualFlightTime)
+            flightTime = k.getFlightTime();
+
+        //if (launcher.teleop) {
+        //KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
+
+        if (!manualR) {
+            r = 1;
+        }
+
+        if (!manualAngle) {
+            KinematicsCalculator.min_angle = Range.clip( -0.214286 * d +56.857144, 38, 45);
+        }
+
+        k.setDistance(d * r);
+        if (!manualRPM)
+            Launcher.tele_target = k.getRPM();
+        /*
+        else
+            Launcher.tele_target = Launcher.target_velocity; */
+        Launcher.auto_target = k.getRPM();
+        double hoodPos = k.getHood(launcher.current_velocity);
+        if (!Launcher.teleop) {
+            if (EighteenBall.firstCouple) {
+                if (alliance == Alliance.RED)
+                    hoodPos -= 0;
+                else {
+                    hoodPos -= 0;
+                }
+            }
+            else
+            if (alliance == Alliance.RED)
+                hoodPos += 0;
+            else
+                hoodPos += 0;
+        }
+        if (hoodPos > 0) {
+            validLaunch = true;
+            if (!shotStarted || hoodAdjustment || true) {
+                if (d < 100)
+                    hood.setTarget(hoodPos);
+                else {
+                    hood.setTarget(hoodPos);
+                    //hood.setTarget(Hood.hoodUp);
+                }
+            }
+        } else {
+            validLaunch = false;
+        }
+        // }
+        /*
+        else {
+            Launcher.auto_target = 4400;
+            hood.setTarget(.9);
+        } */
+
+
+
+
+
+
+        //Old shooting code
+        /*
+        if (getDistanceFromGoal() > farLaunchDist) {
+            Launcher.tele_target = 5200;
+            Hood.hoodIncreaseAmt = 0;
+            hood.setTarget(Hood.hoodUp);
+        }
+        else if (getDistanceFromGoal() > goalDist) {
+            Launcher.tele_target = 4200;
+            Hood.hoodIncreaseAmt = 0.01;
+            hood.setTarget(Hood.hoodUp);
+        }
+        else {
+            Launcher.tele_target = 3000;
+            Hood.hoodIncreaseAmt = 0;
+            hood.setTarget(Hood.hoodDown);
+        }
+        */
+
+    }
+
     public void updateLimelight() {
         if (limelight.getResult().isValid()) {
             Pose3D botPose = limelight.botPose();
@@ -641,8 +733,8 @@ public class Robot {
 
     public double getDistanceFromGoal() {
         goalY = centerY;
-        double vx = KinematicsCalculator.inchesToMeters(follower.getVelocity().getXComponent());
-        double vy = KinematicsCalculator.inchesToMeters(follower.getVelocity().getYComponent());
+        double vx = follower.getVelocity().getXComponent();
+        double vy = follower.getVelocity().getYComponent();
         double dx = goalX - turretX - vx * flightTime;
         double dy = goalY - turretY - vy * flightTime;
 
@@ -744,7 +836,16 @@ public class Robot {
     }
 
     public boolean intakeDone() {
-        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > 2.4;
+        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > 1.6;
+    }
+    public boolean shotDone() {
+        return intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8;
+    }
+    public boolean has4() {
+        return  intake.intake.getCurrent(CurrentUnit.AMPS) > 4;
+    }
+    public boolean notMoving() {
+        return follower.getVelocity().getXComponent() < .2 && follower.getVelocity().getYComponent() < .2 && follower.getAngularVelocity() < .1;
     }
 
 

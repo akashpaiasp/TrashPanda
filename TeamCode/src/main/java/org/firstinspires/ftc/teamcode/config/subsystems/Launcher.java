@@ -52,7 +52,7 @@ public class Launcher extends SubsystemBase {
     public static double tele_target = 4500;
     public static double auto_target = 4000;
     public static boolean powerMode = false;
-    public static boolean bangBang = false;
+    public static boolean bangBang = true;
     public static boolean pid1 = true;
     public double current_velocity = 0;
     public double prev_velocity = 0;

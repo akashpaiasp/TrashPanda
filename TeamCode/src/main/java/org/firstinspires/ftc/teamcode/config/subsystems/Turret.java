@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.util.AxonContinuous;
 import org.firstinspires.ftc.teamcode.config.util.PDFLController;
+import org.opencv.core.Mat;
 
 /*Sample subsystem class. Subsystems are anything on the robot that is not the drive train
 such as a claw or a lift.
@@ -29,6 +30,7 @@ such as a claw or a lift.
 public class Turret extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     public static double power = 0;
+    public boolean turretOffAuto = false;
 
     public static double offset = -4;
     //61.7, 14.9
@@ -53,14 +55,16 @@ public class Turret extends SubsystemBase {
     public static boolean useTurret = true;
 
 
-    private static final double MIN_ANGLE = -90; // turret left limit
-    private static final double MAX_ANGLE = 90;  // turret right limit
+    public static  double MIN_ANGLE = -120; // turret left limit
+    public static  double MAX_ANGLE = 120;  // turret right limit
     public static double autoFudge = 3;
     public double current;
 
     private MultipleTelemetry telemetry;
     public AxonContinuous spin;
     public CRServo spin2;
+
+    public static double targetRange = 3;
     //public Servo spin;
 
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -81,7 +85,7 @@ public class Turret extends SubsystemBase {
 
     public void periodicTest() {
         spin.calculate();
-        current = -(Math.round(getTotalDegrees() * 10.0)) / 10.0;
+        current = -getTotalDegrees();
         controller.updateConstants(p, d, target > current ? f : -f, l, i);
         controller.update(current, target);
         power = controller.run();
@@ -122,7 +126,7 @@ public class Turret extends SubsystemBase {
         //if (Robot.logData) log();
         aim();
         spin.calculate();
-        current = -(Math.round(getTotalDegrees() * 10.0)) / 10.0;
+        current = -getTotalDegrees();
         controller.update(current, target);
         llcontroller.updateConstants(p2, d2, f2, l2, i2);
 
@@ -191,6 +195,7 @@ public class Turret extends SubsystemBase {
 
     public void setTargetDegrees(double targetDeg) {
         target = targetDeg;
+        turretOffAuto = true;
     }
 
     public void updateAiming(double targetX, double targetY, Pose botPose) {
@@ -225,7 +230,7 @@ public class Turret extends SubsystemBase {
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
         double turretRelativeAngle;
 
-        if (Launcher.teleop)
+        if (Launcher.teleop || true)
             turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + fudgeFactor) ;
         else {
             if (Robot.alliance == Alliance.RED)
@@ -236,13 +241,19 @@ public class Turret extends SubsystemBase {
 
         turretRelativeAngle = Range.clip(turretRelativeAngle, MIN_ANGLE, MAX_ANGLE);
         //turretRelativeAngle = 0;
-        if (useTurret)
-            setTargetDegrees(-turretRelativeAngle);
+        if (useTurret) {
+            if (Launcher.teleop || !turretOffAuto)
+                target = -turretRelativeAngle;
+        }
         else
-            setTargetDegrees(0);
+            target = 0;
 
         telemetry.addData("Target Degrees", -turretRelativeAngle);
 
+    }
+
+    public boolean atTarget() {
+        return Math.abs(target - current) < targetRange;
     }
 
 
@@ -266,5 +277,6 @@ public class Turret extends SubsystemBase {
         Logger.logData(LogType.TURRET_FULL_ROTS, String.valueOf(spin.full_rotations));
 
     }
+
 
 }

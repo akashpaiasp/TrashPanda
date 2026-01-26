@@ -33,10 +33,10 @@ public class EighteenBall extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = .3;
-    double onThresholdTwo = .3;
+    double onThreshold = 0;
+    double onThresholdTwo = 0;
 
-    double offThreshold = .1;
+    double offThreshold = 0;
     double moveThreshold = 1.8;
     double moveIntakeThreshold = 1.3;
     public static boolean firstCouple = true;
@@ -60,9 +60,22 @@ public class EighteenBall extends OpMode {
     boolean pressingBack = false;
 
 
+    public static double rpm = 4000;
+    public static boolean sotm = false;
+    public static boolean twentyOne = false;
+    public static double hood1 = .7;
+    public static double hood2 = .8;
+    public static double hood3 = .9;
+    public static double timeBetween = .5;
+    public static double tValue = .3;
+
+
+
     public void autonomousPathUpdate() {
 
-        if (aimTurret) new Aim(robot, goalX, goalY).execute();
+        if (aimTurret) {
+            robot.turret.turretOffAuto = false;
+        }//new Aim(robot, goalX, goalY).execute();
         else {
             if (robot.getAlliance() == Alliance.RED)
                 robot.turret.setTargetDegrees(-62);
@@ -76,6 +89,7 @@ public class EighteenBall extends OpMode {
 
         switch (pathState) {
             case 00: //preload & set max power
+                //sotm = true;
                 robot.getFollower().setMaxPower(1);
                 //robot.turret.setTargetDegrees(robot.getAlliance() == Alliance.RED ? -53 : 53);
                 //if (gamepad1.square)
@@ -91,10 +105,31 @@ public class EighteenBall extends OpMode {
                 setPathState(1025);
                 break;
             case 1025:
-                if (robot.getFollower().getCurrentTValue() > .8) {
-                    if (alliance == Alliance.BLUE)
+                if (robot.getFollower().getCurrentTValue() >= 0) {
                         aimTurret = true;
+                        //sotm = true;
+                        //robot.launcher.setTarget(rpm);
+                        // setPathState(1026);
                     setPathState(1201);
+                }
+                break;
+
+            case 1026:
+                if (robot.getFollower().getCurrentTValue() >= tValue) {
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    robot.shotStarted = true;
+
+                    if (pathTimer.getElapsedTimeSeconds() > timeBetween) {
+                        if (pathTimer.getElapsedTimeSeconds() > timeBetween * 2) {
+                            robot.hood.setTarget(hood3);
+                            setPathState(1201);
+                        }
+                        else
+                            robot.hood.setTarget(hood2);
+                    }
+                    else
+                        robot.hood.setTarget(hood1);
                 }
                 break;
 
@@ -188,11 +223,12 @@ public class EighteenBall extends OpMode {
             case 1202:
                 doneNum = 0;
                 firstCouple = false;
-                //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                ////robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? strafe1(robot.getFollower()) : strafe1Blue(robot.getFollower()), true);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? strafe1(robot.getFollower()) : strafe1Blue(robot.getFollower()), false);
                 robot.intake.setGateState(Intake.GateState.CLOSED);
+                sotm = false;
                 //if (gamepad1.square)
                 setPathState(12025);
                 break;
@@ -251,7 +287,8 @@ public class EighteenBall extends OpMode {
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        setPathState(12);
+                        if (!twentyOne)setPathState(12);
+                        else setPathState(1301);
                         doneDone = false;
                     }
                 }
@@ -263,14 +300,87 @@ public class EighteenBall extends OpMode {
                 }
                 break;
 
+                //21 ball here
+            case 1301: {
+                two = false;
+                doneNum = 0;
+                ////robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickupBlue(robot.getFollower()), true);
+                robot.intake.setGateState(Intake.GateState.CLOSED);
+                //if (gamepad1.square)
+                setPathState(1302);
 
-            //end
+            }
+            break;
+
+
+
+
+
+            case 1302:
+                if (robot.getFollower().getCurrentTValue() > .9) {
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                }
+                if (robot.getFollower().isBusy()) {
+                    pathTimer.reset();
+                    return;
+                }
+                if (intakeDone())
+                {
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGateBlue(robot.getFollower()), true);
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    setPathState(1303);
+                }
+                break;
+
+            case 1303:
+                if (robot.getFollower().getCurrentTValue() > 0) {
+                    robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+                    robot.intake.setGateState(Intake.GateState.OPEN);
+                    aimTurret = true;
+                    setPathState(1304);
+                }
+                break;
+            case 1304:
+                if (robot.getFollower().isBusy()) {
+                    pathTimer.reset();
+                    return;
+                }
+
+                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                        robot.intake.setUptakeState(Intake.UptakeState.ON); }
+                    robot.shotStarted = true;
+                }
+                if (doneDone) {
+                    if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
+                        robot.shotStarted = false;
+                        //setPathState(1452);
+                        setPathState(12);
+                        doneDone = false;
+
+                    }
+                }
+                if (shotDone()) {
+                    pathTimer.reset();
+                    doneDone = true;
+                    time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
+                    //if (gamepad1.square)
+                }
+                break;
+
+
+            //21 ball end
 
 
             case 12: {
                 two = false;
                 doneNum = 0;
-                robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                ////robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
                 robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickupBlue(robot.getFollower()), true);
@@ -318,7 +428,7 @@ public class EighteenBall extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intake.setUptakeState(Intake.UptakeState.ON); }
                     robot.shotStarted = true;
                 }
@@ -340,7 +450,7 @@ public class EighteenBall extends OpMode {
 
             case 1452: {
                 doneNum = 0;
-                robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
                 robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? gatePickup2(robot.getFollower()) : gatePickup2Blue(robot.getFollower()), true);
@@ -389,7 +499,7 @@ public class EighteenBall extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intake.setUptakeState(Intake.UptakeState.ON); }
                     robot.shotStarted = true;
                 }
@@ -412,7 +522,7 @@ public class EighteenBall extends OpMode {
             case 1456:
                 doneNum = 0;
                 if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
-                    robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                    //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                     //robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     //robot.intake.setUptakeState(Intake.UptakeState.OFF);
 
@@ -458,7 +568,7 @@ public class EighteenBall extends OpMode {
                     return;
                 }
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.ON); }
                 }
                 if (pathTimer.getElapsedTimeSeconds() > moveThreshold)
@@ -471,8 +581,8 @@ public class EighteenBall extends OpMode {
             case 19:
                 doneNum = 0;
                 if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
-                    robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup2(robot.getFollower()) : strafe1Blue(robot.getFollower()), true);
+                    //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup2(robot.getFollower()) : strafe1Blue(robot.getFollower()), false);
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                     robot.intake.setGateState(Intake.GateState.CLOSED);
@@ -489,7 +599,7 @@ public class EighteenBall extends OpMode {
                     return;
                 }
                 else  {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot3(robot.getFollower()) : shoot3Blue(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot3(robot.getFollower()) : shoot3Blue(robot.getFollower()), false);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     //if (gamepad1.square)
@@ -515,7 +625,7 @@ public class EighteenBall extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intake.setUptakeState(Intake.UptakeState.ON); }
                     robot.shotStarted = true;
                 }
@@ -538,10 +648,10 @@ public class EighteenBall extends OpMode {
 
             case 23:
                 doneNum = 0;
-                robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? strafe2(robot.getFollower()) : strafe2Blue(robot.getFollower()), true);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? strafe2(robot.getFollower()) : strafe2Blue(robot.getFollower()), false);
                 robot.intake.setGateState(Intake.GateState.CLOSED);
                 //if (gamepad1.square)
                 setPathState(24);
@@ -589,7 +699,7 @@ public class EighteenBall extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThresholdTwo) {
-                    if(robot.validLaunch) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intake.setUptakeState(Intake.UptakeState.ON); }
                     robot.shotStarted = true;
                 }
@@ -635,7 +745,7 @@ public class EighteenBall extends OpMode {
         }
         else {
             pathState = 99999;
-            robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+            //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
             robot.intake.setIntakeState(Intake.IntakeState.OFF);
             robot.intake.setUptakeState(Intake.UptakeState.OFF);
         }
@@ -712,7 +822,7 @@ public class EighteenBall extends OpMode {
     }
     public boolean intakeDone() {
         if (pathTimer.getElapsedTimeSeconds() < checkTime) return false;
-        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > 2.4);
+        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > 4.1 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > 1.7);
     }
 
     public void launch3() {

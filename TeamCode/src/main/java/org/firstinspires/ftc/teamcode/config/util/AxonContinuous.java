@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.config.util;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -8,7 +9,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+@Config
 public class AxonContinuous {
     private CRServo c;
     private AnalogInput a;
@@ -25,8 +28,10 @@ public class AxonContinuous {
     public double lastTimePos = 0;
     public static double timeThreshold = 0.05;
     public ArrayList<Double> volts = new ArrayList<>();
-    public boolean first = true;
+    public static int windowSize = 5;
     public double volt;
+    public static double roundAmt = 100.0;
+
 
 
 
@@ -47,7 +52,27 @@ public class AxonContinuous {
 
     public double getVolts() {
         //if (a.getVoltage() < 3.2 && a.getVoltage() > 0.1)
-        volt = Math.round(a.getVoltage() * 100.0) / 100.0;
+        volt = Math.round(a.getVoltage() * (double)roundAmt) / (double)roundAmt;
+
+
+
+        /*
+        volts.add(volt);
+
+        if (volts.size() > windowSize) {
+            volts.remove(0);
+        }
+
+        if (volts.size() <= 1 || windowSize == 1) {
+            return volt;
+        }
+
+        double sum = 0.0;
+        for (double v : volts) {
+            sum += v;
+        }
+        return sum / volts.size(); */
+
         /*
         if (first) {
             for (double d : volts)
