@@ -22,10 +22,12 @@ public class Hood extends SubsystemBase {
 
     //state of the subsystem
     public Servo hood;
-    public static double hoodDown = 0.5; //-.025; //23.9
+
+    public static double shootingVariable = 0.025;
+    public static double hoodDown = 0.5 - shootingVariable; //23.9
     public double hoodMid = 0.625 ;
     public double hoodMidUp = 0.75; //64(hoodPos-0.5) + 23.9 //6.4
-    public static double hoodUp = 0.95-.025; //49.5
+    public static double hoodUp = 0.95 - shootingVariable; //49.5
     public static double target = 0.0;
     public static double hoodIncreaseAmt = 0.02;
     public static double autoHoodShoot1 = 0.9;

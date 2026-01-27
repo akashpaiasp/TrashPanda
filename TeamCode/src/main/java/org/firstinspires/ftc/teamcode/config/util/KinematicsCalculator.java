@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.util;
 
+import static org.firstinspires.ftc.teamcode.config.subsystems.Hood.shootingVariable;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.Range;
 
@@ -128,7 +130,7 @@ public class KinematicsCalculator {
 
     private static double thetaToHood(double theta) {
         if (theta < 0) return -1;
-        return Range.clip(1.4758 - 0.015625 * theta, Hood.hoodDown, Hood.hoodUp);
+        return Range.clip(1.4758 - 0.015625 * theta - shootingVariable, Hood.hoodDown, Hood.hoodUp);
     }
 
     public static double hoodToTheta(double hood) {
