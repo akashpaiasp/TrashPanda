@@ -13,7 +13,7 @@ public class EighteenBall {
     private static double braking = 1;
     private static double velConstraint = 0.00000001;
     // Red Poses
-    public static final Pose startPose = new Pose(34.46, 62.21, 1.561);
+    public static final Pose startPose = new Pose(39.04, 60.4, 1.561);
 
     private static final Pose shootPose = new Pose(15.5, 12, 0);
     public static final Pose shootPose2 = new Pose(14, 5, Math.toRadians(-15));

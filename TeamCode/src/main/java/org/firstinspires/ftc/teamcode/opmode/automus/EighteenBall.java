@@ -35,12 +35,12 @@ public class EighteenBall extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = 0.15;
+    double onThreshold = 0;
     double onThresholdTwo = 0;
 
     double offThreshold = 0;
     double moveThreshold = 1.8;
-    double moveIntakeThreshold = 1.4;
+    double moveIntakeThreshold = 1.2;
     public static boolean firstCouple = true;
     boolean doneOff = false;
     double doneNum = 0;
