@@ -19,7 +19,11 @@ public class KinematicsCalculator {
     public static final double r_flywheel_in = d_flywheel_in / 2.0;
 
     public static final double g = 9.81;                     // gravity (m/s^2)
+
+
     public static  double efficiency = .83;          // launcher efficiency factor
+    public static double efficiencyTele = .83;
+    public static double efficiencyAuto = .79;
 
     public static double FUDGE_FACTOR_VEL = 0.946;
 
@@ -51,6 +55,10 @@ public class KinematicsCalculator {
             y_target_m = inchesToMeters(y_target_in);
         else
             y_target_m = inchesToMeters(y_target_in + 10);
+
+        if (Launcher.teleop)
+            efficiency = efficiencyTele;
+        else efficiency = efficiencyAuto;
     }
 
     public double getRPM() {
