@@ -41,12 +41,16 @@ public class Robot {
     private Opmode op = TELEOP;
     private double speed = 1.0;
     public static double turretOffset = 3.8;
+    public static double uptakeThreshold = 5.5;
+    public static double intakeThreshold = 2;
+    public static double outtakeTime = .3;
     public static double r = 1;
 
     //Booleans to change on FTCDash
     public static boolean showTelemetry = false;
     public static boolean hoodAdjustment = false;
-    public static boolean rapidFireFar = true;
+    public static boolean rapidFireFar = false;
+    public static double farLaunchR = 0.8;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
     public static boolean manualAngle = false;
@@ -551,7 +555,7 @@ public class Robot {
         d = getDistanceFromGoal();
 
         if (!manualR) {
-            if (d > 120) r = .8;
+            if (d > 120) r = farLaunchR;
             else r = .64;
         }
 
@@ -774,7 +778,7 @@ public class Robot {
             intake.setIntakeState(Intake.IntakeState.SLOWOUTTAKE);
         }
         else {
-            if (timer.getElapsedTimeSeconds() > .1) {
+            if (timer.getElapsedTimeSeconds() > outtakeTime) {
                 intake.setIntakeState(Intake.IntakeState.OFF);
                 intakeOff = true;
             }
@@ -836,7 +840,7 @@ public class Robot {
     }
 
     public boolean intakeDone() {
-        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > 4 || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > 1.6;
+        return  (intake.uptake.getCurrent(CurrentUnit.AMPS) > uptakeThreshold || uptakeOff) && intake.intake.getCurrent(CurrentUnit.AMPS) > intakeThreshold;
     }
     public boolean shotDone() {
         return intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8;

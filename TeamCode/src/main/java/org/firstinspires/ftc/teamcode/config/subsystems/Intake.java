@@ -24,6 +24,7 @@ public class Intake extends SubsystemBase {
     public static double launchIntake = 1;
     public static double launchUptake = 1;
     public static double intakeUptake = .7;
+    public static double outtake1Power = -.5;
 
     public static boolean manual = false;
 
@@ -113,7 +114,7 @@ public class Intake extends SubsystemBase {
                 intake.setPower(-1);
                 break;
             case SLOWOUTTAKE:
-                intake.setPower(-.25);
+                intake.setPower(outtake1Power);
                 break;
         }
 

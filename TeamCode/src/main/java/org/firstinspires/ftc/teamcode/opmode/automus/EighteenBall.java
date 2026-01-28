@@ -4,7 +4,9 @@ import static org.firstinspires.ftc.teamcode.config.core.Robot.alliance;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.blueX;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.goalX;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.goalY;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.intakeThreshold;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.redX;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.uptakeThreshold;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.*;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -33,12 +35,12 @@ public class EighteenBall extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = 0;
+    double onThreshold = 0.15;
     double onThresholdTwo = 0;
 
     double offThreshold = 0;
     double moveThreshold = 1.8;
-    double moveIntakeThreshold = 1.3;
+    double moveIntakeThreshold = 1.4;
     public static boolean firstCouple = true;
     boolean doneOff = false;
     double doneNum = 0;
@@ -46,6 +48,7 @@ public class EighteenBall extends OpMode {
     double lastMoveTime = 5.2;
     double intakeTime = 2;
     double checkTime = .15;
+    double gateOpenTimeFirstIntake = .8;
     int doneThreshold = 4;
     double dist;
     boolean time = false;
@@ -68,6 +71,7 @@ public class EighteenBall extends OpMode {
     public static double hood3 = .9;
     public static double timeBetween = .5;
     public static double tValue = .3;
+    public boolean dontChangeTurret = false;
 
 
 
@@ -76,7 +80,7 @@ public class EighteenBall extends OpMode {
         if (aimTurret) {
             robot.turret.turretOffAuto = false;
         }//new Aim(robot, goalX, goalY).execute();
-        else {
+        else if (!dontChangeTurret){
             if (robot.getAlliance() == Alliance.RED)
                 robot.turret.setTargetDegrees(-62);
             else
@@ -253,6 +257,7 @@ public class EighteenBall extends OpMode {
                     pathTimer.reset();
                     return;
                 }
+                else if (pathTimer.getElapsedTimeSeconds() < gateOpenTimeFirstIntake) return;
                 else  {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot2(robot.getFollower()) : shoot2Blue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
@@ -711,6 +716,7 @@ public class EighteenBall extends OpMode {
                     }
                 }
                 if (shotDone()) {
+                    dontChangeTurret = true;
                     pathTimer.reset();
                     doneDone = true;
                     time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
@@ -822,7 +828,7 @@ public class EighteenBall extends OpMode {
     }
     public boolean intakeDone() {
         if (pathTimer.getElapsedTimeSeconds() < checkTime) return false;
-        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > 4.1 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > 1.7);
+        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > uptakeThreshold && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > intakeThreshold);
     }
 
     public void launch3() {

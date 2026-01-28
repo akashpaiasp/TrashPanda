@@ -19,7 +19,7 @@ public class KinematicsCalculator {
     public static final double r_flywheel_in = d_flywheel_in / 2.0;
 
     public static final double g = 9.81;                     // gravity (m/s^2)
-    public static  double efficiency = .8;          // launcher efficiency factor
+    public static  double efficiency = .83;          // launcher efficiency factor
 
     public static double FUDGE_FACTOR_VEL = 0.946;
 
@@ -47,7 +47,7 @@ public class KinematicsCalculator {
 
     public void setDistance(double distance) {
         this.distance = inchesToMeters(distance);
-        if (distance > inchesToMeters(25))
+        if (distance > inchesToMeters(35))
             y_target_m = inchesToMeters(y_target_in);
         else
             y_target_m = inchesToMeters(y_target_in + 10);
@@ -56,8 +56,14 @@ public class KinematicsCalculator {
     public double getRPM() {
         double vel;
         double thetaRad1, thetaRad2;
-        thetaRad1 = Math.toRadians(max_angle - 1);
-        thetaRad2 = Math.toRadians(min_angle + 1);
+        if (distance <= inchesToMeters(35)) {
+            thetaRad1 = Math.toRadians(max_angle - 1);
+            thetaRad2 = Math.toRadians(min_angle + 1);
+        }
+        else {
+            thetaRad1 = Math.toRadians(max_angle);
+            thetaRad2 = Math.toRadians(min_angle);
+        }
 
         double vel1 = Math.sqrt(g * distance * distance /
                 (2.0 * Math.pow(Math.cos(thetaRad1), 2.0) *
@@ -68,7 +74,7 @@ public class KinematicsCalculator {
                 (2.0 * Math.pow(Math.cos(thetaRad2), 2.0) *
                         (distance * Math.tan(thetaRad2) + y_exit_m - y_target_m))
         );
-        if (distance > inchesToMeters(35))
+        if (distance >= inchesToMeters(35))
             vel = Math.max(vel1, vel2);
         else {
             vel = //Math.min(vel1, vel2);
@@ -79,7 +85,7 @@ public class KinematicsCalculator {
 
     public double getHood(double currentRPM) {
         RPM = currentRPM;
-        if (distance < inchesToMeters(25)) return Hood.hoodDown;
+        if (distance < inchesToMeters(35)) return Hood.hoodDown;
         double v0 = rpmToVel(currentRPM);
 
         // Quadratic coefficients in tan(theta)
@@ -108,6 +114,8 @@ public class KinematicsCalculator {
             return -1;
         }
         angleDeg = thetaDeg;
+        /*if (distance > inchesToMeters(35))
+            return Hood.hoodUp; */
         if (distance > inchesToMeters(25))
             return thetaToHood(thetaDeg);
         return Hood.hoodDown;

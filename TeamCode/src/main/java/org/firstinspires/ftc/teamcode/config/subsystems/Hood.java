@@ -23,7 +23,7 @@ public class Hood extends SubsystemBase {
     //state of the subsystem
     public Servo hood;
 
-    public static double shootingVariable = 0.025;
+    public static double shootingVariable = 0;
     public static double hoodDown = 0.5 - shootingVariable; //23.9
     public double hoodMid = 0.625 ;
     public double hoodMidUp = 0.75; //64(hoodPos-0.5) + 23.9 //6.4
