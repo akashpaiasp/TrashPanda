@@ -21,7 +21,7 @@ public class EighteenBall {
 
     public static final Pose shootPose4 =new Pose(16, 5, startPose.getHeading());
     public static final Pose shootPose3 = shootPose2;//new Pose(11, 5, Math.toRadians(-15));
-    private static final Pose moveToShoot = new Pose(24, 0, Math.toRadians(0));
+    private static final Pose moveToShoot = new Pose(30, 0, Math.toRadians(0));
     private static final Pose strafe1 = new Pose(30, -7.2, 0);
     private static final Pose pickup2 = new Pose(54, -7.2, 0); //second spike mark
     private static final Pose pickup1 = new Pose(54, 12, 0); //first spike mark
