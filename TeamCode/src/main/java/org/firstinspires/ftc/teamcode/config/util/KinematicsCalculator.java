@@ -23,7 +23,7 @@ public class KinematicsCalculator {
 
     public static  double efficiency = .83;          // launcher efficiency factor
     public static double efficiencyTele = .83;
-    public static double efficiencyAuto = .79;
+    public static double efficiencyAuto = .83;
 
     public static double FUDGE_FACTOR_VEL = 0.946;
 

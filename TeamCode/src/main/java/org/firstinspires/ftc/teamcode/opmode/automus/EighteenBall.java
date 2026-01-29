@@ -48,7 +48,7 @@ public class EighteenBall extends OpMode {
     double lastMoveTime = 5.2;
     double intakeTime = 2;
     double checkTime = .15;
-    double gateOpenTimeFirstIntake = .8;
+    double gateOpenTimeFirstIntake = .1;
     int doneThreshold = 4;
     double dist;
     boolean time = false;

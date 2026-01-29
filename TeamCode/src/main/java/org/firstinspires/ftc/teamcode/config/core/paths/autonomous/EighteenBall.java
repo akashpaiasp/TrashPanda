@@ -27,7 +27,7 @@ public class EighteenBall {
     private static final Pose pickup1 = new Pose(54, 12, 0); //first spike mark
 
     public static final Pose strafeGate = new Pose(40, -10, 0.59);
-    public static final Pose gate = new Pose(59, -12.5, .515);
+    public static final Pose gate = new Pose(59, -11.5, .515);
     public static final Pose gateBlue = convertToBlue(gate);//new Pose(-59, -10, 2.55);
     private static final Pose strafe2 = new Pose(20, -33.5, 0);
     private static final Pose pickup3 = new Pose(53, -33.5, 0);
