@@ -52,7 +52,7 @@ public class Launcher extends SubsystemBase {
     public static double tele_target = 4500;
     public static double auto_target = 4000;
     public static boolean powerMode = false;
-    public static boolean bangBang = true;
+    public static boolean boomBoom = true;
     public static boolean pid1 = true;
     public double current_velocity = 0;
     public double prev_velocity = 0;
@@ -312,7 +312,7 @@ public class Launcher extends SubsystemBase {
             } */
         // 4) Set Power (steady state)
         if (!(current == LauncherState.STOP)) {
-            if (!bangBang) {
+            if (!boomBoom) {
                 launcher1.setPower(pdfl);
                 launcher2.setPower(pdfl);
             }
