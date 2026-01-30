@@ -31,6 +31,7 @@ public class Turret extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     public static double power = 0;
     public boolean turretOffAuto = false;
+    public boolean lockTurret = false;
 
     public static double offset = -4;
     //61.7, 14.9
@@ -134,8 +135,14 @@ public class Turret extends SubsystemBase {
 
         power = Range.clip(power, -1, 1);
 
-        spin.setPower(power);
-        spin2.setPower(power);
+        if (!lockTurret || true) {
+            spin.setPower(power);
+            spin2.setPower(power);
+        }
+        else {
+            spin.setPower(0);
+            spin2.setPower(0);
+        }
 
         telemetry.addData("turret target", target);
         telemetry.addData("turret power", power);

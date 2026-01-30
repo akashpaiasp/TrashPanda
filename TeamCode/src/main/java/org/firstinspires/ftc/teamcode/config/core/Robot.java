@@ -50,7 +50,7 @@ public class Robot {
     public static boolean showTelemetry = false;
     public static boolean hoodAdjustment = false;
     public static boolean rapidFireFar = false;
-    public static double farLaunchR = 0.8;
+    public static double farLaunchR = 0.85;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
     public static boolean manualAngle = false;
@@ -60,6 +60,8 @@ public class Robot {
 
     public double robotX = 0, robotY = 0;
     public boolean rev = false;
+    public static double increaseAmt = .5;
+
 
 
     public AutoDriving autoDrive;
@@ -86,6 +88,8 @@ public class Robot {
 
 
     public static double centerX = 67, centerY = 67, centerXBlue = -67;
+    public static double farZoneX = 70;
+    public static double farZoneXBlue = -72 + (72-farZoneX);
     public static double centerX2 = centerX, centerY2 = centerY;
     public static double goalY = centerY;
     public static double redX = centerX;
@@ -359,10 +363,16 @@ public class Robot {
             //Aim.fudgeFactor = 0;
         }));
         g2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(new InstantCommand(() -> {
-            hood.increase();
+            decreaseY();
         }));
         g2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
-            hood.decrease();
+            increaseY();
+        }));
+        g2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
+            decreaseX();
+        }));
+        g2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
+            increaseX();
         }));
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             autoDrive.toGate();
@@ -752,8 +762,8 @@ public class Robot {
             goalY = 67;
         }
         else {
-            redX = 72;
-            blueX = -72;
+            redX = farZoneX;
+            blueX = farZoneXBlue;
             goalY = 72;
         }
 
@@ -850,6 +860,18 @@ public class Robot {
     }
     public boolean notMoving() {
         return follower.getVelocity().getXComponent() < .2 && follower.getVelocity().getYComponent() < .2 && follower.getAngularVelocity() < .1;
+    }
+    public void increaseX() {
+        follower.setX(follower.getPose().getX() + increaseAmt);
+    }
+    public void increaseY() {
+        follower.setY(follower.getPose().getY() + increaseAmt);
+    }
+    public void decreaseX() {
+        follower.setX(follower.getPose().getX() - increaseAmt);
+    }
+    public void decreaseY() {
+        follower.setY(follower.getPose().getY() - increaseAmt);
     }
 
 

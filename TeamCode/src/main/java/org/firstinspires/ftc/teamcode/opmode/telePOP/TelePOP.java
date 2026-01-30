@@ -32,6 +32,7 @@ public class TelePOP extends LinearOpMode {
     public static boolean manualMode = false;
     public boolean pressingC = false;
     public boolean pressingRT = false;
+    public boolean rumble = false;
     public int shotNum = 0;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -74,6 +75,7 @@ public class TelePOP extends LinearOpMode {
 
 
             if (gamepad1.right_trigger > 0.3) {
+                if (robot.intakeDone()) rumble = true;
                 pressingRT = true;
                 robot.intakeOff = false;
                 robot.intake.setGateState(Intake.GateState.CLOSED);
@@ -138,20 +140,24 @@ public class TelePOP extends LinearOpMode {
                 robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
             }
 
-            if (robot.validLaunch) {
+            if (rumble) {
                 gamepad1.rumble(50);
                 gamepad2.rumble(50);
             }
 
-            if ((gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone())))) { //&& (robot.validLaunch || robot.shotStarted))) {
+            if ((gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone())))) {
+                rumble = false;
+                //&& (robot.validLaunch || robot.shotStarted))) {
                 //change this value to add wait for RPM in far launch
                 if (true || (robot.notMoving() && robot.turret.atTarget())) {
                     if (robot.getDistanceFromGoal() < 100) { //100
+                        robot.turret.lockTurret = true;
                         robot.intake.setUptakeState(Intake.UptakeState.ON);
                         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intakeOff = false;
                         robot.uptakeOff = false;
                     } else {
+                        robot.turret.lockTurret = false;
                         if (robot.validLaunch || (robot.shotStarted && rapidFireFar)) {
                             robot.intake.setUptakeState(Intake.UptakeState.ON);
                             robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
@@ -171,6 +177,9 @@ public class TelePOP extends LinearOpMode {
                         robot.intakeOff = true;
                         robot.uptakeOff = true;
                 }
+            }
+            else {
+                robot.turret.lockTurret = false;
             }
 
             robot.shotStarted = gamepad1.left_bumper || gamepad2.right_bumper;
