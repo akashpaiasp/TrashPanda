@@ -88,7 +88,7 @@ public class Robot {
 
 
     public static double centerX = 67, centerY = 67, centerXBlue = -67;
-    public static double farZoneX = 70;
+    public static double farZoneX = 67;
     public static double farZoneXBlue = -72 + (72-farZoneX);
     public static double centerX2 = centerX, centerY2 = centerY;
     public static double goalY = centerY;
