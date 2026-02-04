@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.config.core;
 
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.convertToBlue;
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -119,6 +120,7 @@ public class Robot {
     public static Pose cornerBlueBack = new Pose(-61.9, -65.9);
     // public static Pose cornerRedFront = new Pose(-72, -72);
     public static Pose cornerRedBack = new Pose(61.9, -65.9);
+    public static Pose resetTurret = new Pose(-63, -58.5, 1.5);
 
     public boolean uptakeOff = true;
     public boolean launcherOff = true;
@@ -494,7 +496,10 @@ public class Robot {
     }
 
     public void resetPose() {
-        follower.setPose(new Pose(0, 0, Math.toRadians(90)));
+        if (alliance == Alliance.RED)
+            follower.setPose(resetTurret);
+        else
+            follower.setPose(convertToBlue(resetTurret));
     }
 
     public void log() {

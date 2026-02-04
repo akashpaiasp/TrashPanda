@@ -30,8 +30,10 @@ such as a claw or a lift.
 public class Turret extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     public static double power = 0;
+    public static boolean continuousMode = false;
     public boolean turretOffAuto = false;
     public boolean lockTurret = false;
+
 
     public static double offset = -4;
     //61.7, 14.9

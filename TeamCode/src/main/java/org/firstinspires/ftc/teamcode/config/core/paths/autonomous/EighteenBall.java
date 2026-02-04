@@ -19,11 +19,11 @@ public class EighteenBall {
     public static final Pose shootPose2 = new Pose(14, 5, Math.toRadians(-15));
     public static final Pose shootPoseThirdPickup = shootPose2;//new Pose(16, 10, -.94);
 
-    public static final Pose shootPose4 =new Pose(16, 5, startPose.getHeading());
+    public static final Pose shootPose4 =new Pose(16, 15, startPose.getHeading());
     public static final Pose shootPose3 = shootPose2;//new Pose(11, 5, Math.toRadians(-15));
     private static final Pose moveToShoot = new Pose(30, 0, Math.toRadians(0));
-    private static final Pose strafe1 = new Pose(30, -7.2, 0);
-    private static final Pose pickup2 = new Pose(54, -7.2, 0); //second spike mark
+    private static final Pose strafe1 = new Pose(30, -7.8, 0);
+    private static final Pose pickup2 = new Pose(54, -7.8, 0); //second spike mark
     private static final Pose pickup1 = new Pose(54, 12, 0); //first spike mark
 
     public static final Pose strafeGate = new Pose(40, -10, 0.59);
@@ -34,7 +34,7 @@ public class EighteenBall {
     private static final Pose move = new Pose(24, 0, shootPose3.getHeading());
 
     // Blue Poses
-    public static final Pose startPoseBlue = convertToBlue(startPose);//new Pose(49.6, 49.9, 0.77);
+    public static final Pose startPoseBlue = convertToBlue(startPose);//new Pose(-36.7+1.5, 58.1+4, 1.55);
 
     private static final Pose shootPoseBlue = convertToBlue(shootPose);//new Pose(12, 12, 0);
     public static final Pose shootPose2Blue = convertToBlue(shootPose2);//new Pose(16, 5, Math.toRadians(-15));
