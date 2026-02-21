@@ -10,7 +10,7 @@ import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.config.commands.*;
+//import org.firstinspires.ftc.teamcode.config.commands.*;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
 import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
@@ -131,13 +131,16 @@ public class TelePOP extends LinearOpMode {
             }
             //}
 
-            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper || robot.rev || keepShooterOn) {
-                robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+            if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper) {
+                robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
                 if (gamepad1.right_bumper || gamepad2.right_bumper || gamepad2.left_bumper || gamepad1.left_bumper)
                     robot.intake.setGateState(Intake.GateState.OPEN);
             }
             else {
-                robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
+                if (Robot.keepShooterOn)
+                    robot.launcher.setLauncherState(Launcher.LauncherState.OUT);
+                else
+                    robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
             }
 
             if (rumble) {

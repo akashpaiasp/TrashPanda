@@ -28,18 +28,18 @@ public class Launcher extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     private MultipleTelemetry telemetry;
 
-    public DcMotorEx launcher1;
+    public DcMotorEx launcher1; //launcher 1 = flywheel
 
-    public DcMotorEx launcher2;
+    public DcMotorEx launcher2; //launcher 2 = counter roller
 
     public PDFLController controller;
 
     //pdfl values tuned in FTC Dashboard
-    public static double p = 0.007;
-    public static double d = 0.01;
-    public static double f = 0.13;
+    public static double p = 0.00008;
+    public static double d = 0;
+    public static double f = 0.18;
     public static double l = 0;
-    public static double i = 0.00035;
+    public static double i = 0;
 
     public static double p2 = 0.007;
     public static double d2 = 0.01;
@@ -49,12 +49,14 @@ public class Launcher extends SubsystemBase {
 
 
     public static double target_velocity = 0;
+    public static double target_velocity_2 = 4200;
     public static double tele_target = 4500;
     public static double auto_target = 4000;
     public static boolean powerMode = false;
     public static boolean boomBoom = true;
     public static boolean pid1 = true;
     public double current_velocity = 0;
+    public double current_velocity_2 = 0;
     public double prev_velocity = 0;
     public double currentPower = 0;
     public double pdfl = 0;
@@ -92,6 +94,7 @@ public class Launcher extends SubsystemBase {
         IN,
         OUT,
         STOP,
+        SHOOT
     }
 
     public LauncherState current = LauncherState.STOP;
@@ -105,9 +108,9 @@ public class Launcher extends SubsystemBase {
         this.hw = hardwareMap;
 
         //init servos based on their name in the robot's config file
-        launcher1 = hardwareMap.get(DcMotorEx.class, "em0");
-        launcher2 = hardwareMap.get(DcMotorEx.class, "em1");
-        launcher2.setDirection(DcMotorSimple.Direction.REVERSE);
+        launcher1 = hardwareMap.get(DcMotorEx.class, "cm1");
+        launcher2 = hardwareMap.get(DcMotorEx.class, "cm0");
+        launcher1.setDirection(DcMotorSimple.Direction.REVERSE);
         launcher1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -121,43 +124,10 @@ public class Launcher extends SubsystemBase {
     /*Periodic method gets run in a loop during auto and teleop.
     The telemetry gets updated constantly so you can see the status of the subsystems */
     public void periodicTest() {
-        last_position = curr_position;
-        last_time = curr_time;
-
-        //current_velocity = tickstoRPM(launcher1.getVelocity());
-
-
-        curr_position = launcher1.getCurrentPosition();
-        //curr_time = timer.getElapsedTime();
-
-        //delta_time = (timer.getElapsedTime() - last_time) / 1000.0;
-        //delta_pos = curr_position - last_position;
-        current_velocity = tickstoRPM(launcher1.getVelocity());//tickstoRPM((double)(delta_pos) / delta_time);
-
-
-        controller.update(current_velocity, target_velocity);
-        pdfl = controller.run();
-        power =  target_velocity != 0 ? pdfl : 0;
-        //power = test1;
-        power = Range.clip(power, -1, 1);
-        currentPower = power;
-
-        // Clamp power between -1 and 1
-        //power = Math.max(-1, Math.min(1, power));
-        if (!powerMode) {
-            launcher1.setPower(power);
-            launcher2.setPower(power);
-        }
-        else {
-            launcher1.setPower(test1);
-            launcher2.setPower(test2);
-        }
-        if (pid1)
-            controller.updateConstants(p, d, f, l, i);
-        else
-            controller.updateConstants(p2, d2, f2, l2, i2);
-        telemetry.addData("Launcher1 Velocity", current_velocity);
-        telemetry.addData("Launcher2 Velocity", tickstoRPM(launcher2.getVelocity()));
+        current = LauncherState.OUT;
+        updateShooter();
+        telemetry.addData("Launcher 2 Velocity", -current_velocity);
+        telemetry.addData("Launcher 1 Velocity", -current_velocity_2);
 
         telemetry.addData("pdfl", pdfl);
 
@@ -206,12 +176,12 @@ public class Launcher extends SubsystemBase {
 
     public void periodic() {
         //if (Robot.logData) log();
-        if (current == LauncherState.OUT) {
+        if (current != LauncherState.STOP) {
             if (teleop)
                 target_velocity = tele_target;
             else target_velocity = auto_target;
         }
-        else if (current == LauncherState.STOP) {
+        else  {
             target_velocity = 0;
             launcher1.setPower(0);
             launcher2.setPower(0);
@@ -220,11 +190,15 @@ public class Launcher extends SubsystemBase {
 
 
 
-        telemetry.addData("Target Velocity", target_velocity);
-        telemetry.addData("Current Velocity", current_velocity);
+        telemetry.addData("Target Velocity 1", target_velocity);
+        telemetry.addData("Target Velocity 2", target_velocity_2);
+        telemetry.addData("Current Velocity 2", current_velocity);
+        telemetry.addData("Current Velocity 1", current_velocity_2);
+
         //telemetry.addData("Done", controller.done);
         //telemetry.addData("Num Done", numDone);
-        telemetry.addData("Launcher Current", launcher1.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("Launcher 1 Current", launcher1.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("Launcher 2 Current", launcher2.getCurrent(CurrentUnit.AMPS));
 
 
     }
@@ -265,22 +239,10 @@ public class Launcher extends SubsystemBase {
     public void updateShooter() {
         double pdfl = 0;
         prev_velocity = current_velocity;
-        current_velocity = tickstoRPM(launcher1.getVelocity());
-        controller.update(current_velocity, target_velocity);
-
-        // 1) Detect shot
-        //if (!inBoost/* && !inAggressive) {
-        double drop = prev_velocity - current_velocity;
-        if (drop > (DROP_THRESHOLD * target_velocity)) { //|| current_velocity < target_velocity * FALL_THRESHOLD) {
-            shotDetected = true;
-            timer.reset();
-        }
-        if (shotDetected && timer.getElapsedTimeSeconds() > 0.02)
-            shotDetected = false;
-        if (target_velocity < 3500)
-            controller.updateConstants(p2, d, f, l, i);
-        else
-            controller.updateConstants(p, d, f, l, i);
+        current_velocity = tickstoRPM(launcher2.getVelocity());
+        current_velocity_2 = tickstoRPM(launcher1.getVelocity());
+        controller.update(current_velocity_2, target_velocity_2);
+        controller.updateConstants(p, d, f, l, i);
         pdfl = controller.run();
         //}
 
@@ -317,13 +279,27 @@ public class Launcher extends SubsystemBase {
                 launcher2.setPower(pdfl);
             }
             else {
-                if (target_velocity > current_velocity) {
-                    launcher1.setPower(1);
-                    launcher2.setPower(1);
+                if (!powerMode) {
+                    if (target_velocity > -current_velocity) {
+                        launcher1.setPower(1);
+                    } else {
+                        launcher1.setPower(0);
+                    }
+
+
+                    /*if (target_velocity_2 > -current_velocity_2) {
+                        launcher2.setPower(1);
+                    } else {
+                        launcher2.setPower(0);
+                    } */
+                    if (current == LauncherState.SHOOT)
+                        launcher2.setPower(pdfl);
+                    else
+                        launcher2.setPower(pdfl);
                 }
                 else {
-                    launcher1.setPower(0);
-                    launcher2.setPower(0);
+                    launcher1.setPower(test1);
+                    launcher2.setPower(test2);
                 }
             }
         }

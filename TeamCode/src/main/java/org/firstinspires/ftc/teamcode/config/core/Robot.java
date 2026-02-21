@@ -43,15 +43,18 @@ public class Robot {
     private double speed = 1.0;
     public static double turretOffset = 3.8;
     public static double uptakeThreshold = 5.5;
+    public static double threeBallUptake = 5.5;
+    public static double twoBallUptake = 4;
+    public static double oneBallUptake = 2.5;
     public static double intakeThreshold = 2;
     public static double outtakeTime = .3;
     public static double r = 1;
 
     //Booleans to change on FTCDash
     public static boolean showTelemetry = false;
-    public static boolean hoodAdjustment = false;
+    public static boolean hoodAdjustment = true;
     public static boolean rapidFireFar = false;
-    public static double farLaunchR = 0.85;
+    public static double farLaunchR = 1.35;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
     public static boolean manualAngle = false;
@@ -62,6 +65,9 @@ public class Robot {
     public double robotX = 0, robotY = 0;
     public boolean rev = false;
     public static double increaseAmt = .5;
+
+    public static int sortNum = 0;
+    //0 = all fast, 1 = lob fast fast, 2 = lob lob fast, 3 = lob fast lob, 4 = fast lob fast
 
 
 
@@ -253,10 +259,12 @@ public class Robot {
         //aInitLoop = false;
         // telemetry.addData("Start Pose", p);
         init();
-        turret.spin.numRotations = 0;
-        turret.spin.partial_rotations = 0;
-        turret.spin.full_rotations = 0;
-        Logger.first = true;
+        if (Turret.continuousMode) {
+            turret.spin.numRotations = 0;
+            turret.spin.partial_rotations = 0;
+            turret.spin.full_rotations = 0;
+        }
+            Logger.first = true;
 
         k = new KinematicsCalculator(getDistanceFromGoal());
 
@@ -356,10 +364,10 @@ public class Robot {
             Aim.fudgeFactor -= 2.5;
         })); */
         g1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
-            turret.spin.full_rotations--;
+            increaseX();
         }));
         g1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(new InstantCommand(() -> {
-            turret.spin.full_rotations++;
+            decreaseX();
         }));
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             //Aim.fudgeFactor = 0;
@@ -373,7 +381,7 @@ public class Robot {
         g2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
             decreaseX();
         }));
-        g2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
+        g2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(new InstantCommand(() -> {
             increaseX();
         }));
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
@@ -570,15 +578,40 @@ public class Robot {
         d = getDistanceFromGoal();
 
         if (!manualR) {
-            if (d > 120) r = farLaunchR;
-            else r = .64;
+            if (d>100)
+                r = farLaunchR;
+            else
+                r = 1;
         }
 
-        if (!manualAngle) {
-            KinematicsCalculator.min_angle = Range.clip( -0.214286 * d +56.857144, 35, 45);
+        else if (KinematicsCalculator.airsort) {
+            hoodAdjustment = true;
+            int n = getNumBallsWhileShooting();
+            boolean b;
+            switch (sortNum) {
+                case 0:
+                    b = false;
+                    break;
+                case 1:
+                    b = n == 3;
+                    break;
+                case 2:
+                    b = n != 1;
+                    break;
+                case 3:
+                    b = n != 2;
+                    break;
+                case 4:
+                    b = n == 2;
+                    break;
+                default:
+                    b = false;
+            }
+            k.lob = b;
         }
 
         k.setDistance(d * r);
+
         if (!manualRPM)
             Launcher.tele_target = k.getRPM();
         /*
@@ -586,148 +619,22 @@ public class Robot {
             Launcher.tele_target = Launcher.target_velocity; */
         Launcher.auto_target = k.getRPM();
         double hoodPos = k.getHood(launcher.current_velocity);
-        if (!Launcher.teleop) {
-            if (EighteenBall.firstCouple) {
-                if (alliance == Alliance.RED)
-                    hoodPos -= 0;
-                else {
-                    hoodPos -= 0;
-                }
-            }
-            else
-            if (alliance == Alliance.RED)
-                hoodPos += 0;
-            else
-                hoodPos += 0;
-        }
-        if (hoodPos > 0) {
+        if (hoodPos > 0 ) {
             validLaunch = true;
             if (!shotStarted || hoodAdjustment) {
                 if (d < 100)
                     hood.setTarget(hoodPos);
                 else {
                     hood.setTarget(hoodPos);
-                    //hood.setTarget(Hood.hoodUp);
                 }
             }
         } else {
             validLaunch = false;
         }
-        // }
-        /*
-        else {
-            Launcher.auto_target = 4400;
-            hood.setTarget(.9);
-        } */
-
-
-
-
-
-
-        //Old shooting code
-        /*
-        if (getDistanceFromGoal() > farLaunchDist) {
-            Launcher.tele_target = 5200;
-            Hood.hoodIncreaseAmt = 0;
-            hood.setTarget(Hood.hoodUp);
-        }
-        else if (getDistanceFromGoal() > goalDist) {
-            Launcher.tele_target = 4200;
-            Hood.hoodIncreaseAmt = 0.01;
-            hood.setTarget(Hood.hoodUp);
-        }
-        else {
-            Launcher.tele_target = 3000;
-            Hood.hoodIncreaseAmt = 0;
-            hood.setTarget(Hood.hoodDown);
-        }
-        */
 
     }
 
-    public void updateShooting(double d) {
-        if (!manualFlightTime)
-            flightTime = k.getFlightTime();
 
-        //if (launcher.teleop) {
-        //KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
-
-        if (!manualR) {
-            r = 1;
-        }
-
-        if (!manualAngle) {
-            KinematicsCalculator.min_angle = Range.clip( -0.214286 * d +56.857144, 38, 45);
-        }
-
-        k.setDistance(d * r);
-        if (!manualRPM)
-            Launcher.tele_target = k.getRPM();
-        /*
-        else
-            Launcher.tele_target = Launcher.target_velocity; */
-        Launcher.auto_target = k.getRPM();
-        double hoodPos = k.getHood(launcher.current_velocity);
-        if (!Launcher.teleop) {
-            if (EighteenBall.firstCouple) {
-                if (alliance == Alliance.RED)
-                    hoodPos -= 0;
-                else {
-                    hoodPos -= 0;
-                }
-            }
-            else
-            if (alliance == Alliance.RED)
-                hoodPos += 0;
-            else
-                hoodPos += 0;
-        }
-        if (hoodPos > 0) {
-            validLaunch = true;
-            if (!shotStarted || hoodAdjustment || true) {
-                if (d < 100)
-                    hood.setTarget(hoodPos);
-                else {
-                    hood.setTarget(hoodPos);
-                    //hood.setTarget(Hood.hoodUp);
-                }
-            }
-        } else {
-            validLaunch = false;
-        }
-        // }
-        /*
-        else {
-            Launcher.auto_target = 4400;
-            hood.setTarget(.9);
-        } */
-
-
-
-
-
-
-        //Old shooting code
-        /*
-        if (getDistanceFromGoal() > farLaunchDist) {
-            Launcher.tele_target = 5200;
-            Hood.hoodIncreaseAmt = 0;
-            hood.setTarget(Hood.hoodUp);
-        }
-        else if (getDistanceFromGoal() > goalDist) {
-            Launcher.tele_target = 4200;
-            Hood.hoodIncreaseAmt = 0.01;
-            hood.setTarget(Hood.hoodUp);
-        }
-        else {
-            Launcher.tele_target = 3000;
-            Hood.hoodIncreaseAmt = 0;
-            hood.setTarget(Hood.hoodDown);
-        }
-        */
-
-    }
 
     public void updateLimelight() {
         if (limelight.getResult().isValid()) {
@@ -852,6 +759,16 @@ public class Robot {
         double x = pose.getX();
         double y = pose.getY();
         return y < x - 48 && y < -x - 48 && y < -48;
+    }
+
+    public int getNumBallsWhileShooting() {
+        if (intake.uptake.getCurrent(CurrentUnit.AMPS) > threeBallUptake)
+            return 3;
+        else if (intake.uptake.getCurrent(CurrentUnit.AMPS) > twoBallUptake)
+            return 2;
+        else if (intake.uptake.getCurrent(CurrentUnit.AMPS) > oneBallUptake)
+            return 1;
+        else return 0;
     }
 
     public boolean intakeDone() {

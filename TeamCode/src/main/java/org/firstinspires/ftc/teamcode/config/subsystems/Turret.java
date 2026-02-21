@@ -16,12 +16,10 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
-import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.util.AxonContinuous;
 import org.firstinspires.ftc.teamcode.config.util.PDFLController;
-import org.opencv.core.Mat;
 
 /*Sample subsystem class. Subsystems are anything on the robot that is not the drive train
 such as a claw or a lift.
@@ -57,6 +55,14 @@ public class Turret extends SubsystemBase {
     public static double fudgeFactor = 0;
     public static boolean useTurret = true;
 
+    public static double zeroPos = 0.465;
+    public static double ninetyPos = .79;
+    /*
+    public static double leftPos = .5;
+    public static double rightPos = .5; */
+    public static double pos = .5;
+
+
 
     public static  double MIN_ANGLE = -120; // turret left limit
     public static  double MAX_ANGLE = 120;  // turret right limit
@@ -64,8 +70,9 @@ public class Turret extends SubsystemBase {
     public double current;
 
     private MultipleTelemetry telemetry;
-    public AxonContinuous spin;
-    public CRServo spin2;
+    public AxonContinuous spin; //sh0
+    public CRServo spin2; //sh1
+    public Servo left, right, middle;
 
     public static double targetRange = 3;
     //public Servo spin;
@@ -73,11 +80,17 @@ public class Turret extends SubsystemBase {
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        spin = new AxonContinuous(hardwareMap, "sh1", "ca1");
-        spin.getC().setDirection(DcMotorSimple.Direction.REVERSE);
-        spin2 = hardwareMap.get(CRServo.class, "sh0");
-        spin2.setDirection(DcMotorSimple.Direction.REVERSE);
+        if (continuousMode) {
+            spin = new AxonContinuous(hardwareMap, "sh1", "ca1");
+            spin.getC().setDirection(DcMotorSimple.Direction.REVERSE);
+            spin2 = hardwareMap.get(CRServo.class, "sh0");
+            spin2.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+        else {
+            left = hardwareMap.get(Servo.class, "sh1");
+            right = hardwareMap.get(Servo.class, "sh2");
+            middle = hardwareMap.get(Servo.class, "sh0");
+        }
         //spin = hardwareMap.get(Servo.class, "sh2");
         controller = new PDFLController(p, d, f, l, i);
         controller.setDeadZone(deadZone);
@@ -87,40 +100,64 @@ public class Turret extends SubsystemBase {
     }
 
     public void periodicTest() {
-        spin.calculate();
-        current = -getTotalDegrees();
-        controller.updateConstants(p, d, target > current ? f : -f, l, i);
-        controller.update(current, target);
-        power = controller.run();
+        if (continuousMode) {
+            spin.calculate();
+            current = -getTotalDegrees();
+            controller.updateConstants(p, d, target > current ? f : -f, l, i);
+            controller.update(current, target);
+            power = controller.run();
 
-        power = Range.clip(power, -1, 1);
+            power = Range.clip(power, -1, 1);
 
-        spin.setPower(power);
-        spin2.setPower(power);
-        controller.setDeadZone(deadZone);
+            spin.setPower(power);
+            spin2.setPower(power);
+            controller.setDeadZone(deadZone);
 
-        telemetry.addData("Rise Time", controller.getRiseTime());
-        telemetry.addData("Settling Time", controller.getSettlingTime());
-        telemetry.addData("Settled", controller.isSettled());
-        telemetry.addData("Target", target);
-        telemetry.addData("Current", current);
-        telemetry.addData("Power", power);
-        telemetry.addData("Raw", spin.getVolts());
-        telemetry.addData("Rotations", totalRotations());
+            telemetry.addData("Rise Time", controller.getRiseTime());
+            telemetry.addData("Settling Time", controller.getSettlingTime());
+            telemetry.addData("Settled", controller.isSettled());
+            telemetry.addData("Target", target);
+            telemetry.addData("Current", current);
+            telemetry.addData("Power", power);
+            telemetry.addData("Raw", spin.getVolts());
+            telemetry.addData("Rotations", totalRotations());
+        }
+
+        else {
+            double b = getPos();
+            left.setPosition(b);
+            right.setPosition(b);
+            middle.setPosition(b);
+            telemetry.addData("left", left.getPosition());
+            telemetry.addData("right", right.getPosition());
+            telemetry.addData("middle", middle.getPosition());
+        }
+
+
         telemetry.update();
     }
 
     public void periodicTest2() {
-        spin.calculate();
+        if (continuousMode) {
+            spin.calculate();
 
-        spin.setPower(power);
-        spin2.setPower(power);
+            spin.setPower(power);
+            spin2.setPower(power);
 
-        telemetry.addData("Raw", spin.getVolts());
-        telemetry.addData("Rotations", spin.getNumRotations());
-        telemetry.addData("Partial rotations", spin.getPartial_rotations());
-        telemetry.addData("Full rotations", spin.getFull_rotations());
-        telemetry.update();
+            telemetry.addData("Raw", spin.getVolts());
+            telemetry.addData("Rotations", spin.getNumRotations());
+            telemetry.addData("Partial rotations", spin.getPartial_rotations());
+            telemetry.addData("Full rotations", spin.getFull_rotations());
+            telemetry.update();
+        }
+        else {
+            left.setPosition(pos);
+            right.setPosition(pos);
+            middle.setPosition(pos);
+            telemetry.addData("left", left.getPosition());
+            telemetry.addData("right", right.getPosition());
+            telemetry.addData("middle", middle.getPosition());
+        }
     }
 
 
@@ -128,27 +165,30 @@ public class Turret extends SubsystemBase {
     public void periodic() {
         //if (Robot.logData) log();
         aim();
-        spin.calculate();
-        current = -getTotalDegrees();
-        controller.update(current, target);
-        llcontroller.updateConstants(p2, d2, f2, l2, i2);
+        if (continuousMode) {
+            spin.calculate();
+            current = -getTotalDegrees();
+            controller.update(current, target);
+            llcontroller.updateConstants(p2, d2, f2, l2, i2);
 
-        power = controller.run();
+            power = controller.run();
 
-        power = Range.clip(power, -1, 1);
+            power = Range.clip(power, -1, 1);
 
-        if (!lockTurret || true) {
+
             spin.setPower(power);
             spin2.setPower(power);
+
+            telemetry.addData("turret power", power);
+            telemetry.addData("turret volts", spin.getVolts());
         }
         else {
-            spin.setPower(0);
-            spin2.setPower(0);
+            double b = getPos();
+            left.setPosition(b);
+            right.setPosition(b);
+            middle.setPosition(b);
         }
-
         telemetry.addData("turret target", target);
-        telemetry.addData("turret power", power);
-        telemetry.addData("turret volts", spin.getVolts());
         //telemetry.addData("Use Limelight", limelightMode);
 
     }
@@ -213,6 +253,10 @@ public class Turret extends SubsystemBase {
         this.botPose = botPose;
     }
 
+    public double getPos() {
+        return zeroPos + (target / 90.0) * (ninetyPos - zeroPos);
+    }
+
 
 
     public void aim() {
@@ -251,13 +295,17 @@ public class Turret extends SubsystemBase {
         turretRelativeAngle = Range.clip(turretRelativeAngle, MIN_ANGLE, MAX_ANGLE);
         //turretRelativeAngle = 0;
         if (useTurret) {
-            if (Launcher.teleop || !turretOffAuto)
-                target = -turretRelativeAngle;
+            if (Launcher.teleop || !turretOffAuto) {
+                if (continuousMode)
+                    target = -turretRelativeAngle;
+                else
+                    target = turretRelativeAngle;
+            }
         }
         else
             target = 0;
 
-        telemetry.addData("Target Degrees", -turretRelativeAngle);
+        telemetry.addData("Target Degrees", continuousMode ? -turretRelativeAngle : turretRelativeAngle);
 
     }
 

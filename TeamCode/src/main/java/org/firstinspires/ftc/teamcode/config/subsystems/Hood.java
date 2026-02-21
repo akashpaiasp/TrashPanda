@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -21,13 +20,13 @@ public class Hood extends SubsystemBase {
     private MultipleTelemetry telemetry;
 
     //state of the subsystem
-    public Servo hood;
+    public Servo hoodR, hoodL;
 
     public static double shootingVariable = 0.02;
-    public static double hoodDown = 0.5 - shootingVariable; //23.9
-    public double hoodMid = 0.625 ;
-    public double hoodMidUp = 0.75; //64(hoodPos-0.5) + 23.9 //6.4
-    public static double hoodUp = 0.95 - shootingVariable; //49.5
+    public static double hoodDown = .35; //23.9
+    public double hoodMid = 0.4 ;
+    public double hoodMidUp = 0.5; //64(hoodPos-0.5) + 23.9 //6.4
+    public static double hoodUp = .77; //49.5
     public static double target = 0.0;
     public static double hoodIncreaseAmt = 0.02;
     public static double autoHoodShoot1 = 0.9;
@@ -40,14 +39,15 @@ public class Hood extends SubsystemBase {
         DOWN,
         MANUAL
     }
-    public HoodState current = HoodState.DOWN;
+    public HoodState current = HoodState.MANUAL ;
 
     public Hood(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         //init servos based on their name in the robot's config file
-        hood = hardwareMap.get(Servo.class, "sh2");
+        hoodR = hardwareMap.get(Servo.class, "sh4");
+        hoodL = hardwareMap.get(Servo.class, "sh3");
         target = 0.0;
     }
 
@@ -64,7 +64,7 @@ public class Hood extends SubsystemBase {
     The telemetry gets updated constantly so you can see the status of the subsystems */
     public void periodic() {
 
-        telemetry.addData("Hood", hood.getPosition());
+        telemetry.addData("Hood", hoodR.getPosition());
         telemetry.addData("Hood state", current);
         switch (current) {
             case UP:
@@ -84,10 +84,12 @@ public class Hood extends SubsystemBase {
                 //hood.setPosition(hoodDown);
                 break;
             case MANUAL :
-                hood.setPosition(target);
+                hoodR.setPosition(target);
+                hoodL.setPosition(target);
 
         }
-        hood.setPosition(target);
+        hoodR.setPosition(target);
+        hoodL.setPosition(target);
     }
     public void increase() {
         setState(HoodState.MANUAL);

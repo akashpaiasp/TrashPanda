@@ -72,10 +72,9 @@ public class Intake extends SubsystemBase {
         //pusherM = hardwareMap.get(Servo.class, "cs2");
         //pusherM = hardwareMap.get(Servo.class, "cs3");
 
-        gateL = hardwareMap.get(Servo.class, "sh5");
-        gateR = hardwareMap.get(Servo.class, "sh4");
-        intake = hardwareMap.get(DcMotorEx.class, "cm0");
-        uptake = hardwareMap.get(DcMotorEx.class, "cm1");
+        gateL = hardwareMap.get(Servo.class, "es0");
+        gateR = hardwareMap.get(Servo.class, "cs0");        intake = hardwareMap.get(DcMotorEx.class, "em1");
+        uptake = hardwareMap.get(DcMotorEx.class, "em0");
 
 
         //intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -140,8 +139,7 @@ public class Intake extends SubsystemBase {
 
                 case OPEN:
                     gateL.setPosition(lOpen);
-                    gateR.setPosition(rOpen);
-                    break;
+                    gateR.setPosition(rOpen);                    break;
                 case CLOSED:
                     gateL.setPosition(lClosed);
                     gateR.setPosition(rClosed);

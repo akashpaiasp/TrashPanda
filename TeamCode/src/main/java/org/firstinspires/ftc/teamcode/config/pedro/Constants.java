@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(11.7)
+            .mass(12.4)
             .forwardZeroPowerAcceleration(-38)
             .lateralZeroPowerAcceleration(-81)
             .useSecondaryTranslationalPIDF(true)
@@ -30,14 +30,14 @@ public class Constants {
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.13, 0, 0.01, 0.02))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.05, 0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.005, 0.0001, 0.000005, 0.6, 0.01))
-            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(.3, .07448, .001735));
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(.3, .078274, .0016864));
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             //Motor names in the robot's config file
-            .leftFrontMotorName("cm3")
-            .leftRearMotorName("cm2")
-            .rightFrontMotorName("em2")
-            .rightRearMotorName("em3")
+            .leftFrontMotorName("em2")
+            .leftRearMotorName("em3")
+            .rightFrontMotorName("cm2")
+            .rightRearMotorName("cm3")
 
             //Motor directions
             .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
@@ -52,7 +52,7 @@ public class Constants {
             .forwardPodY(-6.713)
             .strafePodX(-.73) //47 //145.5
             .distanceUnit(DistanceUnit.INCH)
-            .hardwareMapName("ci0")
+            .hardwareMapName("ci1")
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
     public static PathConstraints pathConstraints = new PathConstraints(.975, 50, 1, 1);
