@@ -88,8 +88,6 @@ public class Launcher extends SubsystemBase {
     private boolean inAggressive = false;
     public static boolean teleop = false;
 
-
-
     public enum LauncherState {
         IN,
         OUT,
@@ -181,6 +179,7 @@ public class Launcher extends SubsystemBase {
                 target_velocity = tele_target;
             else target_velocity = auto_target;
         }
+
         else  {
             target_velocity = 0;
             launcher1.setPower(0);

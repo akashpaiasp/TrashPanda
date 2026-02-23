@@ -118,6 +118,11 @@ public class TelePOP extends LinearOpMode {
             else {
                 robot.outtake = false;
             }
+
+            if (gamepad2.triangle){
+                Turret.sotm = !Turret.sotm;
+            }
+
             /*if (useTurret)
                 new Aim(robot, goalX, goalY).execute();
             else

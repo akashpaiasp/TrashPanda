@@ -16,6 +16,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.config.core.Robot;
 import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
+import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.util.AxonContinuous;
@@ -76,6 +77,10 @@ public class Turret extends SubsystemBase {
 
     public static double targetRange = 3;
     //public Servo spin;
+
+    public static double weight = 1.5;
+
+    public static boolean sotm = false;
 
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
@@ -265,19 +270,29 @@ public class Turret extends SubsystemBase {
          * Clamps to [-90°, +90°].
          */
 
-        double vxTemp = 0;//KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
-        double vx = Double.isNaN(vxTemp) ? 0 : vxTemp;
-        double vyTemp = 0;//KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
-        double vy = Double.isNaN(vyTemp) ? 0 : vyTemp;
-        double va = 0;//r.getFollower().getAngularVelocity();
+//        double vxTemp = 0;//KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getXComponent());
+//        double vx = Double.isNaN(vxTemp) ? 0 : vxTemp;
+//        double vyTemp = 0;//KinematicsCalculator.inchesToMeters(r.getFollower().getVelocity().getYComponent());
+//        double vy = Double.isNaN(vyTemp) ? 0 : vyTemp;
+//        double va = 0;//r.getFollower().getAngularVelocity();
+
+        double vX, vY;
+
+        if (sotm) {
+            vX = Constants.localizer.getVelocity().getX();
+            vY = Constants.localizer.getVelocity().getY();
+        } else {
+            vX = 0;
+            vY = 0;
+        }
 
         double dx;
         double dy;
 
         double x = botPose.getX();
         double y = botPose.getY();
-        dx = targetX - x - vx * flightTime;
-        dy = targetY - y - vy * flightTime;
+        dx = targetX - x - vX * weight;
+        dy = targetY - y - vY * weight;
         double robotHeading = Math.toDegrees(botPose.getHeading());
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
