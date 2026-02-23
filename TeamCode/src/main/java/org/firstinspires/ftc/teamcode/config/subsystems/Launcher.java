@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -31,8 +32,11 @@ public class Launcher extends SubsystemBase {
     public DcMotorEx launcher1; //launcher 1 = flywheel
 
     public DcMotorEx launcher2; //launcher 2 = counter roller
+    //private VoltageSensor sensor; //measures current battery voltage
 
     public PDFLController controller;
+    public static double counterRollerPower = .91;
+    public static boolean manualCounterRoller = false;
 
     //pdfl values tuned in FTC Dashboard
     public static double p = 0.00008;
@@ -65,7 +69,6 @@ public class Launcher extends SubsystemBase {
 
     public static double test1 = 0;
     public static double test2 = 0;
-    public static boolean shoot = false;
 
     public long lastUpdateTime = 0;
     private Timer timer = new Timer();
@@ -83,6 +86,7 @@ public class Launcher extends SubsystemBase {
     public static double RECOVERY_THRESHOLD = 100;
     public static double DROP_THRESHOLD = .1;
     public static double FALL_THRESHOLD = .83;
+    public double measuredV = 0;
 
     private boolean inBoost = false;
     private boolean inAggressive = false;
@@ -108,6 +112,9 @@ public class Launcher extends SubsystemBase {
         //init servos based on their name in the robot's config file
         launcher1 = hardwareMap.get(DcMotorEx.class, "cm1");
         launcher2 = hardwareMap.get(DcMotorEx.class, "cm0");
+
+        //sensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
+
         launcher1.setDirection(DcMotorSimple.Direction.REVERSE);
         launcher1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcher2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -122,6 +129,7 @@ public class Launcher extends SubsystemBase {
     /*Periodic method gets run in a loop during auto and teleop.
     The telemetry gets updated constantly so you can see the status of the subsystems */
     public void periodicTest() {
+        measuredV = hw.voltageSensor.iterator().next().getVoltage();
         current = LauncherState.OUT;
         updateShooter();
         telemetry.addData("Launcher 2 Velocity", -current_velocity);
@@ -159,6 +167,7 @@ public class Launcher extends SubsystemBase {
         telemetry.addData("Total Error", controller.getTot_error());
 
         telemetry.addData("Done", controller.done);
+        telemetry.addData("Volts", measuredV);
 
 
 
@@ -173,6 +182,7 @@ public class Launcher extends SubsystemBase {
 
 
     public void periodic() {
+        measuredV = hw.voltageSensor.iterator().next().getVoltage();
         //if (Robot.logData) log();
         if (current != LauncherState.STOP) {
             if (teleop)
@@ -193,6 +203,7 @@ public class Launcher extends SubsystemBase {
         telemetry.addData("Target Velocity 2", target_velocity_2);
         telemetry.addData("Current Velocity 2", current_velocity);
         telemetry.addData("Current Velocity 1", current_velocity_2);
+        telemetry.addData("Volts", measuredV);
 
         //telemetry.addData("Done", controller.done);
         //telemetry.addData("Num Done", numDone);
@@ -204,7 +215,7 @@ public class Launcher extends SubsystemBase {
 
     public void periodicShootingTest(Robot r) {
         updateShooter();
-        if (shoot) {
+        if (true) {
             if (controller.done) {
 
                 r.intake.setUptakeState(Intake.UptakeState.ON);
@@ -229,7 +240,7 @@ public class Launcher extends SubsystemBase {
         telemetry.addData("Current Velocity", current_velocity);
         telemetry.addData("State", current);
         telemetry.addData("Done", controller.done);
-        telemetry.addData("Volts", hw.voltageSensor.iterator().next().getVoltage());
+        telemetry.addData("Volts", measuredV);
         telemetry.update();
         log();
         r.intake.log();
@@ -279,6 +290,7 @@ public class Launcher extends SubsystemBase {
             }
             else {
                 if (!powerMode) {
+                    //target_velocity *= 13.0 / measuredV;
                     if (target_velocity > -current_velocity) {
                         launcher1.setPower(1);
                     } else {
@@ -292,9 +304,9 @@ public class Launcher extends SubsystemBase {
                         launcher2.setPower(0);
                     } */
                     if (current == LauncherState.SHOOT)
-                        launcher2.setPower(pdfl);
+                        launcher2.setPower(counterRollerPower * (12.01 / measuredV));
                     else
-                        launcher2.setPower(pdfl);
+                        launcher2.setPower(counterRollerPower * (12.01 / measuredV));
                 }
                 else {
                     launcher1.setPower(test1);

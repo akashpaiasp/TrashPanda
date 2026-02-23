@@ -35,7 +35,7 @@ public class Intake extends SubsystemBase {
             lOpen = .6,
             lClosed = .45,
             rOpen = .42,
-            rClosed = 0.54;
+            rClosed = .54;
 
     public enum IntakeState {
         OUTTAKE,

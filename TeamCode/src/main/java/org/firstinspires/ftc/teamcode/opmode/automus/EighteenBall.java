@@ -801,7 +801,7 @@ public class EighteenBall extends OpMode {
         if (pathTimer.getElapsedTimeSeconds() < checkTime + onThreshold) return false;
         //else
         //  if (pathTimer.getElapsedTimeSeconds() < checkTime + onThresholdTwo + .15) return false;
-        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8)) {
+        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < 1.1 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8)) {
             aimTurret = false;
             return true;
         }

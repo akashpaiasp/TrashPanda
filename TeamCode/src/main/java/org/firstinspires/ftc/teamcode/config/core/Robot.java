@@ -42,11 +42,11 @@ public class Robot {
     private Opmode op = TELEOP;
     private double speed = 1.0;
     public static double turretOffset = 3.8;
-    public static double uptakeThreshold = 5.5;
+    public static double uptakeThreshold = 4.5;
     public static double threeBallUptake = 5.5;
     public static double twoBallUptake = 4;
     public static double oneBallUptake = 2.5;
-    public static double intakeThreshold = 2;
+    public static double intakeThreshold = 1.2;
     public static double outtakeTime = .3;
     public static double r = 1;
 
@@ -54,7 +54,7 @@ public class Robot {
     public static boolean showTelemetry = false;
     public static boolean hoodAdjustment = true;
     public static boolean rapidFireFar = false;
-    public static double farLaunchR = 1.35;
+    public static double farLaunchR = 1;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
     public static boolean manualAngle = false;
@@ -238,13 +238,6 @@ public class Robot {
 
 
         timer.reset();
-
-
-        ekf = new PoseEkf(
-                p.getX(), p.getY(),
-                processNoiseXY, processNoiseHeading,
-                visionNoiseXY, visionNoiseHeading
-        );
 
         launcher = new Launcher(hw, telemetry);
         turret = new Turret(hw, telemetry);
@@ -674,9 +667,9 @@ public class Robot {
             goalY = 67;
         }
         else {
-            redX = farZoneX;
-            blueX = farZoneXBlue;
-            goalY = 72;
+            redX = 67;//72;
+            blueX = -76;//farZoneXBlue;
+            goalY = 67;//72;
         }
 
         if (alliance == Alliance.RED) {
