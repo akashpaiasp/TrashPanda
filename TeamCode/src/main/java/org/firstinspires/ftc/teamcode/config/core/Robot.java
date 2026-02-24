@@ -39,6 +39,7 @@ public class Robot {
     //private MultipleTelemetry telemetry;
     private Telemetry telemetry;
     private Follower follower;
+    private Breakbeams breakbeams;
     private Opmode op = TELEOP;
     private double speed = 1.0;
     public static double turretOffset = 3.8;
@@ -239,11 +240,12 @@ public class Robot {
 
         timer.reset();
 
+        breakbeams = new Breakbeams(hw, telemetry);
         launcher = new Launcher(hw, telemetry);
         turret = new Turret(hw, telemetry);
         hood = new Hood(hw, telemetry);
         intake = new Intake(hw, telemetry);
-        led = new LED(hw, telemetry);
+        //led = new LED(hw, telemetry);
 
         autoDrive = new AutoDriving(follower, telemetry);
         //limelight = new Limelight(hw, telemetry);

@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 public class Intake extends SubsystemBase {
     //Telemetry = text that is printed on the driver station while the robot is running
     private MultipleTelemetry telemetry;
-    private Servo gateL, gateR;
+    private Servo gate;
     public DcMotorEx intake, uptake;
     public static double launchIntake = 1;
     public static double launchUptake = 1;
@@ -28,14 +28,11 @@ public class Intake extends SubsystemBase {
 
     public static boolean manual = false;
 
-    public static double gateLPos = 0.5;
-    public static double gateRPos = 0.5;
+    public static double gatePos = 0.5;
 
     private static double
-            lOpen = .6,
-            lClosed = .45,
-            rOpen = .42,
-            rClosed = .54;
+            open = .93,
+            closed = 0;
 
     public enum IntakeState {
         OUTTAKE,
@@ -72,8 +69,8 @@ public class Intake extends SubsystemBase {
         //pusherM = hardwareMap.get(Servo.class, "cs2");
         //pusherM = hardwareMap.get(Servo.class, "cs3");
 
-        gateL = hardwareMap.get(Servo.class, "es0");
-        gateR = hardwareMap.get(Servo.class, "cs0");        intake = hardwareMap.get(DcMotorEx.class, "em1");
+        gate = hardwareMap.get(Servo.class, "sh5");
+        intake = hardwareMap.get(DcMotorEx.class, "em1");
         uptake = hardwareMap.get(DcMotorEx.class, "em0");
 
 
@@ -131,18 +128,16 @@ public class Intake extends SubsystemBase {
                 uptake.setPower(-1);
         }
         if(manual) {
-            gateL.setPosition(gateLPos);
-            gateR.setPosition(gateRPos);
+            gate.setPosition(gatePos);
         }
         else {
             switch (currentGate) {
 
                 case OPEN:
-                    gateL.setPosition(lOpen);
-                    gateR.setPosition(rOpen);                    break;
+                    gate.setPosition(open);
+                    break;
                 case CLOSED:
-                    gateL.setPosition(lClosed);
-                    gateR.setPosition(rClosed);
+                    gate.setPosition(closed);
                     break;
             }
         }
@@ -157,8 +152,7 @@ public class Intake extends SubsystemBase {
         setIntakeState(IntakeState.OFF);
         intake.setPower(0);
         setGateState(GateState.CLOSED);
-        gateL.setPosition(lClosed);
-        gateR.setPosition(rClosed);
+        gate.setPosition(closed);
     }
 
     public void log(){
