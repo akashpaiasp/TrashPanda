@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
 
 
-@Autonomous (name = "Bigger Smapple")
+@Autonomous (name = "Far")
 @Config
 //@Configurable
 public class Far extends OpMode {
@@ -66,7 +66,7 @@ public class Far extends OpMode {
 
     public void autonomousPathUpdate() {
 
-        if (aimTurret) {
+        if (aimTurret || true) {
             robot.turret.turretOffAuto = false;
         }//new Aim(robot, goalX, goalY).execute();
         else if (!dontChangeTurret){
@@ -115,9 +115,14 @@ public class Far extends OpMode {
                     pathTimer.reset();
                     return;
                 }
-
+                if(robot.validLaunch) {
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.ON);
+                }
+                else {
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                }
                     robot.shotStarted = true;
 
                 if (doneDone) {
@@ -161,10 +166,16 @@ public class Far extends OpMode {
                 else {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayer(robot.getFollower()));
                     two = true;
-                    setPathState(1207);
+                    setPathState(1205);
                 }
 
                 break;
+
+            case 1205:
+                if (robot.getFollower().getCurrentTValue() > .4) {
+                    robot.intake.setGateState(Intake.GateState.OPEN);
+                    setPathState(1207);
+                }
             case 1207:
                 if (robot.getFollower().isBusy()) {
                     pathTimer.reset();
@@ -173,8 +184,14 @@ public class Far extends OpMode {
 
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                    robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    if(robot.validLaunch) {
+                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                        robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    }
+                    else {
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    }
 
                     robot.shotStarted = true;
                 }
@@ -215,7 +232,7 @@ public class Far extends OpMode {
                 break;
 
             case 14:
-                if (robot.getFollower().getCurrentTValue() > 0) {
+                if (robot.getFollower().getCurrentTValue() > .5) {
                     robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
                     robot.intake.setGateState(Intake.GateState.OPEN);
                     aimTurret = true;
@@ -229,8 +246,14 @@ public class Far extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                        robot.intake.setUptakeState(Intake.UptakeState.ON); }
+                    if(robot.validLaunch) {
+                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                        robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    }
+                    else {
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    }
                     robot.shotStarted = true;
                 }
                 if (doneDone) {
@@ -286,7 +309,7 @@ public class Far extends OpMode {
                 break;
 
             case 1454:
-                if (robot.getFollower().getCurrentTValue() > 0) {
+                if (robot.getFollower().getCurrentTValue() > 0.5) {
                     robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
                     robot.intake.setGateState(Intake.GateState.OPEN);
                     aimTurret = true;
@@ -300,8 +323,14 @@ public class Far extends OpMode {
                 }
 
                 if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(true) {robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                        robot.intake.setUptakeState(Intake.UptakeState.ON); }
+                    if (robot.validLaunch) {
+                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                        robot.intake.setUptakeState(Intake.UptakeState.ON);
+                    }
+                    else {
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    }
                     robot.shotStarted = true;
                 }
                 if (doneDone) {

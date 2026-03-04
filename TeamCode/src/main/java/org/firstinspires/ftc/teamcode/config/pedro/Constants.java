@@ -32,7 +32,7 @@ public class Constants {
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.13, 0, 0.01, 0.02))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.05, 0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.005, 0.0001, 0.000005, 0.6, 0.01))
-            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(.3, .078274, .0016864));
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(.3, .06756, .00203));
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             //Motor names in the robot's config file

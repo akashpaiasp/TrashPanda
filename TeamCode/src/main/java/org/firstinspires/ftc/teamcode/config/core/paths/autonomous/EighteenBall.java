@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.config.core.paths.autonomous;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
@@ -14,24 +13,28 @@ public class EighteenBall {
     private static double braking = 1;
     private static double velConstraint = 0.00000001;
     // Red Poses
-    public static final Pose startPose = new Pose(39.04, 60.4, 1.561);
+    public static final Pose startPose = new Pose(38.7, 60.4, 1.5721);
 
     private static final Pose shootPose = new Pose(15.5, 12, 0);
     public static final Pose shootPose2 = new Pose(14, 5, Math.toRadians(-15));
-    public static final Pose shootPoseThirdPickup = new Pose(8, 15, -.94);
+    public static final Pose shootPoseThirdPickup = new Pose(12, 36, -.94);
 
-    public static final Pose shootPose4 =new Pose(16, 15, startPose.getHeading());
+    public static final Pose shootPose4 =new Pose(11, 10, startPose.getHeading());
     public static final Pose shootPose3 = shootPose2;//new Pose(11, 5, Math.toRadians(-15));
     private static final Pose moveToShoot = new Pose(30, 0, Math.toRadians(0));
     private static final Pose strafe1 = new Pose(30, -11, 0);
     private static final Pose pickup2 = new Pose(51, -11, 0); //second spike mark
-    private static final Pose openGate = new Pose(54, -7, 0); //second spike mark
+    private static final Pose openGate = new Pose(56, -7, 0); //second spike mark
 
 
-    private static final Pose pickup1 = new Pose(54, 12, 0); //first spike mark
+    private static final Pose pickup1 = new Pose(53.16767, 12, 0); //first spike mark
+    public static final Pose shoot1Klutch = new Pose(20, 15, Math.toRadians(-120));
+    private static final Pose pickup1Klutch = new Pose(45, 13, 0); //first spike mark
+    public static final Pose gateKlutch = new Pose(53, 9, 0);
+
 
     public static final Pose strafeGate = new Pose(40, -10, 0.59);
-    public static final Pose gate = new Pose(59, -11.5, .515);
+    public static final Pose gate = new Pose(59, -10, .515);
     public static final Pose gateBlue = convertToBlue(gate);//new Pose(-59, -10, 2.55);
     private static final Pose strafe2 = new Pose(20, -33.5, 0);
     private static final Pose pickup3 = new Pose(53, -33.5, 0);
@@ -61,10 +64,14 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose4))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose4.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                .build();
+    }
+    public static PathChain shoot1Klutch(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(startPose, shoot1Klutch))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootPose4.getHeading())
+                
                 .build();
     }
 
@@ -99,7 +106,7 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2, strafeGate))
                 .setLinearHeadingInterpolation(shootPose2.getHeading(), strafeGate.getHeading())
                 .addPath(new BezierLine(strafeGate, gate))
-                //.setBrakingStart(.8)
+                //
                 .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
                 .build();
     }
@@ -110,7 +117,7 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2, strafeGate))
                 .setLinearHeadingInterpolation(shootPose2.getHeading(), strafeGate.getHeading())
                 .addPath(new BezierLine(strafeGate, gate))
-                .setBrakingStart(.8)
+                
                 .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
                 .build();
     }
@@ -124,16 +131,12 @@ public class EighteenBall {
                 /*
                 .addPath(new BezierLine(gate, moveToShoot))
                 .setLinearHeadingInterpolation(gate.getHeading(), moveToShoot.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .addPath(new BezierLine(moveToShoot, shootPose2))
                 .setLinearHeadingInterpolation(moveToShoot.getHeading(), shootPose2.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                  */
                 .build();
     }
@@ -147,16 +150,12 @@ public class EighteenBall {
                 /*
                 .addPath(new BezierLine(gate, moveToShoot))
                 .setLinearHeadingInterpolation(gate.getHeading(), moveToShoot.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .addPath(new BezierLine(moveToShoot, shootPose2))
                 .setLinearHeadingInterpolation(moveToShoot.getHeading(), shootPose2.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                  */
                 .build();
     }
@@ -168,14 +167,26 @@ public class EighteenBall {
                 .build();
     }
 
+    public static PathChain pickup1Klutch(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierCurve(shootPose, pickup1Klutch, gateKlutch))
+                .setTangentHeadingInterpolation()
+                .build();
+    }
+
+
     public static PathChain shoot3(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup1, shootPose2))
                 .setConstantHeadingInterpolation(shootPose2.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                .build();
+    }
+
+    public static PathChain shoot3Klutch(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(pickup1, shootPoseThirdPickup))
+                .setLinearHeadingInterpolation(pickup1.getHeading(), shootPoseThirdPickup.getHeading())
                 .build();
     }
     /*
@@ -203,10 +214,8 @@ public class EighteenBall {
                 /*
                 .addPath(new BezierLine(pickup3, shootPoseThirdPickup))
                 .setConstantHeadingInterpolation(shootPoseThirdPickup.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint) */
+                
+                 */
                 .build();
     }
 
@@ -223,10 +232,8 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(startPoseBlue, shootPose4Blue))
                 .setLinearHeadingInterpolation(startPoseBlue.getHeading(), shootPose4Blue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .build();
     }
 
@@ -248,10 +255,8 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup2Blue, shootPose2Blue))
                 .setLinearHeadingInterpolation(pickup2Blue.getHeading(), shootPose2Blue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .build();
     }
 
@@ -260,7 +265,7 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2Blue, strafeGateBlue))
                 .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), strafeGateBlue.getHeading())
                 .addPath(new BezierLine(strafeGateBlue, gateBlue))
-                .setBrakingStart(.8)
+                
                 .setLinearHeadingInterpolation(strafeGateBlue.getHeading(), gateBlue.getHeading())
                 .build();
     }
@@ -270,7 +275,7 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2Blue, strafeGateBlue))
                 .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), strafeGateBlue.getHeading())
                 .addPath(new BezierLine(strafeGateBlue, gateBlue))
-                .setBrakingStart(.8)
+                
                 .setLinearHeadingInterpolation(strafeGateBlue.getHeading(), gateBlue.getHeading())
                 .build();
     }
@@ -279,16 +284,12 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(gateBlue, moveToShootBlue))
                 .setLinearHeadingInterpolation(gateBlue.getHeading(), moveToShootBlue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .addPath(new BezierLine(moveToShootBlue, shootPose2Blue))
                 .setLinearHeadingInterpolation(moveToShootBlue.getHeading(), shootPose2Blue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .build();
     }
 
@@ -296,16 +297,12 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(gateBlue, moveToShootBlue))
                 .setLinearHeadingInterpolation(gateBlue.getHeading(), moveToShootBlue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .addPath(new BezierLine(moveToShootBlue, shootPoseBlue))
                 .setLinearHeadingInterpolation(moveToShootBlue.getHeading(), shootPoseBlue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .build();
     }
 
@@ -320,10 +317,8 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup1Blue, shootPose2Blue))
                 .setLinearHeadingInterpolation(pickup1Blue.getHeading(), shootPose2Blue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .build();
     }
 
@@ -345,10 +340,8 @@ public class EighteenBall {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup3Blue, shootPoseThirdPickupBlue))
                 .setLinearHeadingInterpolation(pickup3Blue.getHeading(), shootPoseThirdPickupBlue.getHeading())
-                .setTValueConstraint(shootConstraint)
-                .setTimeoutConstraint(tConstraint)
-                .setBrakingStrength(braking)
-                .setVelocityConstraint(velConstraint)
+                
+                
                 .build();
     }
 

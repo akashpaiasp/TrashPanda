@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.util;
 
 import static org.firstinspires.ftc.teamcode.config.subsystems.Hood.shootingVariable;
+import static org.firstinspires.ftc.teamcode.config.subsystems.Turret.weight;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.Range;
@@ -22,7 +23,7 @@ public class KinematicsCalculator {
     public static  double targetAuto = 35;
     public static  double targetTele = 33;
     public static double y_target_in = 36;          // goal height
-    public static double y_target_in_airsort = 28;
+    public static double y_target_in_airsort = 34;
     public static final double d_flywheel_in = 2.835;       // flywheel diameter
     public static final double r_flywheel_in = d_flywheel_in / 2.0;
 
@@ -58,9 +59,14 @@ public class KinematicsCalculator {
 
     public static double hoodVariable = .37;
     public static boolean manualHood = false;
-    public static double mediumHood = .65;
-    public static double closeHood = .35;
-    public static double farHood = .72;
+    public static double mediumHood = 0.6;
+    public static double closeHood = 0.35;
+    public static double farHood = .77;
+
+    public static double closeFudge = 1.76;
+    public static double mediumFudge = 1.4267676767676767676767676767676767676767;
+    public static double farFudge = 1.29;
+
 
 
 
@@ -85,22 +91,22 @@ public class KinematicsCalculator {
     public double getRPM() {
         if (!manualFudge) {
             if(distance < inchesToMeters(70)) {
-                FUDGE_FACTOR_VEL = 1.76;
+                FUDGE_FACTOR_VEL = closeFudge;
                 if (!Launcher.manualCounterRoller) {
                     Launcher.counterRollerPower = .91;
                 }
             }
-            else if (distance > inchesToMeters(120)) {
+            else if (distance > inchesToMeters(105)) {
                 if (!Launcher.manualCounterRoller) {
                     Launcher.counterRollerPower = 1;
                 }
-                FUDGE_FACTOR_VEL = 1.25;
+                FUDGE_FACTOR_VEL = farFudge;
             }
             else {
                 if (!Launcher.manualCounterRoller) {
                     Launcher.counterRollerPower = .91;
                 }
-                FUDGE_FACTOR_VEL = 1.45;
+                FUDGE_FACTOR_VEL = mediumFudge;
             }
         }
         if (airsort) {
@@ -156,7 +162,7 @@ public class KinematicsCalculator {
 
     public double getHood(double currentRPM) {
         if (!manualHood) {
-            if (distance > inchesToMeters(120))
+            if (distance > inchesToMeters(105))
                 hoodVariable = farHood;
             else if (distance < inchesToMeters(70))
                 hoodVariable = closeHood;
@@ -217,7 +223,7 @@ public class KinematicsCalculator {
     }
 
     private static double velToRpm(double vel) {
-        if (Launcher.teleop)
+        if (true)
             return vel / (Math.PI * r_flywheel_m / 60.0 * efficiency * FUDGE_FACTOR_VEL);
         return vel / (Math.PI * r_flywheel_m / 60.0 * efficiency * AUTO_FUDGE);
         //return vel / .0008 / FUDGE_FACTOR_VEL;
@@ -232,9 +238,10 @@ public class KinematicsCalculator {
         return Range.clip(72.77 - 42.02 * (hood), min_angle, max_angle);
     }
 
+    //Aabhas has helped me work through numerous software issues,
+
     public  double getFlightTime() {
         //return 0 ;
-
 
         double theta = Math.toRadians(angleDeg);
         double v0 = rpmToVel(RPM);
@@ -242,7 +249,7 @@ public class KinematicsCalculator {
         double v_horizontal = v0 * Math.cos(theta);
         double ft = distance / v_horizontal;
         if (Double.isNaN(ft) || ft > 10 || ft < 0) return 0;
-        return ft;
+        return ft * weight;
     }
 
     public boolean isValid(double vel) {

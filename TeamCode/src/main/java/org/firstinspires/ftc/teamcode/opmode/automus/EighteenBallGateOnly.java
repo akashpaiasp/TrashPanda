@@ -2,33 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.automus;
 
 import static org.firstinspires.ftc.teamcode.config.core.Robot.intakeThreshold;
 import static org.firstinspires.ftc.teamcode.config.core.Robot.uptakeThreshold;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickupBlue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.move;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.moveBlue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot1;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot1Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot3;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot3Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot4;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot4Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGateBlue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootPose2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.startPose;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.startPoseBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.*;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -67,7 +41,7 @@ public class EighteenBallGateOnly extends OpMode {
     double lastMoveTime = 5.2;
     double intakeTime = 2;
     double checkTime = .15;
-    double gateOpenTimeFirstIntake = .1;
+    double gateOpenTimeFirstIntake = .4;
     int doneThreshold = 4;
     double dist;
     boolean time = false;
@@ -121,7 +95,7 @@ public class EighteenBallGateOnly extends OpMode {
 
 
             case 10:
-                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?  shoot1(robot.getFollower()) : shoot1Blue(robot.getFollower()),  true);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?  shoot1Klutch(robot.getFollower()) : shoot1Blue(robot.getFollower()),  true);
                 robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
                 robot.intake.setGateState(Intake.GateState.OPEN);
                 //if (gamepad1.square)
@@ -129,14 +103,15 @@ public class EighteenBallGateOnly extends OpMode {
                 break;
             case 1025:
                 if (robot.getFollower().getCurrentTValue() >= 0) {
-                        aimTurret = true;
-                        //sotm = true;
-                        //robot.launcher.setTarget(rpm);
-                        // setPathState(1026);
+                    aimTurret = true;
+                    //sotm = true;
+                    //robot.launcher.setTarget(rpm);
+                    // setPathState(1026);
                     setPathState(1201);
                 }
                 break;
 
+                /*
             case 1026:
                 if (robot.getFollower().getCurrentTValue() >= tValue) {
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
@@ -154,7 +129,7 @@ public class EighteenBallGateOnly extends OpMode {
                     else
                         robot.hood.setTarget(hood1);
                 }
-                break;
+                break; */
 
 //            case 11:
 //                if (robot.getFollower().isBusy()) {
@@ -215,7 +190,7 @@ public class EighteenBallGateOnly extends OpMode {
 
 
             case 1201:
-                if (robot.getFollower().isBusy()) {
+                if (robot.getFollower().isBusy() && (!sotm || robot.getFollower().getCurrentTValue() < tValue)) {
                     pathTimer.reset();
                     return;
                 }
@@ -255,7 +230,7 @@ public class EighteenBallGateOnly extends OpMode {
                         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                     }
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup1(robot.getFollower()) : pickup1Blue(robot.getFollower()));
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup1Klutch(robot.getFollower()) : pickup1Blue(robot.getFollower()));
                     two = true;
                     setPathState(1204);
                 }
@@ -303,7 +278,7 @@ public class EighteenBallGateOnly extends OpMode {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
                         if (!twentyOne)setPathState(12);
-                        else setPathState(1301);
+                        else setPathState(1456);
                         doneDone = false;
                     }
                 }
@@ -316,6 +291,7 @@ public class EighteenBallGateOnly extends OpMode {
                 break;
 
                 //21 ball here
+
             case 1301: {
                 two = false;
                 doneNum = 0;
@@ -522,7 +498,7 @@ public class EighteenBallGateOnly extends OpMode {
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        setPathState(1456);
+                        setPathState(275);
                         doneDone = false;
                     }
                 }
@@ -543,7 +519,7 @@ public class EighteenBallGateOnly extends OpMode {
                     //robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     //robot.intake.setUptakeState(Intake.UptakeState.OFF);
 
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup2(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup1(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
 
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
@@ -611,12 +587,15 @@ public class EighteenBallGateOnly extends OpMode {
                */
             case 19:
                 aim1 = true;
-                if (robot.getFollower().isBusy()  ){
+                if (robot.getFollower().isBusy()){
                     pathTimer.reset();
                     return;
                 }
+                else if (pathTimer.getElapsedTimeSeconds() < gateOpenTimeFirstIntake) {
+                    return;
+                }
                 else  {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot3(robot.getFollower()) : shoot3Blue(robot.getFollower()), false);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shoot3Klutch(robot.getFollower()) : shoot3Blue(robot.getFollower()), false);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     //if (gamepad1.square)
@@ -649,7 +628,7 @@ public class EighteenBallGateOnly extends OpMode {
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        setPathState(275);
+                        setPathState(1301);
                         doneDone = false;
                     }
                 }

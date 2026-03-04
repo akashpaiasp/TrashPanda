@@ -46,8 +46,8 @@ public class Hood extends SubsystemBase {
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         //init servos based on their name in the robot's config file
-        hoodR = hardwareMap.get(Servo.class, "sh4");
-        hoodL = hardwareMap.get(Servo.class, "sh3");
+        hoodR = hardwareMap.get(Servo.class, "sh15");
+        hoodL = hardwareMap.get(Servo.class, "sh10");
         target = 0.0;
     }
 

@@ -68,14 +68,8 @@ public class TelePOP extends LinearOpMode {
             //Update everything
             robot.tPeriodic();
 
-            if (robot.has4()) {
-                robot.outtake1();
-                pressingRT = false;
-            }
-
-
             if (gamepad1.right_trigger > 0.3) {
-                if (robot.intakeDone()) rumble = true;
+                if (robot.has4()) rumble = true;
                 pressingRT = true;
                 robot.intakeOff = false;
                 robot.intake.setGateState(Intake.GateState.CLOSED);
@@ -122,6 +116,13 @@ public class TelePOP extends LinearOpMode {
             if (gamepad2.triangle){
                 Turret.sotm = !Turret.sotm;
             }
+
+            /*if (robot.intake.has3() && gamepad2.right_trigger < .3) {
+                robot.intake.setGateState(Intake.GateState.OPEN);
+            }
+            else if (gamepad2.right_trigger > .3) {
+                robot.intake.setGateState(Intake.GateState.CLOSED);
+            } */
 
             /*if (useTurret)
                 new Aim(robot, goalX, goalY).execute();
@@ -275,6 +276,8 @@ public class TelePOP extends LinearOpMode {
             telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
             telemetry.addData("Robot zone", zone);
             telemetry.addData("X vel", robot.getFollower().getVelocity().getXComponent());
+            telemetry.addData("Num", robot.intake.num());
+            telemetry.addData("voltage", robot.getFollower().getDrivetrain().getVoltage());
         }
         CSVInterface.log();
     }

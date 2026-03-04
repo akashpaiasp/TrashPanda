@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.config.core;
 
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.convertToBlue;
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
+import static org.firstinspires.ftc.teamcode.config.subsystems.Turret.weight;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Vector;
@@ -28,6 +29,7 @@ import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.*;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
+import org.firstinspires.ftc.teamcode.config.util.photoncore.PhotonCore;
 import org.firstinspires.ftc.teamcode.opmode.automus.EighteenBall;
 
 import java.util.List;
@@ -127,7 +129,7 @@ public class Robot {
     public static Pose cornerBlueBack = new Pose(-61.9, -65.9);
     // public static Pose cornerRedFront = new Pose(-72, -72);
     public static Pose cornerRedBack = new Pose(61.9, -65.9);
-    public static Pose resetTurret = new Pose(-63, -58.5, 1.5);
+    public static Pose resetTurret = new Pose(-61.5, -61.5, 1.54);
 
     public boolean uptakeOff = true;
     public boolean launcherOff = true;
@@ -218,6 +220,11 @@ public class Robot {
     } */
 
     public Robot(HardwareMap hw, Telemetry telemetry, Alliance alliance, Pose startPose) {
+        /*PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable(); */
+
         List<LynxModule> allHubs = hw.getAll(LynxModule.class);
 
         for (LynxModule hub : allHubs) {
@@ -240,7 +247,7 @@ public class Robot {
 
         timer.reset();
 
-        breakbeams = new Breakbeams(hw, telemetry);
+        //breakbeams = new Breakbeams(hw, telemetry);
         launcher = new Launcher(hw, telemetry);
         turret = new Turret(hw, telemetry);
         hood = new Hood(hw, telemetry);
@@ -414,8 +421,7 @@ public class Robot {
         //telemetry.addData("path", follower.getCurrentPath());
         updateGoalCoords();
         updateRobotCoords();
-        if (!EighteenBall.sotm || launcher.teleop)
-            updateShooting();
+        updateShooting();
         follower.update();
         //autoEndPose = follower.getPose().copy();
         if (alliance == Alliance.RED)
@@ -426,6 +432,8 @@ public class Robot {
         if (logData) log();
         if (showTelemetry)
             telemetry.update();
+        /*PhotonCore.CONTROL_HUB.clearBulkCache();
+        PhotonCore.EXPANSION_HUB.clearBulkCache(); */
     }
 
     public void aInitLoop(GamepadEx g1) {
@@ -435,6 +443,8 @@ public class Robot {
         g1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(() -> {
             alliance = Alliance.BLUE;
         }));
+        /*PhotonCore.CONTROL_HUB.clearBulkCache();
+        PhotonCore.EXPANSION_HUB.clearBulkCache(); */
     }
 
     public void tPeriodic() {
@@ -445,6 +455,8 @@ public class Robot {
         if (showTelemetry)
             telemetry.update();
         if (logData) log();
+        /*PhotonCore.CONTROL_HUB.clearBulkCache();
+        PhotonCore.EXPANSION_HUB.clearBulkCache();*/
 
         //turret.periodic();
         // launcher.periodic();
@@ -579,13 +591,13 @@ public class Robot {
                 r = 1;
         }
 
-        else if (KinematicsCalculator.airsort) {
+        if (KinematicsCalculator.airsort) {
             hoodAdjustment = true;
             int n = getNumBallsWhileShooting();
             boolean b;
             switch (sortNum) {
                 case 0:
-                    b = false;
+                    b = true;
                     break;
                 case 1:
                     b = n == 3;
@@ -615,7 +627,7 @@ public class Robot {
         Launcher.auto_target = k.getRPM();
         double hoodPos = k.getHood(launcher.current_velocity);
         if (hoodPos > 0 ) {
-            validLaunch = true;
+            //validLaunch = true;
             if (!shotStarted || hoodAdjustment) {
                 if (d < 100)
                     hood.setTarget(hoodPos);
@@ -624,8 +636,10 @@ public class Robot {
                 }
             }
         } else {
-            validLaunch = false;
+            //validLaunch = false;
         }
+
+        validLaunch = launcher.getValidLaunch();
 
     }
 
@@ -654,8 +668,8 @@ public class Robot {
 
     public double getDistanceFromGoal() {
         goalY = centerY;
-        double vx = follower.getVelocity().getXComponent();
-        double vy = follower.getVelocity().getYComponent();
+        double vx = turret.getVx();
+        double vy = turret.getVy();
         double dx = goalX - turretX - vx * flightTime;
         double dy = goalY - turretY - vy * flightTime;
 
@@ -757,13 +771,15 @@ public class Robot {
     }
 
     public int getNumBallsWhileShooting() {
+        /*
         if (intake.uptake.getCurrent(CurrentUnit.AMPS) > threeBallUptake)
             return 3;
         else if (intake.uptake.getCurrent(CurrentUnit.AMPS) > twoBallUptake)
             return 2;
         else if (intake.uptake.getCurrent(CurrentUnit.AMPS) > oneBallUptake)
             return 1;
-        else return 0;
+        else return 0; */
+        return intake.num();
     }
 
     public boolean intakeDone() {
@@ -773,7 +789,7 @@ public class Robot {
         return intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8;
     }
     public boolean has4() {
-        return  intake.intake.getCurrent(CurrentUnit.AMPS) > 4;
+        return  intake.has3();
     }
     public boolean notMoving() {
         return follower.getVelocity().getXComponent() < .2 && follower.getVelocity().getYComponent() < .2 && follower.getAngularVelocity() < .1;

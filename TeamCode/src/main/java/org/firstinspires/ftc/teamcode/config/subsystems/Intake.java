@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -21,17 +22,21 @@ public class Intake extends SubsystemBase {
     private MultipleTelemetry telemetry;
     private Servo gate;
     public DcMotorEx intake, uptake;
+    public DigitalChannel bb1, bb2, bb3;
+    //larger number = further from shooter
+
     public static double launchIntake = 1;
     public static double launchUptake = 1;
     public static double intakeUptake = .7;
-    public static double outtake1Power = -.5;
+    public static double outtake1Power = -.2;
 
     public static boolean manual = false;
 
     public static double gatePos = 0.5;
 
+    public static boolean autoOuttake = true;
     private static double
-            open = .93,
+            open = 1,
             closed = 0;
 
     public enum IntakeState {
@@ -69,9 +74,15 @@ public class Intake extends SubsystemBase {
         //pusherM = hardwareMap.get(Servo.class, "cs2");
         //pusherM = hardwareMap.get(Servo.class, "cs3");
 
-        gate = hardwareMap.get(Servo.class, "sh5");
+        gate = hardwareMap.get(Servo.class, "cs5");
+
         intake = hardwareMap.get(DcMotorEx.class, "em1");
         uptake = hardwareMap.get(DcMotorEx.class, "em0");
+
+
+        bb1 = hardwareMap.get(DigitalChannel.class, "ed0");
+        bb2 = hardwareMap.get(DigitalChannel.class, "ed1");
+        bb3 = hardwareMap.get(DigitalChannel.class, "ed6");
 
 
         //intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -90,7 +101,14 @@ public class Intake extends SubsystemBase {
     The telemetry gets updated constantly so you can see the status of the subsystems */
 
     public void setIntakeState(IntakeState intakeState) {
-        currentIntake = intakeState;
+        if (autoOuttake) {
+            if ((intakeState == IntakeState.INTAKE || intakeState == IntakeState.OFF) && has3()) {
+                currentIntake = IntakeState.SLOWOUTTAKE;
+            }
+            else currentIntake = intakeState;
+        }
+        else
+            currentIntake = intakeState;
     }
     public void setUptakeState(UptakeState uptakeState) {
         currentUptake = uptakeState;
@@ -120,9 +138,11 @@ public class Intake extends SubsystemBase {
                 break;
             case ON:
                 uptake.setPower(launchUptake);
+                //setGateState(GateState.OPEN);
                 break;
             case SLOW:
                 uptake.setPower(intakeUptake);
+                //setGateState(GateState.CLOSED);
                 break;
             case BACK:
                 uptake.setPower(-1);
@@ -144,8 +164,43 @@ public class Intake extends SubsystemBase {
 
         telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
         telemetry.addData("Uptake amps", uptake.getCurrent(CurrentUnit.AMPS));
-        //telemetry.addData("Intake state", currentIntake);
-        //telemetry.addData("Uptake state", currentUptake);
+
+        telemetry.addData("bb1", bb1.getState());
+        telemetry.addData("bb2", bb2.getState());
+        telemetry.addData("bb3", bb3.getState());
+    }
+
+    public boolean has3() {
+        return !bb1.getState() && !bb2.getState() && !bb3.getState();
+    }
+
+    public boolean none() {
+        return bb1.getState() && bb2.getState() && bb3.getState();
+    }
+
+    public int num() {
+        if (!bb1.getState()) {
+            if (!bb2.getState()) {
+                if (!bb3.getState())
+                    return 3;
+                else
+                    return 2;
+            }
+            else if (!bb3.getState())
+                return 2;
+            else return 1;
+        }
+        else if (!bb2.getState()) {
+                if (!bb3.getState())
+                    return 2;
+                else
+                    return 1;
+            }
+        else if (!bb3.getState()) {
+            return 1;
+        }
+        else return 0;
+
     }
 
     public void init() {

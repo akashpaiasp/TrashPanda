@@ -39,11 +39,11 @@ public class Launcher extends SubsystemBase {
     public static boolean manualCounterRoller = false;
 
     //pdfl values tuned in FTC Dashboard
-    public static double p = 0.00008;
+    public static double p = 0.01;
     public static double d = 0;
-    public static double f = 0.18;
+    public static double f = 0.08;
     public static double l = 0;
-    public static double i = 0;
+    public static double i = 0.00001;
 
     public static double p2 = 0.007;
     public static double d2 = 0.01;
@@ -57,7 +57,7 @@ public class Launcher extends SubsystemBase {
     public static double tele_target = 4500;
     public static double auto_target = 4000;
     public static boolean powerMode = false;
-    public static boolean boomBoom = true;
+    public static boolean boomBoom = false;
     public static boolean pid1 = true;
     public double current_velocity = 0;
     public double current_velocity_2 = 0;
@@ -91,6 +91,8 @@ public class Launcher extends SubsystemBase {
     private boolean inBoost = false;
     private boolean inAggressive = false;
     public static boolean teleop = false;
+    public boolean validLaunch = false;
+    public static double threshold = 200.0;
 
     public enum LauncherState {
         IN,
@@ -129,48 +131,17 @@ public class Launcher extends SubsystemBase {
     /*Periodic method gets run in a loop during auto and teleop.
     The telemetry gets updated constantly so you can see the status of the subsystems */
     public void periodicTest() {
+        double d = Math.abs(target_velocity + current_velocity);
+        validLaunch = d < threshold;
         measuredV = hw.voltageSensor.iterator().next().getVoltage();
         current = LauncherState.OUT;
         updateShooter();
-        telemetry.addData("Launcher 2 Velocity", -current_velocity);
-        telemetry.addData("Launcher 1 Velocity", -current_velocity_2);
-
-        telemetry.addData("pdfl", pdfl);
-
-        telemetry.addData("Target", target_velocity);
-
-        telemetry.addData("p", controller.getP());
-        telemetry.addData("d", controller.getD());
-        telemetry.addData("f", controller.getF());
-        telemetry.addData("l", controller.getL());
-        telemetry.addData("i", controller.getI());
-
-        telemetry.addData("dt", controller.getDelta_time());
-        telemetry.addData("de", controller.getDelta_error());
-
-        telemetry.addData("power", power);
-
-        telemetry.addData("Reached target", controller.getReached());
-        telemetry.addData("Rise time", controller.getRiseTime());
-
-        telemetry.addData("Settled", controller.isSettled());
-        telemetry.addData("Settling time", controller.getSettlingTime());
-
-        telemetry.addData("Error", controller.getError());
-        telemetry.addData("Reached Threshold" , controller.getReachedThreshold());
-
-        telemetry.addData("Position", launcher1.getCurrentPosition());
-
-        telemetry.addData("Delta Time 2", delta_time);
-        telemetry.addData("Delta Position", delta_pos);
-
-        telemetry.addData("Total Error", controller.getTot_error());
-
-        telemetry.addData("Done", controller.done);
+        telemetry.addData("Target Velocity 1", target_velocity);
+        telemetry.addData("Target Velocity 2", target_velocity_2);
+        telemetry.addData("Current Velocity 1", -current_velocity);
+        telemetry.addData("Current Velocity 2", -current_velocity_2);
         telemetry.addData("Volts", measuredV);
-
-
-
+        telemetry.addData("Valid", validLaunch);
         telemetry.update();
         log();
 
@@ -182,6 +153,8 @@ public class Launcher extends SubsystemBase {
 
 
     public void periodic() {
+        double d = Math.abs(target_velocity + current_velocity);
+        validLaunch = d < threshold;
         measuredV = hw.voltageSensor.iterator().next().getVoltage();
         //if (Robot.logData) log();
         if (current != LauncherState.STOP) {
@@ -201,9 +174,10 @@ public class Launcher extends SubsystemBase {
 
         telemetry.addData("Target Velocity 1", target_velocity);
         telemetry.addData("Target Velocity 2", target_velocity_2);
-        telemetry.addData("Current Velocity 2", current_velocity);
-        telemetry.addData("Current Velocity 1", current_velocity_2);
+        telemetry.addData("Current Velocity 1", current_velocity);
+        telemetry.addData("Current Velocity 2", current_velocity_2);
         telemetry.addData("Volts", measuredV);
+        telemetry.addData("Valid", validLaunch);
 
         //telemetry.addData("Done", controller.done);
         //telemetry.addData("Num Done", numDone);
@@ -214,6 +188,8 @@ public class Launcher extends SubsystemBase {
     }
 
     public void periodicShootingTest(Robot r) {
+        double d = Math.abs(target_velocity - current_velocity);
+        validLaunch = d < threshold;
         updateShooter();
         if (true) {
             if (controller.done) {
@@ -237,10 +213,11 @@ public class Launcher extends SubsystemBase {
 
         r.intake.periodic();
         telemetry.addData("Target Velocity", target_velocity);
-        telemetry.addData("Current Velocity", current_velocity);
+        telemetry.addData("Current Velocity", -current_velocity);
         telemetry.addData("State", current);
         telemetry.addData("Done", controller.done);
         telemetry.addData("Volts", measuredV);
+        telemetry.addData("Valid", validLaunch);
         telemetry.update();
         log();
         r.intake.log();
@@ -251,7 +228,7 @@ public class Launcher extends SubsystemBase {
         prev_velocity = current_velocity;
         current_velocity = tickstoRPM(launcher2.getVelocity());
         current_velocity_2 = tickstoRPM(launcher1.getVelocity());
-        controller.update(current_velocity_2, target_velocity_2);
+        controller.update(-current_velocity, target_velocity);
         controller.updateConstants(p, d, f, l, i);
         pdfl = controller.run();
         //}
@@ -286,7 +263,7 @@ public class Launcher extends SubsystemBase {
         if (!(current == LauncherState.STOP)) {
             if (!boomBoom) {
                 launcher1.setPower(pdfl);
-                launcher2.setPower(pdfl);
+                launcher2.setPower(counterRollerPower * (12.01 / measuredV));
             }
             else {
                 if (!powerMode) {
@@ -318,6 +295,10 @@ public class Launcher extends SubsystemBase {
 
     public void setTarget(double target) {
         target_velocity = target;
+    }
+
+    public boolean getValidLaunch() {
+        return validLaunch;
     }
 
     public double tickstoRPM(double velocity) {

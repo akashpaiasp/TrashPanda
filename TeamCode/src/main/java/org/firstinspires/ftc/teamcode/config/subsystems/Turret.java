@@ -56,8 +56,8 @@ public class Turret extends SubsystemBase {
     public static double fudgeFactor = 0;
     public static boolean useTurret = true;
 
-    public static double zeroPos = 0.465;
-    public static double ninetyPos = .79;
+    public static double zeroPos = 0.491;
+    public static double ninetyPos = 0.81;
     /*
     public static double leftPos = .5;
     public static double rightPos = .5; */
@@ -78,9 +78,13 @@ public class Turret extends SubsystemBase {
     public static double targetRange = 3;
     //public Servo spin;
 
-    public static double weight = 1.5;
+    public static double weight = 1.25067;
+    public static double velWeight = 1.25;
 
-    public static boolean sotm = false;
+    public static boolean sotm = true;
+    public double vx, vy = 0;
+    public double prevX = 0, prevY = 0;
+    public double dvx, dvy = 0;
 
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
@@ -92,7 +96,7 @@ public class Turret extends SubsystemBase {
             spin2.setDirection(DcMotorSimple.Direction.REVERSE);
         }
         else {
-            left = hardwareMap.get(Servo.class, "sh1");
+            left = hardwareMap.get(Servo.class, "sh4");
             right = hardwareMap.get(Servo.class, "sh2");
             middle = hardwareMap.get(Servo.class, "sh0");
         }
@@ -170,6 +174,7 @@ public class Turret extends SubsystemBase {
     public void periodic() {
         //if (Robot.logData) log();
         aim();
+        sotm = Launcher.teleop;
         if (continuousMode) {
             spin.calculate();
             current = -getTotalDegrees();
@@ -276,14 +281,18 @@ public class Turret extends SubsystemBase {
 //        double vy = Double.isNaN(vyTemp) ? 0 : vyTemp;
 //        double va = 0;//r.getFollower().getAngularVelocity();
 
-        double vX, vY;
-
         if (sotm) {
-            vX = Constants.localizer.getVelocity().getX();
-            vY = Constants.localizer.getVelocity().getY();
+            vx = Constants.localizer.getVelocity().getX();
+            vy = Constants.localizer.getVelocity().getY();
+            dvx = vx - prevX;
+            dvy = vy - prevY;
+            prevX = vx;
+            prevY = vy;
+            vx += dvx * velWeight;
+            vy += dvy * velWeight;
         } else {
-            vX = 0;
-            vY = 0;
+            vx = 0;
+            vy = 0;
         }
 
         double dx;
@@ -291,21 +300,14 @@ public class Turret extends SubsystemBase {
 
         double x = botPose.getX();
         double y = botPose.getY();
-        dx = targetX - x - vX * weight;
-        dy = targetY - y - vY * weight;
+        dx = targetX - x - vx * flightTime;
+        dy = targetY - y - vy * flightTime;
         double robotHeading = Math.toDegrees(botPose.getHeading());
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
         double turretRelativeAngle;
 
-        if (Launcher.teleop || true)
-            turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + fudgeFactor) ;
-        else {
-            if (Robot.alliance == Alliance.RED)
-                turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + autoFudge *1.8);
-            else
-                turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading - autoFudge * 1.8);
-        }
+        turretRelativeAngle = wrapTo180(angleToTargetField - robotHeading + fudgeFactor) ;
 
         turretRelativeAngle = Range.clip(turretRelativeAngle, MIN_ANGLE, MAX_ANGLE);
         //turretRelativeAngle = 0;
@@ -337,6 +339,12 @@ public class Turret extends SubsystemBase {
         if (angle > 180) angle -= 360;
         if (angle < -180) angle += 360;
         return angle;
+    }
+    public double getVx() {
+        return vx;
+    }
+    public double getVy() {
+        return vy;
     }
     public void updateLL(double d) {
         llcontroller.update(d, 1);

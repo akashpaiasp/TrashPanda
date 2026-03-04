@@ -1,11 +1,33 @@
 package org.firstinspires.ftc.teamcode.opmode.automus;
 
-import static org.firstinspires.ftc.teamcode.config.core.Robot.intakeThreshold;
-import static org.firstinspires.ftc.teamcode.config.core.Robot.uptakeThreshold;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.*;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickupBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Klutch;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot1;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot3;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot3Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot4;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot4Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGateBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootPose2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.startPose;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.startPoseBlue;
 
 import com.acmerobotics.dashboard.config.Config;
-//import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
@@ -19,20 +41,20 @@ import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
 
 
-@Autonomous (name = "Big Smapple")
+@Autonomous (name = "No third spikemark")
 @Config
 //@Configurable
-public class EighteenBall extends OpMode {
+public class EighteenBallNoThird extends OpMode {
     //private MultipleTelemetry telemetry;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = .3;
-    double onThresholdTwo = 0.3;
+    double onThreshold = 0.05;
+    double onThresholdTwo = 0;
 
-    double offThreshold = 0.05;
+    double offThreshold = 0.03;
     double moveThreshold = 1.8;
     double moveIntakeThreshold = 1.2;
     public static boolean firstCouple = true;
@@ -59,7 +81,8 @@ public class EighteenBall extends OpMode {
 
     public static double rpm = 4000;
     public static boolean sotm = false;
-    public static boolean twentyOne = false;
+    public static boolean twentyOne = true;
+    public boolean finishedOne = false;
     public static double hood1 = .7;
     public static double hood2 = .8;
     public static double hood3 = .9;
@@ -278,8 +301,7 @@ public class EighteenBall extends OpMode {
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        if (!twentyOne)setPathState(12);
-                        else setPathState(1301);
+                        setPathState(1301);
                         doneDone = false;
                     }
                 }
@@ -352,7 +374,13 @@ public class EighteenBall extends OpMode {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
                         //setPathState(1452);
-                        setPathState(12);
+                        if (!finishedOne) {
+                            setPathState(1301);
+                            finishedOne = true;
+                        }
+                        else {
+                            setPathState(12);
+                        }
                         doneDone = false;
 
                     }
@@ -519,7 +547,7 @@ public class EighteenBall extends OpMode {
                     //robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     //robot.intake.setUptakeState(Intake.UptakeState.OFF);
 
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup2(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup1Klutch(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
 
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
@@ -625,7 +653,7 @@ public class EighteenBall extends OpMode {
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        setPathState(24);
+                        setPathState(275);
                         doneDone = false;
                     }
                 }

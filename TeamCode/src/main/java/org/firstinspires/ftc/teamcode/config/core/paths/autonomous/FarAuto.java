@@ -12,7 +12,7 @@ public class FarAuto {
         public static final Pose startPose = new Pose(13, -60.6, 0);
     public static final Pose shootPose = new Pose(13, -57, 0);
     public static final Pose humanPlayer = new Pose(59, -57.5, -.31);
-    public static final Pose turn = new Pose(60.8, -61.6, -.189);
+    public static final Pose turn = new Pose(60.8, -60, -.189);
 
     private static final Pose strafe = new Pose(20, -33.5, 0);
     private static final Pose thirdSpike = new Pose(53, -33.5, 0);
