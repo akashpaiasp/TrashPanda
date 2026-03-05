@@ -14,8 +14,10 @@ import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.limelightvision.LLResultTypes.DetectorResult;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import java.util.List;
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -24,6 +26,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D; // ? needed ?
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Limelight extends SubsystemBase {
+    //pipeline numbers
+    final static int APRILTAG = 0;
+    final static int NEURALDETECTOR = 1;
+
+
     //Telemetry = text that is printed on the driver station while the robot is running
     private MultipleTelemetry telemetry;
 
@@ -37,7 +44,7 @@ public class Limelight extends SubsystemBase {
         limelight = hardwareMap.get(Limelight3A.class, "ll");
 
         //default pipeline
-        //8 = red goal, 7 = obeselisque, 6 = blue goal
+        //8 = red goal, 7 = obelisk, 6 = blue goal
         setPipeline(8);
 
         limelight.start();
@@ -70,9 +77,8 @@ public class Limelight extends SubsystemBase {
 
     @Override
     public void periodic() {
-        /*
-        updateTelemetry();
-        update(); */
+        //updateTelemetry();
+        update();
     }
 
     public double getLatency() {
@@ -93,25 +99,24 @@ public class Limelight extends SubsystemBase {
                 status.getPipelineIndex(), status.getPipelineType());
 
         LLResult result = limelight.getLatestResult();
-        if (result.isValid()) {
-            // Access general information
-            Pose3D botpose = result.getBotpose_MT2();
-            double captureLatency = result.getCaptureLatency();
-            double targetingLatency = result.getTargetingLatency();
-            double parseLatency = result.getParseLatency();
-            telemetry.addData("LL Latency", captureLatency + targetingLatency);
-            telemetry.addData("Parse Latency", parseLatency);
-            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
 
-            telemetry.addData("tx", result.getTx());
-            telemetry.addData("txnc", result.getTxNC());
-            telemetry.addData("ty", result.getTy());
-            telemetry.addData("tync", result.getTyNC());
+        // Access general information
+        Pose3D botpose = result.getBotpose_MT2();
+        double captureLatency = result.getCaptureLatency();
+        double targetingLatency = result.getTargetingLatency();
+        double parseLatency = result.getParseLatency();
+        telemetry.addData("LL Latency", result.isValid() ? captureLatency + targetingLatency : 0.0);
+        telemetry.addData("Parse Latency", result.isValid() ? parseLatency : 0.0);
+        telemetry.addData("PythonOutput", result.isValid() ? java.util.Arrays.toString(result.getPythonOutput()) : "Null");
 
-            telemetry.addData("Botpose", botpose.toString());
-        }
+        telemetry.addData("tx", result.isValid() ? result.getTx() : 0.0);
+        telemetry.addData("txnc", result.isValid() ? result.getTxNC() : 0.0);
+        telemetry.addData("ty", result.isValid() ? result.getTy() : 0.0);
+        telemetry.addData("tync", result.isValid() ? result.getTyNC() : 0.0);
 
-        //telemetry.update();
+        telemetry.addData("Botpose", result.isValid() ? botpose.toString() : "Null");
+
+        telemetry.update();
     }
 
     /**
@@ -133,7 +138,21 @@ public class Limelight extends SubsystemBase {
      * @return Bot pose based on the limelight's algorithm using the internal 3d map
      */
     public Pose3D botPose() {
-        return result.getBotpose_MT2();
+        return getResult().getBotpose_MT2();
+    }
+
+    /**
+     * A direct access that returns raw results from the neural detector pipeline
+     * on the limelight.
+     * @return list of raw detector results from the neural network pipeline
+     * if pipeline is equal to NEURALDETECTOR. Else, returns null.
+     */
+    public List<DetectorResult> getDetectorResults() {
+        if(limelight.getStatus().getPipelineIndex() == NEURALDETECTOR)
+        {
+            return limelight.getLatestResult().getDetectorResults();
+        }
+        return null;
     }
 
 }
