@@ -6,81 +6,83 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
-
 public class EighteenBall {
+
     private static double shootConstraint = .99;
     private static double tConstraint = 100;
     private static double braking = 1;
     private static double velConstraint = 0.00000001;
-    // Red Poses
+
+    // ---------------- RED POSES ----------------
+
     public static final Pose startPose = new Pose(38.7, 60.4, 1.5721);
 
     private static final Pose shootPose = new Pose(15.5, 12, 0);
     public static final Pose shootPose2 = new Pose(14, 5, Math.toRadians(-15));
     public static final Pose shootPoseThirdPickup = new Pose(12, 36, -.94);
 
-    public static final Pose shootPose4 =new Pose(11, 10, startPose.getHeading());
-    public static final Pose shootPose3 = shootPose2;//new Pose(11, 5, Math.toRadians(-15));
+    public static final Pose shootPose4 = new Pose(11, 10, startPose.getHeading());
+    public static final Pose shootPose3 = shootPose2;
+
     private static final Pose moveToShoot = new Pose(30, 0, Math.toRadians(0));
     private static final Pose strafe1 = new Pose(30, -11, 0);
-    private static final Pose pickup2 = new Pose(51, -11, 0); //second spike mark
-    private static final Pose openGate = new Pose(56, -7, 0); //second spike mark
+    private static final Pose pickup2 = new Pose(51, -11, 0);
+    private static final Pose openGate = new Pose(54.5, -7, 0);
 
-
-    private static final Pose pickup1 = new Pose(53.16767, 12, 0); //first spike mark
+    private static final Pose pickup1 = new Pose(53.16767, 12, 0);
     public static final Pose shoot1Klutch = new Pose(20, 15, Math.toRadians(-120));
-    private static final Pose pickup1Klutch = new Pose(45, 13, 0); //first spike mark
+    private static final Pose pickup1Klutch = new Pose(45, 13, 0);
     public static final Pose gateKlutch = new Pose(53, 9, 0);
 
-
     public static final Pose strafeGate = new Pose(40, -10, 0.59);
-    public static final Pose gate = new Pose(59, -10, .515);
-    public static final Pose gateBlue = convertToBlue(gate);//new Pose(-59, -10, 2.55);
+    public static final Pose gate = new Pose(59, -11.5, .515);
+
     private static final Pose strafe2 = new Pose(20, -33.5, 0);
     private static final Pose pickup3 = new Pose(53, -33.5, 0);
     private static final Pose move = new Pose(12, 50, shootPose3.getHeading());
 
-    // Blue Poses
-    public static final Pose startPoseBlue = convertToBlue(startPose);//new Pose(-36.7+1.5, 58.1+4, 1.55);
+    // ---------------- BLUE POSES ----------------
 
-    private static final Pose shootPoseBlue = convertToBlue(shootPose);//new Pose(12, 12, 0);
-    public static final Pose shootPose2Blue = convertToBlue(shootPose2);//new Pose(16, 5, Math.toRadians(-15));
+    public static final Pose startPoseBlue = new Pose(-40.7, 60.6, 1.581);//convertToBlue(startPose);
+
+    private static final Pose shootPoseBlue = convertToBlue(shootPose);
+    public static final Pose shootPose2Blue = convertToBlue(shootPose2);
+    public static final Pose shootPose3Blue = shootPose2Blue;
+    public static final Pose shootPose4Blue = convertToBlue(shootPose4);
     public static final Pose shootPoseThirdPickupBlue = convertToBlue(shootPoseThirdPickup);
 
-    private static final Pose moveToShootBlue = convertToBlue(moveToShoot);//new Pose(24, 0, Math.toRadians(0));
-    private static final Pose strafe1Blue = convertToBlue(strafe1);//new Pose(30, -11.7, 0);
-    private static final Pose pickup2Blue = convertToBlue(pickup2);//new Pose(50, -11.7, 0); //second spike mark
-    private static final Pose pickup1Blue = convertToBlue(pickup1);//new Pose(50, 12, 0); //first spike mark
-    public static final Pose strafeGateBlue = convertToBlue(strafeGate);//new Pose(40, -10, 0.59);
-    //public static final Pose gateBlue = convertToBlue(gate);//new Pose(60, -12.5, 0.6487);
-    private static final Pose strafe2Blue = convertToBlue(strafe2);//new Pose(30, -36, 0);
-    private static final Pose pickup3Blue = convertToBlue(pickup3);//new Pose(53, -36, 0);
-    private static final Pose moveBlue = convertToBlue(move);//new Pose(24, 0, 0.77);
-    public static final Pose shootPose4Blue = convertToBlue(shootPose4);
+    private static final Pose moveToShootBlue = convertToBlue(moveToShoot);
+    private static final Pose strafe1Blue = convertToBlue(strafe1);
+    private static final Pose pickup2Blue = convertToBlue(pickup2);
+    private static final Pose openGateBlue = convertToBlue(openGate);
 
+    private static final Pose pickup1Blue = convertToBlue(pickup1);
+    public static final Pose shoot1KlutchBlue = convertToBlue(shoot1Klutch);
+    private static final Pose pickup1KlutchBlue = convertToBlue(pickup1Klutch);
+    public static final Pose gateKlutchBlue = convertToBlue(gateKlutch);
 
+    public static final Pose strafeGateBlue = convertToBlue(strafeGate);
+    public static final Pose gateBlue = convertToBlue(gate);
+
+    private static final Pose strafe2Blue = convertToBlue(strafe2);
+    private static final Pose pickup3Blue = convertToBlue(pickup3);
+    private static final Pose moveBlue = convertToBlue(move);
+
+    // ---------------- RED PATHS (UNCHANGED) ----------------
 
     public static PathChain shoot1(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose4))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose4.getHeading())
-                
                 .build();
     }
+
     public static PathChain shoot1Klutch(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(startPose, shoot1Klutch))
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose4.getHeading())
-                
                 .build();
     }
-
-    /*public static PathChain strafe1(Follower f) {
-        return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2, strafe1))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(), strafe1.getHeading())
-                .build();
-    } */
 
     public static PathChain pickup1(Follower f) {
         return f.pathBuilder()
@@ -89,35 +91,27 @@ public class EighteenBall {
                 .build();
     }
 
-
     public static PathChain shoot2(Follower f) {
         return f.pathBuilder()
-                //.addPath(new BezierCurve(pickup2, shootPose2))
                 .addPath(new BezierLine(pickup2, shootPose2))
-                //.setReversed()
                 .setConstantHeadingInterpolation(shootPose2.getHeading())
                 .build();
     }
 
     public static PathChain gatePickup(Follower f) {
         return f.pathBuilder()
-                /*.addPath(new BezierCurve(shootPose2, strafeGate, gate))
-                .setTangentHeadingInterpolation() */
                 .addPath(new BezierLine(shootPose2, strafeGate))
                 .setLinearHeadingInterpolation(shootPose2.getHeading(), strafeGate.getHeading())
                 .addPath(new BezierLine(strafeGate, gate))
-                //
                 .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
                 .build();
     }
+
     public static PathChain gatePickup2(Follower f) {
         return f.pathBuilder()
-                /*.addPath(new BezierCurve(shootPose2, strafeGate, gate))
-                .setTangentHeadingInterpolation() */
                 .addPath(new BezierLine(shootPose2, strafeGate))
                 .setLinearHeadingInterpolation(shootPose2.getHeading(), strafeGate.getHeading())
                 .addPath(new BezierLine(strafeGate, gate))
-                
                 .setLinearHeadingInterpolation(strafeGate.getHeading(), gate.getHeading())
                 .build();
     }
@@ -128,16 +122,6 @@ public class EighteenBall {
                 .setReversed()
                 .setTangentHeadingInterpolation()
                 .setReversed()
-                /*
-                .addPath(new BezierLine(gate, moveToShoot))
-                .setLinearHeadingInterpolation(gate.getHeading(), moveToShoot.getHeading())
-                
-                
-                .addPath(new BezierLine(moveToShoot, shootPose2))
-                .setLinearHeadingInterpolation(moveToShoot.getHeading(), shootPose2.getHeading())
-                
-                
-                 */
                 .build();
     }
 
@@ -147,16 +131,6 @@ public class EighteenBall {
                 .setReversed()
                 .setTangentHeadingInterpolation()
                 .setReversed()
-                /*
-                .addPath(new BezierLine(gate, moveToShoot))
-                .setLinearHeadingInterpolation(gate.getHeading(), moveToShoot.getHeading())
-                
-                
-                .addPath(new BezierLine(moveToShoot, shootPose2))
-                .setLinearHeadingInterpolation(moveToShoot.getHeading(), shootPose2.getHeading())
-                
-                
-                 */
                 .build();
     }
 
@@ -174,12 +148,10 @@ public class EighteenBall {
                 .build();
     }
 
-
     public static PathChain shoot3(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup1, shootPose2))
                 .setConstantHeadingInterpolation(shootPose2.getHeading())
-                
                 .build();
     }
 
@@ -189,14 +161,6 @@ public class EighteenBall {
                 .setLinearHeadingInterpolation(pickup1.getHeading(), shootPoseThirdPickup.getHeading())
                 .build();
     }
-    /*
-    public static PathChain strafe2(Follower f) {
-        return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2, strafe2))
-                .setLinearHeadingInterpolation(shootPose2.getHeading(), strafe2.getHeading())
-                //.setLinearHeadingInterpolation(shootPose2.getHeading(), strafe2.getHeading())
-                .build();
-    } */
 
     public static PathChain pickup3(Follower f) {
         return f.pathBuilder()
@@ -211,11 +175,6 @@ public class EighteenBall {
                 .setReversed()
                 .setTangentHeadingInterpolation()
                 .setReversed()
-                /*
-                .addPath(new BezierLine(pickup3, shootPoseThirdPickup))
-                .setConstantHeadingInterpolation(shootPoseThirdPickup.getHeading())
-                
-                 */
                 .build();
     }
 
@@ -226,37 +185,33 @@ public class EighteenBall {
                 .build();
     }
 
+    // ---------------- BLUE PATHS (MIRRORED) ----------------
 
-    // -------------------- BLUE PATHS (FULL SET) --------------------
     public static PathChain shoot1Blue(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(startPoseBlue, shootPose4Blue))
                 .setLinearHeadingInterpolation(startPoseBlue.getHeading(), shootPose4Blue.getHeading())
-                
-                
                 .build();
     }
 
-    public static PathChain strafe1Blue(Follower f) {
+    public static PathChain shoot1KlutchBlue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2Blue, strafe1Blue))
-                .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), strafe1Blue.getHeading())
+                .addPath(new BezierLine(startPoseBlue, shoot1KlutchBlue))
+                .setLinearHeadingInterpolation(startPoseBlue.getHeading(), shootPose4Blue.getHeading())
                 .build();
     }
 
     public static PathChain pickup1Blue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(strafe1Blue, pickup2Blue))
-                .setLinearHeadingInterpolation(strafe1Blue.getHeading(), pickup2Blue.getHeading())
+                .addPath(new BezierCurve(shootPose2Blue, strafe1Blue, pickup2Blue, openGateBlue))
+                .setTangentHeadingInterpolation()
                 .build();
     }
 
     public static PathChain shoot2Blue(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup2Blue, shootPose2Blue))
-                .setLinearHeadingInterpolation(pickup2Blue.getHeading(), shootPose2Blue.getHeading())
-                
-                
+                .setConstantHeadingInterpolation(shootPose2Blue.getHeading())
                 .build();
     }
 
@@ -265,7 +220,6 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2Blue, strafeGateBlue))
                 .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), strafeGateBlue.getHeading())
                 .addPath(new BezierLine(strafeGateBlue, gateBlue))
-                
                 .setLinearHeadingInterpolation(strafeGateBlue.getHeading(), gateBlue.getHeading())
                 .build();
     }
@@ -275,87 +229,82 @@ public class EighteenBall {
                 .addPath(new BezierLine(shootPose2Blue, strafeGateBlue))
                 .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), strafeGateBlue.getHeading())
                 .addPath(new BezierLine(strafeGateBlue, gateBlue))
-                
                 .setLinearHeadingInterpolation(strafeGateBlue.getHeading(), gateBlue.getHeading())
                 .build();
     }
 
     public static PathChain shootGateBlue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(gateBlue, moveToShootBlue))
-                .setLinearHeadingInterpolation(gateBlue.getHeading(), moveToShootBlue.getHeading())
-                
-                
-                .addPath(new BezierLine(moveToShootBlue, shootPose2Blue))
-                .setLinearHeadingInterpolation(moveToShootBlue.getHeading(), shootPose2Blue.getHeading())
-                
-                
+                .addPath(new BezierCurve(gateBlue, moveToShootBlue, shootPose2Blue))
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
     }
 
     public static PathChain shootGate2Blue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(gateBlue, moveToShootBlue))
-                .setLinearHeadingInterpolation(gateBlue.getHeading(), moveToShootBlue.getHeading())
-                
-                
-                .addPath(new BezierLine(moveToShootBlue, shootPoseBlue))
-                .setLinearHeadingInterpolation(moveToShootBlue.getHeading(), shootPoseBlue.getHeading())
-                
-                
+                .addPath(new BezierCurve(gateBlue, moveToShootBlue, shootPose2Blue))
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
     }
 
     public static PathChain pickup2Blue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2Blue, pickup1Blue))
+                .addPath(new BezierLine(shootPoseBlue, pickup1Blue))
                 .setConstantHeadingInterpolation(Math.PI)
+                .build();
+    }
+
+    public static PathChain pickup1KlutchBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierCurve(shootPoseBlue, pickup1KlutchBlue, gateKlutchBlue))
+                .setTangentHeadingInterpolation()
                 .build();
     }
 
     public static PathChain shoot3Blue(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup1Blue, shootPose2Blue))
-                .setLinearHeadingInterpolation(pickup1Blue.getHeading(), shootPose2Blue.getHeading())
-                
-                
+                .setConstantHeadingInterpolation(shootPose2Blue.getHeading())
                 .build();
     }
 
-    public static PathChain strafe2Blue(Follower f) {
+    public static PathChain shoot3KlutchBlue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2Blue, strafe2Blue))
-                .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), strafe2Blue.getHeading())
+                .addPath(new BezierLine(pickup1Blue, shootPoseThirdPickupBlue))
+                .setLinearHeadingInterpolation(pickup1Blue.getHeading(), shootPoseThirdPickupBlue.getHeading())
                 .build();
     }
 
     public static PathChain pickup3Blue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(strafe2Blue, pickup3Blue))
-                .setConstantHeadingInterpolation(pickup3Blue.getHeading())
+                .addPath(new BezierCurve(shootPose2Blue, strafe2Blue, pickup3Blue))
+                .setTangentHeadingInterpolation()
                 .build();
     }
 
     public static PathChain shoot4Blue(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(pickup3Blue, shootPoseThirdPickupBlue))
-                .setLinearHeadingInterpolation(pickup3Blue.getHeading(), shootPoseThirdPickupBlue.getHeading())
-                
-                
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
     }
 
     public static PathChain moveBlue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(shootPose2Blue, moveBlue))
-                .setLinearHeadingInterpolation(shootPose2Blue.getHeading(), moveBlue.getHeading())
+                .addPath(new BezierLine(shootPose3Blue, moveBlue))
+                .setLinearHeadingInterpolation(shootPose3Blue.getHeading(), moveBlue.getHeading())
                 .build();
     }
 
+    // ---------------- CONVERSION ----------------
 
-
-    // Convert RED pose to BLUE field pose
     public static Pose convertToBlue(Pose p) {
-        return new Pose(-p.getX(), p.getY(),  Math.PI - p.getHeading());
+        return new Pose(-p.getX(), p.getY(), Math.PI - p.getHeading());
     }
 }

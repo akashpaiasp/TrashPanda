@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode.config.subsystems;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -14,6 +15,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D; // ? needed ?
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -31,7 +33,6 @@ public class Limelight extends SubsystemBase {
 
         limelight = hardwareMap.get(Limelight3A.class, "ll");
 
-        //default pipeline - can be changed later
         setPipeline(8);
 
         //8 = red goal, 7 = obeselisque, 6 = blue goal
@@ -79,7 +80,7 @@ public class Limelight extends SubsystemBase {
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
             // Access general information
-            Pose3D botpose = result.getBotpose_MT2();
+            Pose3D botpose = result.getBotpose();
             double captureLatency = result.getCaptureLatency();
             double targetingLatency = result.getTargetingLatency();
             double parseLatency = result.getParseLatency();
@@ -109,7 +110,21 @@ public class Limelight extends SubsystemBase {
     }
 
     public Pose3D botPose() {
-        return result.getBotpose_MT2();
+        return result.getBotpose();
+    }
+
+    public Pose getRobotPosFromTarget() {
+        LLResult result = limelight.getLatestResult();
+
+        if (result != null && result.isValid()) {
+            Pose3D botPose = result.getBotpose();
+            double angle = botPose.getOrientation().getYaw(AngleUnit.DEGREES) + 180;
+            if (angle > 360) angle -= 360;
+
+            return new Pose(botPose.getPosition().x / .0254, botPose.getPosition().y / .0254, Math.toRadians(angle));
+        }
+        return new Pose();
+
     }
 
 

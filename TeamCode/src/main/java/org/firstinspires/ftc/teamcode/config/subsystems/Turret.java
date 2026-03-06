@@ -56,8 +56,8 @@ public class Turret extends SubsystemBase {
     public static double fudgeFactor = 0;
     public static boolean useTurret = true;
 
-    public static double zeroPos = 0.491;
-    public static double ninetyPos = 0.81;
+    public static double zeroPos = 0.475;
+    public static double ninetyPos = 0.8;
     /*
     public static double leftPos = .5;
     public static double rightPos = .5; */
@@ -65,8 +65,8 @@ public class Turret extends SubsystemBase {
 
 
 
-    public static  double MIN_ANGLE = -120; // turret left limit
-    public static  double MAX_ANGLE = 120;  // turret right limit
+    public static  double MIN_ANGLE = -105; // turret left limit
+    public static  double MAX_ANGLE = 105;  // turret right limit
     public static double autoFudge = 3;
     public double current;
 

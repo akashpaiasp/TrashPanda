@@ -278,6 +278,9 @@ public class TelePOP extends LinearOpMode {
             telemetry.addData("X vel", robot.getFollower().getVelocity().getXComponent());
             telemetry.addData("Num", robot.intake.num());
             telemetry.addData("voltage", robot.getFollower().getDrivetrain().getVoltage());
+            //telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
+            //telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
+            //telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
         }
         CSVInterface.log();
     }

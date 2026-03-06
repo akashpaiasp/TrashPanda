@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.Eighte
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Blue;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Klutch;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1KlutchBlue;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2Blue;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3;
@@ -51,8 +52,8 @@ public class EighteenBallNoThird extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = 0.05;
-    double onThresholdTwo = 0;
+    double onThreshold = 0.2;
+    double onThresholdTwo = 0.2;
 
     double offThreshold = 0.03;
     double moveThreshold = 1.8;
@@ -82,7 +83,7 @@ public class EighteenBallNoThird extends OpMode {
     public static double rpm = 4000;
     public static boolean sotm = false;
     public static boolean twentyOne = true;
-    public boolean finishedOne = false;
+    public boolean finishedOne = true;
     public static double hood1 = .7;
     public static double hood2 = .8;
     public static double hood3 = .9;
@@ -547,8 +548,12 @@ public class EighteenBallNoThird extends OpMode {
                     //robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     //robot.intake.setUptakeState(Intake.UptakeState.OFF);
 
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? pickup1Klutch(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
-
+                    robot.getFollower().followPath(
+                            robot.getAlliance() == Alliance.RED
+                                    ? pickup1Klutch(robot.getFollower())
+                                    : pickup1KlutchBlue(robot.getFollower()),
+                            true
+                    );
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
 

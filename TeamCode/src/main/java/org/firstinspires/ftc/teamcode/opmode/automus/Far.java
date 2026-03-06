@@ -91,7 +91,7 @@ public class Far extends OpMode {
 
 
             case 10:
-                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?  shoot1(robot.getFollower()) : shoot1(robot.getFollower()),  true);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ?  shoot1(robot.getFollower()) : shoot1Blue(robot.getFollower()),  true);
                 robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
                 robot.intake.setGateState(Intake.GateState.OPEN);
                 //if (gamepad1.square)
@@ -149,7 +149,7 @@ public class Far extends OpMode {
                 ////robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? humanPlayerZone(robot.getFollower()) : humanPlayerZone(robot.getFollower()), false);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? humanPlayerZone(robot.getFollower()) : humanPlayerZoneBlue(robot.getFollower()), false);
                 robot.intake.setGateState(Intake.GateState.CLOSED);
                 robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                 robot.intake.setUptakeState(Intake.UptakeState.SLOW);
@@ -164,7 +164,7 @@ public class Far extends OpMode {
                     return;
                 }
                 else {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayer(robot.getFollower()));
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayerBlue(robot.getFollower()));
                     two = true;
                     setPathState(1205);
                 }
@@ -198,7 +198,7 @@ public class Far extends OpMode {
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? spikeMarkPickup(robot.getFollower()) : spikeMarkPickup(robot.getFollower()));
+                        robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? spikeMarkPickup(robot.getFollower()) : spikeMarkPickupBlue(robot.getFollower()));
                         setPathState(13);
 
                         doneDone = false;
@@ -224,7 +224,7 @@ public class Far extends OpMode {
                 }
                 if (intakeDone())
                 {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootSpikeMark(robot.getFollower()) : shootSpikeMark(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootSpikeMark(robot.getFollower()) : shootSpikeMarkBlue(robot.getFollower()), true);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     setPathState(14);
@@ -277,7 +277,7 @@ public class Far extends OpMode {
                 //robot.launcher.setLauncherState(Launcher.LauncherState.STOP);
                 robot.intake.setIntakeState(Intake.IntakeState.OFF);
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? humanPlayerZone(robot.getFollower()) : humanPlayerZone(robot.getFollower()), true);
+                robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? humanPlayerZone(robot.getFollower()) : humanPlayerZoneBlue(robot.getFollower()), true);
                 robot.intake.setGateState(Intake.GateState.CLOSED);
                 //if (gamepad1.square)
                 setPathState(1453);
@@ -300,7 +300,7 @@ public class Far extends OpMode {
                 }
                 if (intakeDone())
                 {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayer(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayerBlue(robot.getFollower()), true);
                     aim1 = false;
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);

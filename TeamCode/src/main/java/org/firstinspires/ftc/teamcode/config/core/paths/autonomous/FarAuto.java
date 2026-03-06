@@ -6,10 +6,11 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
-
 public class FarAuto {
-    // Red Poses
-        public static final Pose startPose = new Pose(13, -60.6, 0);
+
+    // ---------------- RED POSES ----------------
+
+    public static final Pose startPose = new Pose(13, -60.6, 0);
     public static final Pose shootPose = new Pose(13, -57, 0);
     public static final Pose humanPlayer = new Pose(59, -57.5, -.31);
     public static final Pose turn = new Pose(60.8, -60, -.189);
@@ -17,9 +18,17 @@ public class FarAuto {
     private static final Pose strafe = new Pose(20, -33.5, 0);
     private static final Pose thirdSpike = new Pose(53, -33.5, 0);
 
+    // ---------------- BLUE POSES ----------------
 
+    public static final Pose startPoseBlue = convertToBlue(startPose);
+    public static final Pose shootPoseBlue = convertToBlue(shootPose);
+    public static final Pose humanPlayerBlue = convertToBlue(humanPlayer);
+    public static final Pose turnBlue = convertToBlue(turn);
 
+    private static final Pose strafeBlue = convertToBlue(strafe);
+    private static final Pose thirdSpikeBlue = convertToBlue(thirdSpike);
 
+    // ---------------- RED PATHS ----------------
 
     public static PathChain shoot1(Follower f) {
         return f.pathBuilder()
@@ -28,13 +37,10 @@ public class FarAuto {
                 .build();
     }
 
-
     public static PathChain humanPlayerZone(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(shootPose, humanPlayer))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), humanPlayer.getHeading())
-                /*.addPath(new BezierLine(humanPlayer, turn))
-                .setLinearHeadingInterpolation(humanPlayer.getHeading(), turn.getHeading()) */
                 .build();
     }
 
@@ -52,7 +58,6 @@ public class FarAuto {
                 .build();
     }
 
-
     public static PathChain shootSpikeMark(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(thirdSpike, shootPose))
@@ -60,12 +65,46 @@ public class FarAuto {
                 .build();
     }
 
+    // ---------------- BLUE PATHS ----------------
 
+    public static PathChain shoot1Blue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(startPoseBlue, shootPoseBlue))
+                .setConstantHeadingInterpolation(shootPoseBlue.getHeading())
+                .build();
+    }
 
+    public static PathChain humanPlayerZoneBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(shootPoseBlue, humanPlayerBlue))
+                .setLinearHeadingInterpolation(shootPoseBlue.getHeading(), humanPlayerBlue.getHeading())
+                .build();
+    }
 
+    public static PathChain shootHumanPlayerBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(turnBlue, shootPoseBlue))
+                .setConstantHeadingInterpolation(shootPoseBlue.getHeading())
+                .build();
+    }
 
-    // Convert RED pose to BLUE field pose
+    public static PathChain spikeMarkPickupBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierCurve(shootPoseBlue, strafeBlue, thirdSpikeBlue))
+                .setTangentHeadingInterpolation()
+                .build();
+    }
+
+    public static PathChain shootSpikeMarkBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(thirdSpikeBlue, shootPoseBlue))
+                .setLinearHeadingInterpolation(thirdSpikeBlue.getHeading(), shootPoseBlue.getHeading())
+                .build();
+    }
+
+    // ---------------- CONVERSION ----------------
+
     public static Pose convertToBlue(Pose p) {
-        return new Pose(-p.getX(), p.getY(),  Math.PI - p.getHeading());
+        return new Pose(-p.getX(), p.getY(), Math.PI - p.getHeading());
     }
 }

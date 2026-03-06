@@ -31,6 +31,7 @@ import org.firstinspires.ftc.teamcode.config.subsystems.*;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
 import org.firstinspires.ftc.teamcode.config.util.photoncore.PhotonCore;
 import org.firstinspires.ftc.teamcode.opmode.automus.EighteenBall;
+import org.firstinspires.ftc.teamcode.opmode.automus.TwentyOne;
 
 import java.util.List;
 
@@ -69,7 +70,11 @@ public class Robot {
     public boolean rev = false;
     public static double increaseAmt = .5;
 
+    public static double timeThreshold = .3;
+
     public static int sortNum = 0;
+
+    public int lastNumBalls = 0;
     //0 = all fast, 1 = lob fast fast, 2 = lob lob fast, 3 = lob fast lob, 4 = fast lob fast
 
 
@@ -629,17 +634,22 @@ public class Robot {
         if (hoodPos > 0 ) {
             //validLaunch = true;
             if (!shotStarted || hoodAdjustment) {
-                if (d < 100)
-                    hood.setTarget(hoodPos);
+                if (!TwentyOne.sotm || Launcher.teleop) {
+                    if (d < 100)
+                        hood.setTarget(hoodPos);
+                    else {
+                        hood.setTarget(hoodPos);
+                    }
+                }
                 else {
-                    hood.setTarget(hoodPos);
+                    hood.setTarget(hoodPos - .1);
                 }
             }
         } else {
             //validLaunch = false;
         }
 
-        validLaunch = launcher.getValidLaunch();
+        validLaunch = changedState();//launcher.getValidLaunch();
 
     }
 
@@ -805,6 +815,16 @@ public class Robot {
     }
     public void decreaseY() {
         follower.setY(follower.getPose().getY() - increaseAmt);
+    }
+
+    public boolean changedState() {
+        if (shotStarted) {
+        if (timer.getElapsedTimeSeconds() > timeThreshold) {
+            lastNumBalls = intake.num();
+            timer.reset();
+        }
+        }
+        return intake.num() == lastNumBalls;
     }
 
 
