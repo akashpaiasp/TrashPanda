@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
+import static org.firstinspires.ftc.teamcode.config.core.Robot.showTelemetry;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -92,7 +94,7 @@ public class Launcher extends SubsystemBase {
     private boolean inAggressive = false;
     public static boolean teleop = false;
     public boolean validLaunch = false;
-    public static double threshold = 200.0;
+    public static double threshold = 50.0;
 
     public enum LauncherState {
         IN,
@@ -171,18 +173,19 @@ public class Launcher extends SubsystemBase {
         updateShooter();
 
 
+        if (showTelemetry) {
+            telemetry.addData("Target Velocity 1", target_velocity);
+            telemetry.addData("Target Velocity 2", target_velocity_2);
+            telemetry.addData("Current Velocity 1", current_velocity);
+            telemetry.addData("Current Velocity 2", current_velocity_2);
+            telemetry.addData("Volts", measuredV);
+            telemetry.addData("Valid", validLaunch);
 
-        telemetry.addData("Target Velocity 1", target_velocity);
-        telemetry.addData("Target Velocity 2", target_velocity_2);
-        telemetry.addData("Current Velocity 1", current_velocity);
-        telemetry.addData("Current Velocity 2", current_velocity_2);
-        telemetry.addData("Volts", measuredV);
-        telemetry.addData("Valid", validLaunch);
-
-        //telemetry.addData("Done", controller.done);
-        //telemetry.addData("Num Done", numDone);
-        telemetry.addData("Launcher 1 Current", launcher1.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("Launcher 2 Current", launcher2.getCurrent(CurrentUnit.AMPS));
+            //telemetry.addData("Done", controller.done);
+            //telemetry.addData("Num Done", numDone);
+            telemetry.addData("Launcher 1 Current", launcher1.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Launcher 2 Current", launcher2.getCurrent(CurrentUnit.AMPS));
+        }
 
 
     }

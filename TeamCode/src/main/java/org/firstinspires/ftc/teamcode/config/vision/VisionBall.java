@@ -1,13 +1,23 @@
 package org.firstinspires.ftc.teamcode.config.vision;
 
+import static org.firstinspires.ftc.teamcode.config.vision.Vision.mmToIn;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.DetectorResult;
+
+import org.opencv.core.Mat;
+
 import java.util.List;
 
+@Config
 public class VisionBall {
 
     // Constants for Distance Math
     public static final double REAL_BALL_WIDTH_MM = 89.0; // Approx FTC Game Element size
-    public static final double FOCAL_LENGTH_PIXELS = 800.0; //FocalLength = (realDistance * pixelW) / RealWidth
+    public static final double FOCAL_LENGTH_PIXELS = 317.0; //FocalLength = (realDistance * pixelW) / RealWidth
+    public static  double CAMERA_HEIGHT_MM = 258;   // measure this
+    public static  double TARGET_HEIGHT_MM = 0.0;     // floor contact approximation
+    public static double CAMERA_PITCH_DEG = 0.0;    // positive if tilted downward
 
     public enum Color { GREEN, PURPLE, UNKNOWN }
 
@@ -64,26 +74,41 @@ public class VisionBall {
     private void updatePositions(double robotX, double robotY, double robotHeading,
                                  double camOffsetX, double camOffsetY, double camAngleOffset) {
 
-        // 1. Distance from the Camera Lens
-        this.distance = (REAL_BALL_WIDTH_MM * FOCAL_LENGTH_PIXELS) / Math.max(pixelW, 1.0);
-
-        // 2. Position relative to the CAMERA (Assuming Y is forward, X is right)
+        // 1. Compute target position relative to CAMERA using angles
         double txRad = Math.toRadians(this.tx);
-        double camRelX = this.distance * Math.sin(txRad);
-        double camRelY = this.distance * Math.cos(txRad);
+        double totalPitchRad = Math.toRadians(CAMERA_PITCH_DEG + this.ty);
 
-        // 3. Position relative to ROBOT CENTER
-        // First, rotate the coordinates if the camera is mounted at an angle (yaw)
-        double camAngleRad = Math.toRadians(camAngleOffset);
-        double rotatedX = camRelX * Math.cos(camAngleRad) + camRelY * Math.sin(camAngleRad);
-        double rotatedY = -camRelX * Math.sin(camAngleRad) + camRelY * Math.cos(camAngleRad);
+        double tanPitch = Math.tan(totalPitchRad);
 
-        // Next, add the physical X/Y offset of the camera from the robot's center
+        // avoid divide-by-zero / nonsense when target is near horizon
+        if (Math.abs(tanPitch) < 1e-6) {
+            return;
+        }
+
+        // Forward distance on ground plane
+        double camRelY = (CAMERA_HEIGHT_MM - TARGET_HEIGHT_MM) / tanPitch;
+
+        // Side offset
+        double camRelX = camRelY * Math.tan(txRad);
+
+        // Radial distance (optional)
+        this.distance = Math.hypot(camRelX, camRelY);
+
+        // 2. Rotate by camera yaw relative to robot
+        double camYawRad = Math.toRadians(camAngleOffset);
+        double rotatedX = camRelX * Math.cos(camYawRad) + camRelY * Math.sin(camYawRad);
+        double rotatedY = -camRelX * Math.sin(camYawRad) + camRelY * Math.cos(camYawRad);
+
+        // 3. Translate from camera origin to robot center
         this.relativeX = rotatedX + camOffsetX;
         this.relativeY = rotatedY + camOffsetY;
+        this.relativeY = -relativeY;
+        this.relativeX = -relativeX;
 
-        // 4. Absolute Position on Field
-        double headingRad = Math.toRadians(robotHeading);
+        // 4. Rotate into field frame
+        // IMPORTANT: if robotHeading is already radians, use it directly
+        double headingRad = robotHeading - Math.PI / 2; // probably correct for PedroPathing
+
         this.absoluteX = robotX + (this.relativeX * Math.cos(headingRad) - this.relativeY * Math.sin(headingRad));
         this.absoluteY = robotY + (this.relativeX * Math.sin(headingRad) + this.relativeY * Math.cos(headingRad));
     }
@@ -141,10 +166,10 @@ public class VisionBall {
 
     // --- Getters ---
     public Color getColor() { return color; }
-    public double getDistance() { return distance; }
-    public double getRelativeX() { return relativeX; }
-    public double getRelativeY() { return relativeY; }
-    public double getAbsoluteX() { return absoluteX; }
-    public double getAbsoluteY() { return absoluteY; }
+    public double getDistance() { return mmToIn(distance); }
+    public double getRelativeX() { return mmToIn(relativeX); }
+    public double getRelativeY() { return mmToIn(relativeY); }
+    public double getAbsoluteX() { return mmToIn(absoluteX); }
+    public double getAbsoluteY() { return mmToIn(absoluteY); }
     public double[] getPixelBoundingBox() { return new double[]{pixelX, pixelY, pixelW, pixelH}; }
 }

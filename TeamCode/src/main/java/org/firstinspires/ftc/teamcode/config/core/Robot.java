@@ -2,12 +2,10 @@ package org.firstinspires.ftc.teamcode.config.core;
 
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.convertToBlue;
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
-import static org.firstinspires.ftc.teamcode.config.subsystems.Turret.weight;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Vector;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -29,8 +27,6 @@ import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.*;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
-import org.firstinspires.ftc.teamcode.config.util.photoncore.PhotonCore;
-import org.firstinspires.ftc.teamcode.opmode.automus.EighteenBall;
 import org.firstinspires.ftc.teamcode.opmode.automus.TwentyOne;
 
 import java.util.List;
@@ -56,6 +52,7 @@ public class Robot {
 
     //Booleans to change on FTCDash
     public static boolean showTelemetry = false;
+    public static boolean showLoopTimes = false;
     public static boolean hoodAdjustment = true;
     public static boolean rapidFireFar = false;
     public static double farLaunchR = 1;
@@ -63,6 +60,7 @@ public class Robot {
     public static boolean keepShooterOn = true;
     public static boolean manualAngle = false;
     public static boolean manualFlightTime = false;
+    public boolean update = true;
 
     public static double robot_length = 8.5; //actual robot length is 9, decreasing it means more robot has to be in zone in order to shoot
 
@@ -102,9 +100,9 @@ public class Robot {
 
 
 
-    public static double centerX = 67, centerY = 67, centerXBlue = -67;
+    public static double centerX = 67, centerY = 67, centerXBlue = -60;
     public static double farZoneX = 67;
-    public static double farZoneXBlue = -72 + (72-farZoneX);
+    public static double farZoneXBlue = -62;
     public static double centerX2 = centerX, centerY2 = centerY;
     public static double goalY = centerY;
     public static double redX = centerX;
@@ -134,7 +132,15 @@ public class Robot {
     public static Pose cornerBlueBack = new Pose(-61.9, -65.9);
     // public static Pose cornerRedFront = new Pose(-72, -72);
     public static Pose cornerRedBack = new Pose(61.9, -65.9);
-    public static Pose resetTurret = new Pose(-61.5, -61.5, 1.54);
+    public static Pose goalReset = new Pose(33.3, 59.6, Math.PI / 2.0);
+    public static Pose humanPlayerReset = new Pose(62, -61.3, 1.68 );
+    public static Pose farZoneReset = new Pose(10.1, -61.5, 1.6);
+    public static Pose resetPose = humanPlayerReset;
+
+
+
+
+    public static Pose constantShot = new Pose(60, 60, Math.toRadians(45));
 
     public boolean uptakeOff = true;
     public boolean launcherOff = true;
@@ -209,7 +215,7 @@ public class Robot {
         driveTrain = new DriveTrain(hw, telemetry);
         intake = new Intake(hw, telemetry);
         led = new MyLED(hw, telemetry);
-        //limelight = new Limelight(hw, telemetry);
+        limelight = new Limelight(hw, telemetry);
         //limelight.update();
 
         //aInitLoop = false;
@@ -260,7 +266,7 @@ public class Robot {
         //led = new LED(hw, telemetry);
 
         autoDrive = new AutoDriving(follower, telemetry);
-        //limelight = new Limelight(hw, telemetry);
+        limelight = new Limelight(hw, telemetry);
         //limelight.update();
 
         //aInitLoop = false;
@@ -282,6 +288,10 @@ public class Robot {
         //Buttons
         g1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(() -> {
             showTelemetry = !showTelemetry;
+        }));
+
+        g1.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON).whenPressed(new InstantCommand(() -> {
+            showLoopTimes = !showLoopTimes;
         }));
 
         /*(g2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).or(g1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER))).whenActive(new InstantCommand(() -> {
@@ -321,10 +331,6 @@ public class Robot {
             intakeOff = true;
             uptakeOff = true;
             rBumper = false;
-        }));
-
-        g1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
-            resetPose();
         }));
 
         /*
@@ -371,11 +377,21 @@ public class Robot {
             Aim.fudgeFactor -= 2.5;
         })); */
         g1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
-            increaseX();
+            resetPose(3);
         }));
         g1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(new InstantCommand(() -> {
-            decreaseX();
+            resetPose(3);
         }));
+
+        g1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(new InstantCommand(() -> {
+            resetPose(2);
+        }));
+
+
+        g1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
+            resetPose(1);
+        }));
+
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             //Aim.fudgeFactor = 0;
         }));
@@ -386,10 +402,10 @@ public class Robot {
             increaseY();
         }));
         g2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
-            decreaseX();
+            KinematicsCalculator.multiplier *= 1.0125;
         }));
         g2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(new InstantCommand(() -> {
-            increaseX();
+            KinematicsCalculator.multiplier /= 1.0125;
         }));
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             autoDrive.toGate();
@@ -457,7 +473,7 @@ public class Robot {
         updateRobotCoords();
         follower.update();
         autoDrive.update();
-        if (showTelemetry)
+        if (showTelemetry || showLoopTimes)
             telemetry.update();
         if (logData) log();
         /*PhotonCore.CONTROL_HUB.clearBulkCache();
@@ -515,11 +531,14 @@ public class Robot {
         //follower.setPose(new Pose(follower.getPose().getX(), follower.getPose().getY(), follower.getPose().getHeading() + Math.toRadians(180)));
     }
 
-    public void resetPose() {
+    public void resetPose(int pose) {
+        if (pose == 1) resetPose = humanPlayerReset;
+        else if (pose == 3) resetPose = goalReset;
+        else resetPose = farZoneReset;
         if (alliance == Alliance.RED)
-            follower.setPose(resetTurret);
+            follower.setPose(resetPose);
         else
-            follower.setPose(convertToBlue(resetTurret));
+            follower.setPose(convertToBlue(resetPose));
     }
 
     public void log() {
@@ -635,7 +654,7 @@ public class Robot {
             //validLaunch = true;
             if (!shotStarted || hoodAdjustment) {
                 if (!TwentyOne.sotm || Launcher.teleop) {
-                    if (d < 100)
+                    if (d < 105)
                         hood.setTarget(hoodPos);
                     else {
                         hood.setTarget(hoodPos);
@@ -649,7 +668,7 @@ public class Robot {
             //validLaunch = false;
         }
 
-        validLaunch = changedState();//launcher.getValidLaunch();
+        validLaunch = false ? changedState() : launcher.getValidLaunch();
 
     }
 
@@ -670,10 +689,16 @@ public class Robot {
     }
 
     public void updateRobotCoords() {
-        robotX = follower.getPose().getX();
-        robotY = follower.getPose().getY();
-        turretX = robotX - turretOffset * Math.cos(follower.getPose().getHeading());
-        turretY = robotY - turretOffset * Math.sin(follower.getPose().getHeading());
+        if (update) {
+            robotX = follower.getPose().getX();
+            robotY = follower.getPose().getY();
+            turretX = robotX - turretOffset * Math.cos(follower.getPose().getHeading());
+            turretY = robotY - turretOffset * Math.sin(follower.getPose().getHeading());
+        }
+        else {
+            turretX = constantShot.getX();
+            turretY = constantShot.getY();
+        }
     }
 
     public double getDistanceFromGoal() {
@@ -687,14 +712,16 @@ public class Robot {
     }
 
     public void updateGoalCoords() {
-        if (getDistanceFromGoal() < 100) {
+        if (getDistanceFromGoal() < 105) {
+            Turret.sotm = Launcher.teleop;
             redX = 67;
             blueX = -67;
             goalY = 67;
         }
         else {
-            redX = 67;//72;
-            blueX = -76;//farZoneXBlue;
+            Turret.sotm = false;
+            redX = 63;//72;
+            blueX = farZoneXBlue;
             goalY = 67;//72;
         }
 
@@ -704,13 +731,18 @@ public class Robot {
         else {
             goalX = blueX;
         }
-
-        turret.updateAiming(goalX, goalY, new Pose(turretX, turretY, follower.getHeading()));
+        if (follower.isTeleopDrive())
+            turret.updateAiming(goalX, goalY, new Pose(turretX, turretY, follower.getHeading()));
+        else {
+            Pose pathEnd = follower.getCurrentPathChain().endPose();
+            double tempX = pathEnd.getX();
+            double tempY = pathEnd.getY();
+            double tempTurretX = tempX - turretOffset * Math.cos(pathEnd.getHeading());
+            double tempTurretY = tempY - turretOffset * Math.sin(pathEnd.getHeading());
+            turret.updateAiming(goalX, goalY, new Pose(tempTurretX, tempTurretY, pathEnd.getHeading()));
+        }
     }
 
-    private static double lerp(double a, double b, double t) {
-        return a + (b - a) * t;
-    }
     public void outtake1() {
         if (!outtake) {
             timer.reset();
@@ -727,7 +759,7 @@ public class Robot {
     }
 
     public boolean isInLaunchZone() {
-        double theta = follower.getHeading() - Math.PI / 2;
+        double theta = follower.getHeading();
         double h = robot_length / 2.0;
         double forwardX = Math.cos(theta);
         double forwardY = Math.sin(theta);

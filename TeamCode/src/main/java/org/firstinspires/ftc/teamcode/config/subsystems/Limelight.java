@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,13 +20,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D; // ? needed ?
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.List;
+
 //subsystem of the limelight 3A
 public class Limelight extends SubsystemBase {
     //for telemetry of the limelight
     private MultipleTelemetry telemetry;
 
     //limelight class - should probably figure out whats inside
-    private Limelight3A limelight;
+    public Limelight3A limelight;
 
     public Limelight(HardwareMap hardwareMap, Telemetry telemetry) {
         //links to limelight - need to make sure it connect properly
@@ -33,7 +36,7 @@ public class Limelight extends SubsystemBase {
 
         limelight = hardwareMap.get(Limelight3A.class, "ll");
 
-        setPipeline(8);
+        setPipeline(0);
 
         //8 = red goal, 7 = obeselisque, 6 = blue goal
 
@@ -109,6 +112,10 @@ public class Limelight extends SubsystemBase {
         return result;
     }
 
+    public List<LLResultTypes.DetectorResult> getDetectorResult() {
+        return limelight.getLatestResult().getDetectorResults();
+    }
+
     public Pose3D botPose() {
         return result.getBotpose();
     }
@@ -121,7 +128,7 @@ public class Limelight extends SubsystemBase {
             double angle = botPose.getOrientation().getYaw(AngleUnit.DEGREES) + 180;
             if (angle > 360) angle -= 360;
 
-            return new Pose(botPose.getPosition().x / .0254, botPose.getPosition().y / .0254, Math.toRadians(angle));
+            return new Pose(botPose.getPosition().y / .0254, botPose.getPosition().x / .0254, Math.toRadians(angle) + Math.PI);
         }
         return new Pose();
 

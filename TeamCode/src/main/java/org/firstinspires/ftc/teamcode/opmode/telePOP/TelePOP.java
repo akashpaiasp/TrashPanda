@@ -55,6 +55,7 @@ public class TelePOP extends LinearOpMode {
 
 
         waitForStart();
+        robot.limelight.startLimelight();
         loopTimer.reset();
         robot.tStart();
         robot.dualControls(g1, g2);
@@ -153,6 +154,7 @@ public class TelePOP extends LinearOpMode {
                 gamepad1.rumble(50);
                 gamepad2.rumble(50);
             }
+            robot.update = !(gamepad2.left_trigger > .3);
 
             if ((gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone())))) {
                 rumble = false;
@@ -265,22 +267,27 @@ public class TelePOP extends LinearOpMode {
                 robot.driveTrain.rf.setPower(rightFrontPower * scaleFactor);
                 robot.driveTrain.lr.setPower(leftBackPower * scaleFactor);
                 robot.driveTrain.rr.setPower(rightBackPower * scaleFactor); */
-            telemetry.addData("Loop Time", currentTime - lastTime);
-            telemetry.addData("Distance From Goal", robot.getDistanceFromGoal());
-            telemetry.addData("turret x" , robot.turretX);
-            telemetry.addData("turret y" , robot.turretY);
-            telemetry.addData("x" , robot.getFollower().getPose().getX());
-            telemetry.addData("y" , robot.getFollower().getPose().getY());
-            telemetry.addData("heading" , robot.getFollower().getPose().getHeading());
-            telemetry.addData("GoalX", redX);
-            telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
-            telemetry.addData("Robot zone", zone);
-            telemetry.addData("X vel", robot.getFollower().getVelocity().getXComponent());
-            telemetry.addData("Num", robot.intake.num());
-            telemetry.addData("voltage", robot.getFollower().getDrivetrain().getVoltage());
-            //telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
-            //telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
-            //telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
+
+            if (showLoopTimes)
+                telemetry.addData("Loop Time", currentTime - lastTime);
+
+            if (showTelemetry) {
+                telemetry.addData("Distance From Goal", robot.getDistanceFromGoal());
+                telemetry.addData("turret x", robot.turretX);
+                telemetry.addData("turret y", robot.turretY);
+                telemetry.addData("x", robot.getFollower().getPose().getX());
+                telemetry.addData("y", robot.getFollower().getPose().getY());
+                telemetry.addData("heading", robot.getFollower().getPose().getHeading());
+                telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
+                telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
+                telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
+                telemetry.addData("GoalX", redX);
+                telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
+                telemetry.addData("Robot zone", zone);
+                telemetry.addData("X vel", robot.getFollower().getVelocity().getXComponent());
+                telemetry.addData("Num", robot.intake.num());
+                telemetry.addData("voltage", robot.getFollower().getDrivetrain().getVoltage());
+            }
         }
         CSVInterface.log();
     }

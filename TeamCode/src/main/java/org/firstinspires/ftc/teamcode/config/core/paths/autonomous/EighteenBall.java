@@ -27,7 +27,7 @@ public class EighteenBall {
     private static final Pose moveToShoot = new Pose(30, 0, Math.toRadians(0));
     private static final Pose strafe1 = new Pose(30, -11, 0);
     private static final Pose pickup2 = new Pose(51, -11, 0);
-    private static final Pose openGate = new Pose(54.5, -7, 0);
+    private static final Pose openGate = new Pose(54.5, -6, 0);
 
     private static final Pose pickup1 = new Pose(53.16767, 12, 0);
     public static final Pose shoot1Klutch = new Pose(20, 15, Math.toRadians(-120));
@@ -35,7 +35,7 @@ public class EighteenBall {
     public static final Pose gateKlutch = new Pose(53, 9, 0);
 
     public static final Pose strafeGate = new Pose(40, -10, 0.59);
-    public static final Pose gate = new Pose(59, -11.5, .515);
+    public static final Pose gate = new Pose(59, -10, .515);
 
     private static final Pose strafe2 = new Pose(20, -33.5, 0);
     private static final Pose pickup3 = new Pose(53, -33.5, 0);

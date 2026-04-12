@@ -64,8 +64,10 @@ public class KinematicsCalculator {
     public static double farHood = .77;
 
     public static double closeFudge = 1.76;
-    public static double mediumFudge = 1.4267676767676767676767676767676767676767;
-    public static double farFudge = 1.29;
+    public static double mediumFudge = 1.45;
+    public static double farFudge = 1.26;
+
+    public static double multiplier = 1;
 
 
 
@@ -100,7 +102,7 @@ public class KinematicsCalculator {
                 if (!Launcher.manualCounterRoller) {
                     Launcher.counterRollerPower = 1;
                 }
-                FUDGE_FACTOR_VEL = farFudge;
+                FUDGE_FACTOR_VEL = farFudge * multiplier;
             }
             else {
                 if (!Launcher.manualCounterRoller) {
