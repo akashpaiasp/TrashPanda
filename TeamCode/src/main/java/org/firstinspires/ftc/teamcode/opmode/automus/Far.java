@@ -28,16 +28,16 @@ public class Far extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = 0;
-    double firstShootThreshold = 2.5;
+    double onThreshold = 0.1;
+    double firstShootThreshold = .4;
 
-    double offThreshold = 0;
-    double moveThreshold = 1.8;
-    double moveIntakeThreshold = 1.2;
+    double offThreshold = 0.3;
+    double moveThreshold = 3.8;
+    double moveIntakeThreshold = .4;
     public static boolean firstCouple = true;
     double doneNum = 0;
     double intakeTime = 2;
-    double checkTime = .15;
+    double checkTime = 0;
     int doneThreshold = 4;
     double dist;
     boolean time = false;
@@ -61,6 +61,10 @@ public class Far extends OpMode {
     public static double timeBetween = .5;
     public static double tValue = .3;
     public boolean dontChangeTurret = false;
+
+    public boolean humanPlayer = false;
+
+    public boolean  shot1Done = false;
 
 
 
@@ -111,8 +115,23 @@ public class Far extends OpMode {
 
 
             case 1201:
-                if (robot.getFollower().isBusy() || pathTimer.getElapsedTimeSeconds() > firstShootThreshold) {
+                if (doneDone) {
+                    if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
+                        robot.shotStarted = false;
+                        //setPathState(1202);
+                        setPathState(1207);
+                        doneDone = false;
+
+                    }
+                }
+                else {
+
+                if ((robot.getFollower().isBusy())) {
                     pathTimer.reset();
+                    return;
+                }
+
+                if (pathTimer.getElapsedTimeSeconds() < onThreshold) {
                     return;
                 }
                 if(robot.validLaunch) {
@@ -125,19 +144,13 @@ public class Far extends OpMode {
                 }
                     robot.shotStarted = true;
 
-                if (doneDone) {
-                    if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
-                        robot.shotStarted = false;
-                        setPathState(1202);
-                        doneDone = false;
 
-                    }
-                }
                 if (shotDone()) {
                     pathTimer.reset();
                     doneDone = true;
                     time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
                     //if (gamepad1.square)
+                }
                 }
                 //stopProgram = true;
                 break;
@@ -151,14 +164,16 @@ public class Far extends OpMode {
                 robot.intake.setUptakeState(Intake.UptakeState.OFF);
                 robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? humanPlayerZone(robot.getFollower()) : humanPlayerZoneBlue(robot.getFollower()), false);
                 robot.intake.setGateState(Intake.GateState.CLOSED);
-                robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                 sotm = false;
                 //if (gamepad1.square)
                 setPathState(12025);
                 break;
 
             case 12025:
+                if (robot.getFollower().getCurrentTValue() > .3) {
+                    robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                    robot.intake.setUptakeState(Intake.UptakeState.SLOW);
+                }
                 if (robot.getFollower().isBusy()){
                     pathTimer.reset();
                     return;
@@ -166,6 +181,8 @@ public class Far extends OpMode {
                 else {
                     robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayerBlue(robot.getFollower()));
                     two = true;
+                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     setPathState(1205);
                 }
 
@@ -177,24 +194,6 @@ public class Far extends OpMode {
                     setPathState(1207);
                 }
             case 1207:
-                if (robot.getFollower().isBusy()) {
-                    pathTimer.reset();
-                    return;
-                }
-
-
-                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {
-                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                        robot.intake.setUptakeState(Intake.UptakeState.ON);
-                    }
-                    else {
-                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    }
-
-                    robot.shotStarted = true;
-                }
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
@@ -204,17 +203,42 @@ public class Far extends OpMode {
                         doneDone = false;
                     }
                 }
-                if (shotDone()) {
-                    pathTimer.reset();
-                    doneDone = true;
-                    time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
-                    //if (gamepad1.square)
+                else {
+                    if (robot.getFollower().isBusy()) {
+                        pathTimer.reset();
+                        return;
+                    }
+
+
+                    if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                        if (robot.validLaunch) {
+                            robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                            robot.intake.setUptakeState(Intake.UptakeState.ON);
+                        } else {
+                            robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                            robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                        }
+
+                        robot.shotStarted = true;
+                    }
+
+                    if (shotDone()) {
+
+                        pathTimer.reset();
+                        doneDone = true;
+                        time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
+                        //if (gamepad1.square)
+                    }
                 }
                 break;
 
 
             case 13:
-                if (robot.getFollower().getCurrentTValue() > .6) {
+                if (robot.getFollower().getCurrentTValue() > .1) {
+                    robot.intake.setGateState(Intake.GateState.CLOSED);
+                }
+                if (robot.getFollower().getCurrentTValue() > .5) {
+
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                 }
@@ -240,22 +264,6 @@ public class Far extends OpMode {
                 }
                 break;
             case 145:
-                if (robot.getFollower().isBusy()) {
-                    pathTimer.reset();
-                    return;
-                }
-
-                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if(robot.validLaunch) {
-                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                        robot.intake.setUptakeState(Intake.UptakeState.ON);
-                    }
-                    else {
-                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    }
-                    robot.shotStarted = true;
-                }
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
@@ -264,11 +272,29 @@ public class Far extends OpMode {
 
                     }
                 }
-                if (shotDone()) {
-                    pathTimer.reset();
-                    doneDone = true;
-                    time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
-                    //if (gamepad1.square)
+
+                else {
+                    if (robot.getFollower().isBusy()) {
+                        pathTimer.reset();
+                        return;
+                    }
+
+                    if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                        if (robot.validLaunch) {
+                            robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                            robot.intake.setUptakeState(Intake.UptakeState.ON);
+                        } else {
+                            robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                            robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                        }
+                        robot.shotStarted = true;
+                    }
+                    if (shotDone()) {
+                        pathTimer.reset();
+                        doneDone = true;
+                        time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
+                        //if (gamepad1.square)
+                    }
                 }
                 break;
 
@@ -283,6 +309,7 @@ public class Far extends OpMode {
                 setPathState(1453);
 
             }
+
             break;
 
 
@@ -290,7 +317,7 @@ public class Far extends OpMode {
 
 
             case 1453:
-                if (robot.getFollower().getCurrentTValue() > .9) {
+                if (robot.getFollower().getCurrentTValue() > .3) {
                     robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                 }
@@ -300,11 +327,19 @@ public class Far extends OpMode {
                 }
                 if (intakeDone())
                 {
-                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayerBlue(robot.getFollower()), true);
-                    aim1 = false;
-                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    setPathState(1454);
+                    if (getRuntime() < 26) {
+                        robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? shootHumanPlayer(robot.getFollower()) : shootHumanPlayerBlue(robot.getFollower()), true);
+                        aim1 = false;
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                        setPathState(1454);
+                    }
+                    else {
+                        robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? park(robot.getFollower()) : parkBlue(robot.getFollower()), true);
+
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                    }
                 }
                 break;
 
@@ -317,34 +352,40 @@ public class Far extends OpMode {
                 }
                 break;
             case 1455:
-                if (robot.getFollower().isBusy()) {
-                    pathTimer.reset();
-                    return;
-                }
-
-                if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
-                    if (robot.validLaunch) {
-                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                        robot.intake.setUptakeState(Intake.UptakeState.ON);
-                    }
-                    else {
-                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    }
-                    robot.shotStarted = true;
-                }
                 if (doneDone) {
                     if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
                         robot.shotStarted = false;
-                        setPathState(1452);
+                        if (humanPlayer)
+                            setPathState(1452);
+                        else
+                            setPathState(1452);
+                        humanPlayer = !humanPlayer;
                         doneDone = false;
                     }
                 }
-                if (shotDone()) {
-                    pathTimer.reset();
-                    doneDone = true;
-                    time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
-                    //if (gamepad1.square)
+                else {
+                    if (robot.getFollower().isBusy()) {
+                        pathTimer.reset();
+                        return;
+                    }
+
+                    if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+                        if (robot.validLaunch) {
+                            robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                            robot.intake.setUptakeState(Intake.UptakeState.ON);
+                        } else {
+                            robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                            robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                        }
+                        robot.shotStarted = true;
+                    }
+                    if (shotDone()) {
+
+                        pathTimer.reset();
+                        doneDone = true;
+                        time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
+                        //if (gamepad1.square)
+                    }
                 }
                 break;
 
@@ -383,8 +424,9 @@ public class Far extends OpMode {
             robot.getFollower().setStartingPose(startPose);
         }
         else {
-            robot.getFollower().setStartingPose(startPose);
+            robot.getFollower().setStartingPose(startPoseBlue);
         }
+        resetRuntime();
     }
 
     @Override
@@ -422,23 +464,11 @@ public class Far extends OpMode {
     }
 
     public boolean shotDone() {
-        if (robot.intake.getUptakeState() == Intake.UptakeState.OFF) {
-            //pathTimer.reset();
-            return false;
-        }
-        //if (!two)
-        if (pathTimer.getElapsedTimeSeconds() < checkTime + onThreshold) return false;
-        //else
-        //  if (pathTimer.getElapsedTimeSeconds() < checkTime + onThresholdTwo + .15) return false;
-        if (pathTimer.getElapsedTimeSeconds() > moveThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && robot.intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8)) {
-            aimTurret = false;
-            return true;
-        }
-        else return false;
+        return robot.intake.none() || pathTimer.getElapsedTimeSeconds() > moveThreshold;
     }
     public boolean intakeDone() {
         if (pathTimer.getElapsedTimeSeconds() < checkTime) return false;
-        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || (robot.intake.uptake.getCurrent(CurrentUnit.AMPS) > uptakeThreshold && robot.intake.intake.getCurrent(CurrentUnit.AMPS) > intakeThreshold);
+        return pathTimer.getElapsedTimeSeconds() > moveIntakeThreshold || robot.intake.has3();
     }
 
     public void launch3() {

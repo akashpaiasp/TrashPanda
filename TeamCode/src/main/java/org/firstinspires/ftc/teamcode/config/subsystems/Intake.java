@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
+import static org.firstinspires.ftc.teamcode.config.core.Robot.showTelemetry;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -162,12 +164,14 @@ public class Intake extends SubsystemBase {
             }
         }
 
-        telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
-        telemetry.addData("Uptake amps", uptake.getCurrent(CurrentUnit.AMPS));
+        if (showTelemetry) {
+            telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Uptake amps", uptake.getCurrent(CurrentUnit.AMPS));
 
-        telemetry.addData("bb1", bb1.getState());
-        telemetry.addData("bb2", bb2.getState());
-        telemetry.addData("bb3", bb3.getState());
+            telemetry.addData("bb1", bb1.getState());
+            telemetry.addData("bb2", bb2.getState());
+            telemetry.addData("bb3", bb3.getState());
+        }
     }
 
     public boolean has3() {

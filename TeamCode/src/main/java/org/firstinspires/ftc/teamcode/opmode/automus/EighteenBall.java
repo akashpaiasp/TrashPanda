@@ -29,9 +29,9 @@ public class EighteenBall extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = .3;
-    double onThresholdTwo = 0.3;
-
+    double onThreshold = .4;
+    double onThresholdTwo = 0.4;
+// 6767 - Julian
     double offThreshold = 0.05;
     double moveThreshold = 1.8;
     double moveIntakeThreshold = 1.2;

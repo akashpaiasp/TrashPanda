@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
 import static org.firstinspires.ftc.teamcode.config.core.Robot.flightTime;
+import static org.firstinspires.ftc.teamcode.config.core.Robot.showTelemetry;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -56,8 +57,8 @@ public class Turret extends SubsystemBase {
     public static double fudgeFactor = 0;
     public static boolean useTurret = true;
 
-    public static double zeroPos = 0.475;
-    public static double ninetyPos = 0.8;
+    public static double zeroPos = 0.478;
+    public static double ninetyPos = 0.795;
     /*
     public static double leftPos = .5;
     public static double rightPos = .5; */
@@ -85,6 +86,7 @@ public class Turret extends SubsystemBase {
     public double vx, vy = 0;
     public double prevX = 0, prevY = 0;
     public double dvx, dvy = 0;
+    public boolean poseMode = false;
 
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
@@ -198,7 +200,9 @@ public class Turret extends SubsystemBase {
             right.setPosition(b);
             middle.setPosition(b);
         }
-        telemetry.addData("turret target", target);
+
+        if (showTelemetry)
+            telemetry.addData("turret target", target);
         //telemetry.addData("Use Limelight", limelightMode);
 
     }

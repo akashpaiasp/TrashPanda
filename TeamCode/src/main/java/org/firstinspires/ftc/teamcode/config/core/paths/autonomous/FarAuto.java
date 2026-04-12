@@ -12,11 +12,12 @@ public class FarAuto {
 
     public static final Pose startPose = new Pose(13, -60.6, 0);
     public static final Pose shootPose = new Pose(13, -57, 0);
-    public static final Pose humanPlayer = new Pose(59, -57.5, -.31);
+    public static final Pose humanPlayer = new Pose(59, -57.5, -.6);
     public static final Pose turn = new Pose(60.8, -60, -.189);
 
     private static final Pose strafe = new Pose(20, -33.5, 0);
     private static final Pose thirdSpike = new Pose(53, -33.5, 0);
+    public static final Pose park = new Pose(53, -57.5, -.189);
 
     // ---------------- BLUE POSES ----------------
 
@@ -27,6 +28,7 @@ public class FarAuto {
 
     private static final Pose strafeBlue = convertToBlue(strafe);
     private static final Pose thirdSpikeBlue = convertToBlue(thirdSpike);
+    public static final Pose parkBlue = convertToBlue(park);
 
     // ---------------- RED PATHS ----------------
 
@@ -46,7 +48,7 @@ public class FarAuto {
 
     public static PathChain shootHumanPlayer(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(turn, shootPose))
+                .addPath(new BezierLine(humanPlayer, shootPose))
                 .setConstantHeadingInterpolation(shootPose.getHeading())
                 .build();
     }
@@ -62,6 +64,12 @@ public class FarAuto {
         return f.pathBuilder()
                 .addPath(new BezierLine(thirdSpike, shootPose))
                 .setLinearHeadingInterpolation(thirdSpike.getHeading(), shootPose.getHeading())
+                .build();
+    }
+    public static PathChain park(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(humanPlayer, park))
+                .setLinearHeadingInterpolation(humanPlayer.getHeading(), park.getHeading())
                 .build();
     }
 
@@ -99,6 +107,13 @@ public class FarAuto {
         return f.pathBuilder()
                 .addPath(new BezierLine(thirdSpikeBlue, shootPoseBlue))
                 .setLinearHeadingInterpolation(thirdSpikeBlue.getHeading(), shootPoseBlue.getHeading())
+                .build();
+    }
+
+    public static PathChain parkBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(humanPlayerBlue, parkBlue))
+                .setLinearHeadingInterpolation(humanPlayerBlue.getHeading(), parkBlue.getHeading())
                 .build();
     }
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.config.subsystems;
 
+import static org.firstinspires.ftc.teamcode.config.core.Robot.showTelemetry;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -63,9 +65,10 @@ public class Hood extends SubsystemBase {
     /*Periodic method gets run in a loop during auto and teleop.
     The telemetry gets updated constantly so you can see the status of the subsystems */
     public void periodic() {
-
-        telemetry.addData("Hood", hoodR.getPosition());
-        telemetry.addData("Hood state", current);
+        if (showTelemetry) {
+            telemetry.addData("Hood", hoodR.getPosition());
+            telemetry.addData("Hood state", current);
+        }
         switch (current) {
             case UP:
                 target = hoodUp;

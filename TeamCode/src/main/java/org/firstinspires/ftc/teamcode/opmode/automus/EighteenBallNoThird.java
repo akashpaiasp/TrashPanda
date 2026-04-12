@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.Eighte
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2Blue;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickupBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.move;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.moveBlue;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Blue;
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Klutch;
@@ -52,8 +54,8 @@ public class EighteenBallNoThird extends OpMode {
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = 0.2;
-    double onThresholdTwo = 0.2;
+    double onThreshold = 0.3;
+    double onThresholdTwo = 0.3;
 
     double offThreshold = 0.03;
     double moveThreshold = 1.8;
@@ -742,7 +744,7 @@ public class EighteenBallNoThird extends OpMode {
                     //if (robot.getAlliance() == Alliance.BLUE)
                     robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                    //robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
+                    robot.getFollower().followPath(robot.getAlliance() == Alliance.RED ? move(robot.getFollower()) : moveBlue(robot.getFollower()), true);
                     setPathState(28);
                 }
 
