@@ -41,7 +41,7 @@ public class Robot {
     private Breakbeams breakbeams;
     private Opmode op = TELEOP;
     private double speed = 1.0;
-    public static double turretOffset = 3.8;
+    public static double turretOffset = 0;
     public static double uptakeThreshold = 4.5;
     public static double threeBallUptake = 5.5;
     public static double twoBallUptake = 4;
@@ -53,11 +53,11 @@ public class Robot {
     //Booleans to change on FTCDash
     public static boolean showTelemetry = false;
     public static boolean showLoopTimes = false;
-    public static boolean hoodAdjustment = true;
+    public static boolean hoodAdjustment = false;
     public static boolean rapidFireFar = false;
     public static double farLaunchR = 1;
     public static boolean autoShoot = false;
-    public static boolean keepShooterOn = true;
+    public static boolean keepShooterOn = false;
     public static boolean manualAngle = false;
     public static boolean manualFlightTime = false;
     public boolean update = true;
@@ -266,7 +266,7 @@ public class Robot {
         //led = new LED(hw, telemetry);
 
         autoDrive = new AutoDriving(follower, telemetry);
-        limelight = new Limelight(hw, telemetry);
+        //limelight = new Limelight(hw, telemetry);
         //limelight.update();
 
         //aInitLoop = false;
@@ -608,13 +608,6 @@ public class Robot {
         //KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
         d = getDistanceFromGoal();
 
-        if (!manualR) {
-            if (d>100)
-                r = farLaunchR;
-            else
-                r = 1;
-        }
-
         if (KinematicsCalculator.airsort) {
             hoodAdjustment = true;
             int n = getNumBallsWhileShooting();
@@ -654,11 +647,7 @@ public class Robot {
             //validLaunch = true;
             if (!shotStarted || hoodAdjustment) {
                 if (!TwentyOne.sotm || Launcher.teleop) {
-                    if (d < 105)
-                        hood.setTarget(hoodPos);
-                    else {
-                        hood.setTarget(hoodPos);
-                    }
+                    hood.setTarget(hoodPos);
                 }
                 else {
                     hood.setTarget(hoodPos - .1);
@@ -668,7 +657,7 @@ public class Robot {
             //validLaunch = false;
         }
 
-        validLaunch = false ? changedState() : launcher.getValidLaunch();
+        validLaunch = launcher.getValidLaunch();
 
     }
 

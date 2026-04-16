@@ -38,8 +38,8 @@ public class Intake extends SubsystemBase {
 
     public static boolean autoOuttake = true;
     private static double
-            open = 1,
-            closed = 0;
+            open = .7,
+            closed = 0.95;
 
     public enum IntakeState {
         OUTTAKE,
@@ -76,10 +76,10 @@ public class Intake extends SubsystemBase {
         //pusherM = hardwareMap.get(Servo.class, "cs2");
         //pusherM = hardwareMap.get(Servo.class, "cs3");
 
-        gate = hardwareMap.get(Servo.class, "cs5");
+        gate = hardwareMap.get(Servo.class, "cs3");
 
-        intake = hardwareMap.get(DcMotorEx.class, "em1");
-        uptake = hardwareMap.get(DcMotorEx.class, "em0");
+        intake = hardwareMap.get(DcMotorEx.class, "cm2");
+        uptake = hardwareMap.get(DcMotorEx.class, "em2");
 
 
         bb1 = hardwareMap.get(DigitalChannel.class, "ed0");
@@ -87,8 +87,8 @@ public class Intake extends SubsystemBase {
         bb3 = hardwareMap.get(DigitalChannel.class, "ed6");
 
 
-        //intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        uptake.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        uptake.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //init servos based on their name in the robot's config file
 

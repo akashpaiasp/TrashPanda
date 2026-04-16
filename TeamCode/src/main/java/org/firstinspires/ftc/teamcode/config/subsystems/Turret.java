@@ -15,8 +15,6 @@ import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.config.core.Robot;
-import org.firstinspires.ftc.teamcode.config.core.util.Alliance;
 import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
@@ -45,6 +43,8 @@ public class Turret extends SubsystemBase {
     public static double p = 0.01, i = 0, d = 0.4, f = 0, l = 0.045;
     public static double p2 = 0.005, i2 = 0, d2 = 1, f2 = 0, l2 = 0.005;
     public static double deadZone = 0.6;
+    public static boolean testLash = false;
+    public static double t1 = 0, t2 = 0, t3 = 0, t4 = 0;
 
     public PDFLController controller;
     public PDFLController llcontroller;
@@ -55,10 +55,10 @@ public class Turret extends SubsystemBase {
     private double targetY;
     private Pose botPose;
     public static double fudgeFactor = 0;
-    public static boolean useTurret = true;
+    public static boolean useTurret = false;
 
-    public static double zeroPos = 0.478;
-    public static double ninetyPos = 0.795;
+    public static double zeroPos = 0.405;
+    public static double ninetyPos = 0.62;
     /*
     public static double leftPos = .5;
     public static double rightPos = .5; */
@@ -74,7 +74,7 @@ public class Turret extends SubsystemBase {
     private MultipleTelemetry telemetry;
     public AxonContinuous spin; //sh0
     public CRServo spin2; //sh1
-    public Servo left, right, middle;
+    public Servo left, right, middle, other;
 
     public static double targetRange = 3;
     //public Servo spin;
@@ -88,6 +88,10 @@ public class Turret extends SubsystemBase {
     public double dvx, dvy = 0;
     public boolean poseMode = false;
 
+    public static boolean power1 = true, power2 = true, power3 = true, power4 = true;
+    public static boolean rev1 = true, rev2 = true, rev3 = false, rev4 = false;
+
+
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
         //init telemetry
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -98,9 +102,17 @@ public class Turret extends SubsystemBase {
             spin2.setDirection(DcMotorSimple.Direction.REVERSE);
         }
         else {
-            left = hardwareMap.get(Servo.class, "sh4");
-            right = hardwareMap.get(Servo.class, "sh2");
-            middle = hardwareMap.get(Servo.class, "sh0");
+            left = hardwareMap.get(Servo.class, "es4");
+            right = hardwareMap.get(Servo.class, "es5");
+            middle = hardwareMap.get(Servo.class, "cs1");
+            other = hardwareMap.get(Servo.class, "cs0");
+
+            if (rev1) left.setDirection(Servo.Direction.REVERSE);
+            if (rev2) right.setDirection(Servo.Direction.REVERSE);
+            if (rev3) middle.setDirection(Servo.Direction.REVERSE);
+            if (rev4) other.setDirection(Servo.Direction.REVERSE);
+
+
         }
         //spin = hardwareMap.get(Servo.class, "sh2");
         controller = new PDFLController(p, d, f, l, i);
@@ -136,9 +148,18 @@ public class Turret extends SubsystemBase {
 
         else {
             double b = getPos();
-            left.setPosition(b);
-            right.setPosition(b);
-            middle.setPosition(b);
+            if (!testLash) {
+                left.setPosition(b);
+                right.setPosition(b);
+                middle.setPosition(b);
+                other.setPosition(b);
+            }
+            else {
+                left.setPosition(t1);
+                right.setPosition(t2);
+                middle.setPosition(t3);
+                other.setPosition(t4);
+            }
             telemetry.addData("left", left.getPosition());
             telemetry.addData("right", right.getPosition());
             telemetry.addData("middle", middle.getPosition());
@@ -162,9 +183,22 @@ public class Turret extends SubsystemBase {
             telemetry.update();
         }
         else {
-            left.setPosition(pos);
-            right.setPosition(pos);
-            middle.setPosition(pos);
+            if (!testLash) {
+                if (power1)
+                    left.setPosition(pos);
+                if (power2)
+                    right.setPosition(pos);
+                if (power3)
+                    middle.setPosition(pos);
+                if (power4)
+                    other.setPosition(pos);
+            }
+            else {
+                left.setPosition(t1);
+                right.setPosition(t2);
+                middle.setPosition(t3);
+                other.setPosition(t4);
+            }
             telemetry.addData("left", left.getPosition());
             telemetry.addData("right", right.getPosition());
             telemetry.addData("middle", middle.getPosition());
@@ -196,9 +230,18 @@ public class Turret extends SubsystemBase {
         }
         else {
             double b = getPos();
-            left.setPosition(b);
-            right.setPosition(b);
-            middle.setPosition(b);
+            if (!testLash) {
+                left.setPosition(b);
+                right.setPosition(b);
+                middle.setPosition(b);
+                other.setPosition(b);
+            }
+            else {
+                left.setPosition(t1);
+                right.setPosition(t2);
+                middle.setPosition(t3);
+                other.setPosition(t4);
+            }
         }
 
         if (showTelemetry)

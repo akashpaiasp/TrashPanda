@@ -29,7 +29,7 @@ public class TelePOP extends LinearOpMode {
     private double scaleFactor = 1;
     public Timer loopTimer = new Timer();
     private double lastTime = 0, currentTime = 0;
-    public static boolean manualMode = false;
+    public static boolean manualMode = true;
     public boolean pressingC = false;
     public boolean pressingRT = false;
     public boolean rumble = false;
@@ -55,7 +55,7 @@ public class TelePOP extends LinearOpMode {
 
 
         waitForStart();
-        robot.limelight.startLimelight();
+        //robot.limelight.startLimelight();
         loopTimer.reset();
         robot.tStart();
         robot.dualControls(g1, g2);
@@ -161,33 +161,12 @@ public class TelePOP extends LinearOpMode {
                 //&& (robot.validLaunch || robot.shotStarted))) {
                 //change this value to add wait for RPM in far launch
                 if (true || (robot.notMoving() && robot.turret.atTarget())) {
-                    if (robot.getDistanceFromGoal() < 100) { //100
                         robot.turret.lockTurret = true;
                         robot.intake.setUptakeState(Intake.UptakeState.ON);
                         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intakeOff = false;
                         robot.uptakeOff = false;
-                    } else {
-                        robot.turret.lockTurret = false;
-                        if (robot.validLaunch || (robot.shotStarted && rapidFireFar)) {
-                            robot.intake.setUptakeState(Intake.UptakeState.ON);
-                            robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                            robot.intakeOff = false;
-                            robot.uptakeOff = false;
-                        } else {
-                            robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                            robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                            robot.intakeOff = true;
-                            robot.uptakeOff = true;
-                        }
                     }
-                }
-                else {
-                        robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                        robot.intakeOff = true;
-                        robot.uptakeOff = true;
-                }
             }
             else {
                 robot.turret.lockTurret = false;
@@ -278,9 +257,9 @@ public class TelePOP extends LinearOpMode {
                 telemetry.addData("x", robot.getFollower().getPose().getX());
                 telemetry.addData("y", robot.getFollower().getPose().getY());
                 telemetry.addData("heading", robot.getFollower().getPose().getHeading());
-                telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
-                telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
-                telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
+                //telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
+                //telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
+                //telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
                 telemetry.addData("GoalX", redX);
                 telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
                 telemetry.addData("Robot zone", zone);

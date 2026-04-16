@@ -22,7 +22,9 @@ public class Hood extends SubsystemBase {
     private MultipleTelemetry telemetry;
 
     //state of the subsystem
-    public Servo hoodR, hoodL;
+    public Servo hood;
+    public static boolean manualTarget = true;
+    public static double manualHoodTarget = .73;
 
     public static double shootingVariable = 0.02;
     public static double hoodDown = .35; //23.9
@@ -48,8 +50,7 @@ public class Hood extends SubsystemBase {
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         //init servos based on their name in the robot's config file
-        hoodR = hardwareMap.get(Servo.class, "sh15");
-        hoodL = hardwareMap.get(Servo.class, "sh10");
+        hood = hardwareMap.get(Servo.class, "cs2");
         target = 0.0;
     }
 
@@ -66,7 +67,7 @@ public class Hood extends SubsystemBase {
     The telemetry gets updated constantly so you can see the status of the subsystems */
     public void periodic() {
         if (showTelemetry) {
-            telemetry.addData("Hood", hoodR.getPosition());
+            telemetry.addData("Hood", hood.getPosition());
             telemetry.addData("Hood state", current);
         }
         switch (current) {
@@ -87,12 +88,13 @@ public class Hood extends SubsystemBase {
                 //hood.setPosition(hoodDown);
                 break;
             case MANUAL :
-                hoodR.setPosition(target);
-                hoodL.setPosition(target);
-
+                break;
         }
-        hoodR.setPosition(target);
-        hoodL.setPosition(target);
+        if (!manualTarget)
+            hood.setPosition(target);
+        else
+            hood.setPosition(manualHoodTarget);
+
     }
     public void increase() {
         setState(HoodState.MANUAL);
