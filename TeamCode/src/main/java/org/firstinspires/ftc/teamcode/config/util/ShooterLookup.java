@@ -1,15 +1,28 @@
 package org.firstinspires.ftc.teamcode.config.util;
 
+import org.firstinspires.ftc.teamcode.config.core.Robot;
+
 public class ShooterLookup {
 
     // --- Editable table entries ---
     // Add your own distances, hood positions, and RPMs here.
     // Make sure distances are in increasing order.
     private static final ShotPoint[] table = {
-            new ShotPoint(45.2, .75, 2300),
-            new ShotPoint(75, .77, 2500),
-            new ShotPoint(62, 0.4, 4000),
-            new ShotPoint(15, 0.45, 3500)
+            new ShotPoint(37, .73, 2150),
+            new ShotPoint(46, .76, 2280),
+            new ShotPoint(57, 0.775, 2300),
+            new ShotPoint(66.5, 0.795, 2600),
+            new ShotPoint(76.7, 0.805, 2850),
+            new ShotPoint(86.5, 0.825, 3000),
+            new ShotPoint(97.9, 0.825, 3150),
+            new ShotPoint(105.3, 0.825, 3300),
+            new ShotPoint(115.9, 0.84, 3620),
+            new ShotPoint(126, 0.84, 3700),
+            new ShotPoint(136, 0.84, 3800),
+            new ShotPoint(147, 0.84, 3900)
+
+
+
     };
 
     // Data structure for a single point
@@ -47,6 +60,9 @@ public class ShooterLookup {
 
                 double hoodInterp = low.hood + t * (high.hood - low.hood);
                 double rpmInterp  = low.rpm  + t * (high.rpm  - low.rpm);
+
+                if (Robot.airsort)
+                    rpmInterp += Robot.airsortOffset;
 
                 return new ShotPoint(distance, hoodInterp, rpmInterp);
             }

@@ -54,7 +54,7 @@ public class Constants {
             .forwardPodY(6.831) //17-3.5
             .strafePodX(0) //47 //145.5
             .distanceUnit(DistanceUnit.INCH)
-            .hardwareMapName("ci0")
+            .hardwareMapName("ci1")
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
     public static PathConstraints pathConstraints = new PathConstraints(.975, 50, 1, 1);

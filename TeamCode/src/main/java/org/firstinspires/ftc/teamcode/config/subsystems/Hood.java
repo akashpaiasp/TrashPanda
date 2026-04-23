@@ -23,18 +23,22 @@ public class Hood extends SubsystemBase {
 
     //state of the subsystem
     public Servo hood;
-    public static boolean manualTarget = true;
+    public static boolean manualTarget = false;
     public static double manualHoodTarget = .73;
 
     public static double shootingVariable = 0.02;
-    public static double hoodDown = .35; //23.9
+    public static double hoodCompPerRpm = 0.00005;
+    public static double hoodDown = .73; //23.9
     public double hoodMid = 0.4 ;
     public double hoodMidUp = 0.5; //64(hoodPos-0.5) + 23.9 //6.4
-    public static double hoodUp = .77; //49.5
+    public static double hoodUp = .89; //49.5
     public static double target = 0.0;
     public static double hoodIncreaseAmt = 0.02;
     public static double autoHoodShoot1 = 0.9;
     public static double autoHoodShoot2 = .9;
+
+    public static double airsort_lobHood = .76;
+    public static double airsort_straightHood = .825;
 
     public enum HoodState {
         UP,
@@ -121,6 +125,12 @@ public class Hood extends SubsystemBase {
     }
     public void setTarget(double t) {
         setState(HoodState.MANUAL);
+        target = Range.clip(t, hoodDown, hoodUp);
+    }
+
+    public void setTarget(double t, double rpmDiff) {
+        setState(HoodState.MANUAL);
+        t += rpmDiff * hoodCompPerRpm;
         target = Range.clip(t, hoodDown, hoodUp);
     }
 }

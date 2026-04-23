@@ -126,9 +126,9 @@ public class Limelight extends SubsystemBase {
         if (result != null && result.isValid()) {
             Pose3D botPose = result.getBotpose();
             double angle = botPose.getOrientation().getYaw(AngleUnit.DEGREES) + 180;
-            if (angle > 360) angle -= 360;
+            if (angle > 180) angle -= 360;
 
-            return new Pose(botPose.getPosition().y / .0254, botPose.getPosition().x / .0254, Math.toRadians(angle) + Math.PI);
+            return new Pose(botPose.getPosition().y / .0254 + 1, -botPose.getPosition().x / .0254 - 1, Math.toRadians(angle) + Math.PI / 2);
         }
         return new Pose();
 

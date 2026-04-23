@@ -94,7 +94,7 @@ public class Launcher extends SubsystemBase {
     private boolean inAggressive = false;
     public static boolean teleop = false;
     public boolean validLaunch = false;
-    public static double threshold = 50.0;
+    public static double threshold = 150.0;
 
     public enum LauncherState {
         IN,
@@ -139,7 +139,6 @@ public class Launcher extends SubsystemBase {
         current = LauncherState.OUT;
         updateShooter();
         telemetry.addData("Target Velocity 1", target_velocity);
-        telemetry.addData("Target Velocity 2", target_velocity_2);
         telemetry.addData("Current Velocity 1", current_velocity);
         telemetry.addData("Volts", measuredV);
         telemetry.addData("Valid", validLaunch);
@@ -175,7 +174,6 @@ public class Launcher extends SubsystemBase {
 
         if (showTelemetry) {
             telemetry.addData("Target Velocity 1", target_velocity);
-            telemetry.addData("Target Velocity 2", target_velocity_2);
             telemetry.addData("Current Velocity", current_velocity);
             telemetry.addData("Volts", measuredV);
             telemetry.addData("Valid", validLaunch);
@@ -286,12 +284,20 @@ public class Launcher extends SubsystemBase {
         }
     }
 
+    public boolean atTarget() {
+        return getAbsDiff() < threshold;
+    }
+
     public void setTarget(double target) {
         target_velocity = target;
     }
 
     public boolean getValidLaunch() {
         return validLaunch;
+    }
+
+    public double getAbsDiff() {
+        return Math.abs(target_velocity - current_velocity);
     }
 
     public double tickstoRPM(double velocity) {

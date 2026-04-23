@@ -10,13 +10,13 @@ public class FarAuto {
 
     // ---------------- RED POSES ----------------
 
-    public static final Pose startPose = new Pose(13, -60.6, 0);
-    public static final Pose shootPose = new Pose(13, -57, 0);
-    public static final Pose humanPlayer = new Pose(59, -57.5, -.6);
+    public static final Pose startPose = new Pose(14.25, -63, -.012);
+    public static final Pose shootPose = new Pose(7.35, -55.7, 0.126);
+    public static final Pose humanPlayer = new Pose(57.3, -63.3, -0.05);
     public static final Pose turn = new Pose(60.8, -60, -.189);
 
     private static final Pose strafe = new Pose(20, -33.5, 0);
-    private static final Pose thirdSpike = new Pose(53, -33.5, 0);
+    private static final Pose thirdSpike = new Pose(55, -36, 0);
     public static final Pose park = new Pose(53, -57.5, -.189);
 
     // ---------------- BLUE POSES ----------------
@@ -64,6 +64,19 @@ public class FarAuto {
         return f.pathBuilder()
                 .addPath(new BezierLine(thirdSpike, shootPose))
                 .setLinearHeadingInterpolation(thirdSpike.getHeading(), shootPose.getHeading())
+                .build();
+    }
+
+    public static PathChain ballCVIntake(Follower f, double ballY) {
+        return f.pathBuilder()
+                .addPath(new BezierCurve(shootPose, new Pose(humanPlayer.getX() - 10, ballY, humanPlayer.getHeading()), new Pose(humanPlayer.getX(), ballY, humanPlayer.getHeading())))
+                .setTangentHeadingInterpolation()
+                .build();
+    }
+    public static PathChain ballCVShoot(Follower f, Pose currentPose) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(currentPose, shootPose))
+                .setLinearHeadingInterpolation(currentPose.getHeading(), shootPose.getHeading())
                 .build();
     }
     public static PathChain park(Follower f) {
@@ -121,5 +134,9 @@ public class FarAuto {
 
     public static Pose convertToBlue(Pose p) {
         return new Pose(-p.getX(), p.getY(), Math.PI - p.getHeading());
+    }
+
+    public static Pose getCVPose(Pose og, Pose cv) {
+        return new Pose(og.getX(), cv.getY(), og.getHeading());
     }
 }

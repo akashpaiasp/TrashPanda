@@ -1,35 +1,32 @@
 package org.firstinspires.ftc.teamcode.opmode.automus;
 
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickup2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.gatePickupBlue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup1Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.pickup3Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot1;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot1Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot3;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot3Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot4;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shoot4Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGate2Blue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootGateBlue;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.shootPose2;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.startPose;
-import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.startPoseBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.gatePickup;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.gatePickup2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.gatePickupBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.pickup1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.pickup2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.pickup3Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.pickupFirstSpike;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.secondSpike;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot1;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot1Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot3;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot3Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot4;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shoot4Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shootGate;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shootGate2Blue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shootGateBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.shootPose2;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.startPose;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.startPoseBlue;
+import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.TwentyOneBall.thirdSpike;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -41,23 +38,22 @@ import org.firstinspires.ftc.teamcode.config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
 
-@Disabled
-@Autonomous(name = "Big Smapple")
+@Autonomous(name = "No third spikemark")
 @Config
 //@Configurable
-public class EighteenBallRemade extends OpMode {
+public class NoThird extends OpMode {
     //private MultipleTelemetry telemetry;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Robot robot;
     int done = 0;
     boolean two = false;
-    double onThreshold = .4;
+    double onThreshold = 0;
     double onThresholdTwo = 0.4;
     // 6767 - Julian
-    double offThreshold = 0.05;
-    double moveThreshold = 1.8;
-    double moveIntakeThreshold = 1.2;
+    double offThreshold = 0;
+    double moveThreshold = .6;
+    double moveIntakeThreshold = 1.5;
     public static boolean firstCouple = true;
     boolean doneOff = false;
     double doneNum = 0;
@@ -76,6 +72,7 @@ public class EighteenBallRemade extends OpMode {
     public static boolean sotm = false;
     public static boolean twentyOne = false;
     public static double tValue = .3;
+    public static double shootTValue = 1;
     public boolean dontChangeTurret = false;
 
 
@@ -100,6 +97,7 @@ public class EighteenBallRemade extends OpMode {
             case 00: //preload & set max power
                 robot.getFollower().setMaxPower(1);
                 setPathState(10);
+                robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
                 break;
 
             case 10:
@@ -109,7 +107,7 @@ public class EighteenBallRemade extends OpMode {
                 break;
 
             case 12025:
-                followPath(robot.getAlliance() == Alliance.RED ? pickup1(robot.getFollower()) : pickup1Blue(robot.getFollower()), true);
+                followPath(robot.getAlliance() == Alliance.RED ? secondSpike(robot.getFollower()) : pickup1Blue(robot.getFollower()), true);
                 if (intakePath(false))
                     setPathState(1204);
                 break;
@@ -147,43 +145,41 @@ public class EighteenBallRemade extends OpMode {
 
 
             case 1452:
-                followPath(robot.getAlliance() == Alliance.RED ? gatePickup2(robot.getFollower()) : gatePickup2Blue(robot.getFollower()), true);
+                followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickup2Blue(robot.getFollower()), true);
                 if (intakePath(true))
                     setPathState(1453);
                 break;
 
 
             case 1453:
-                followPath(robot.getAlliance() == Alliance.RED ? shootGate2(robot.getFollower()) : shootGate2Blue(robot.getFollower()), true);
+                followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGate2Blue(robot.getFollower()), true);
+                if (shootPath())
+                    setPathState(1454);
+                break;
+            case 1454:
+                followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickup2Blue(robot.getFollower()), true);
+                if (intakePath(true))
+                    setPathState(1453);
+                break;
+
+
+            case 1455:
+                followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGate2Blue(robot.getFollower()), true);
                 if (shootPath())
                     setPathState(1456);
                 break;
 
             case 1456:
-                followPath(robot.getAlliance() == Alliance.RED ? pickup2(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
+                followPath(robot.getAlliance() == Alliance.RED ? pickupFirstSpike(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
                 if (intakePath(false))
                     setPathState(19);
                 break;
 
             case 19:
-                followPath(robot.getAlliance() == Alliance.RED ? shoot3(robot.getFollower()) : shoot3Blue(robot.getFollower()), false);
+                followPath(robot.getAlliance() == Alliance.RED ? shoot4(robot.getFollower()) : shoot3Blue(robot.getFollower()), false);
                 if (shootPath())
                     setPathState(24);
                 break;
-
-            case 24:
-                followPath(robot.getAlliance() == Alliance.RED ? pickup3(robot.getFollower()) : pickup3Blue(robot.getFollower()), true);
-                if (intakePath(false))
-                    setPathState(271);
-                break;
-
-
-            case 271:
-                followPath(robot.getAlliance() == Alliance.RED ? shoot4(robot.getFollower()) : shoot4Blue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(28);
-                break;
-
 
 
             case 28:
@@ -290,25 +286,32 @@ public class EighteenBallRemade extends OpMode {
         }
         return true;
     }
+    private boolean pathDone(boolean shotPath) {
+        if (robot.getFollower().getCurrentTValue() < shootTValue && robot.getFollower().isBusy()) {
+            pathTimer.reset();
+            return false;
+        }
+        return true;
+    }
 
     private boolean intakePath(boolean gatePath) {
         robot.intake.setGateState(Intake.GateState.CLOSED);
-        if (robot.getFollower().getCurrentTValue() < tValue) {
+        if (robot.getFollower().getCurrentTValue() < tValue && robot.getFollower().isBusy()) {
+            if (robot.getFollower().getCurrentTValue() > 1-shootTValue) {
+                robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                robot.intake.setUptakeState(Intake.UptakeState.OFF);
+            }
             return false;
         }
         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
         robot.intake.setUptakeState(Intake.UptakeState.SLOW);
         if (gatePath) {
             if (pathDone() && intakeDone()) {
-                robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                robot.intake.setUptakeState(Intake.UptakeState.OFF);
                 first = true;
                 return true;
             }
         } else {
-            if (intakeDone() || pathDone()) {
-                robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                robot.intake.setUptakeState(Intake.UptakeState.OFF);
+            if (robot.intake.has3() || pathDone()) {
                 first = true;
                 return true;
             }
@@ -317,11 +320,9 @@ public class EighteenBallRemade extends OpMode {
     }
 
     private boolean shootPath() {
-        robot.intake.setGateState(Intake.GateState.OPEN);
-        robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
-
-        if (pathDone()) {
-            if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
+        if (pathDone(true)) {
+            telemetry.addData("Path done", true);
+            if (pathTimer.getElapsedTimeSeconds() >= onThreshold) {
                 robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                 robot.intake.setUptakeState(Intake.UptakeState.ON);
                 robot.shotStarted = true;
@@ -329,8 +330,6 @@ public class EighteenBallRemade extends OpMode {
 
             if (doneDone) {
                 if (pathTimer.getElapsedTimeSeconds() > offThreshold) {
-                    robot.intake.setIntakeState(Intake.IntakeState.OFF);
-                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
                     robot.shotStarted = false;
                     doneDone = false;
                     first = true;
@@ -341,6 +340,15 @@ public class EighteenBallRemade extends OpMode {
                 pathTimer.reset();
                 doneDone = true;
                 time = pathTimer.getElapsedTimeSeconds() > moveThreshold;
+            }
+        }
+        else {
+            telemetry.addData("Path done", false);
+            if (robot.getFollower().getCurrentTValue() > 1 - tValue) {
+                robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                robot.intake.setUptakeState(Intake.UptakeState.OFF);
+                robot.intake.setGateState(Intake.GateState.OPEN);
+                robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
             }
         }
         return false;

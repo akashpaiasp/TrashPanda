@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.config.core;
 
 import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.EighteenBall.convertToBlue;
 import static org.firstinspires.ftc.teamcode.config.core.util.Opmode.*;
+import static org.firstinspires.ftc.teamcode.config.util.ShooterLookup.getShot;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Vector;
@@ -22,12 +23,13 @@ import org.firstinspires.ftc.teamcode.config.core.paths.AutoDriving;
 import org.firstinspires.ftc.teamcode.config.core.util.*;
 import org.firstinspires.ftc.teamcode.config.util.KinematicsCalculator;
 import org.firstinspires.ftc.teamcode.config.util.PoseEkf;
+import org.firstinspires.ftc.teamcode.config.util.ShooterLookup;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 import org.firstinspires.ftc.teamcode.config.pedro.Constants;
 import org.firstinspires.ftc.teamcode.config.subsystems.*;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
-import org.firstinspires.ftc.teamcode.opmode.automus.TwentyOne;
+import org.firstinspires.ftc.teamcode.opmode.telePOP.TelePOP;
 
 import java.util.List;
 
@@ -38,10 +40,10 @@ public class Robot {
     //private MultipleTelemetry telemetry;
     private Telemetry telemetry;
     private Follower follower;
-    private Breakbeams breakbeams;
     private Opmode op = TELEOP;
     private double speed = 1.0;
-    public static double turretOffset = 0;
+    public static boolean airsort = false;
+    public static double turretOffset = -1.5;
     public static double uptakeThreshold = 4.5;
     public static double threeBallUptake = 5.5;
     public static double twoBallUptake = 4;
@@ -54,10 +56,11 @@ public class Robot {
     public static boolean showTelemetry = false;
     public static boolean showLoopTimes = false;
     public static boolean hoodAdjustment = false;
+    public static boolean hoodComp = false;
     public static boolean rapidFireFar = false;
     public static double farLaunchR = 1;
     public static boolean autoShoot = false;
-    public static boolean keepShooterOn = false;
+    public static boolean keepShooterOn = true;
     public static boolean manualAngle = false;
     public static boolean manualFlightTime = false;
     public boolean update = true;
@@ -68,11 +71,15 @@ public class Robot {
     public boolean rev = false;
     public static double increaseAmt = .5;
 
-    public static double timeThreshold = .3;
+    public static double timeThreshold = 0;
+    public boolean stateChange = false;
+    public boolean lastState = false;
 
     public static int sortNum = 0;
 
     public int lastNumBalls = 0;
+
+    public int numLeft = 3;
     //0 = all fast, 1 = lob fast fast, 2 = lob lob fast, 3 = lob fast lob, 4 = fast lob fast
 
 
@@ -88,7 +95,7 @@ public class Robot {
     public Launcher launcher;
     public Turret turret;
     public Hood hood;
-    public LED led;
+    public PTO pto;
 
     public KinematicsCalculator k;
     public boolean slowMode;
@@ -101,7 +108,8 @@ public class Robot {
 
 
     public static double centerX = 67, centerY = 67, centerXBlue = -60;
-    public static double farZoneX = 67;
+    public double tempTurretX, tempTurretY = 0;
+    public static double farZoneX = 60;
     public static double farZoneXBlue = -62;
     public static double centerX2 = centerX, centerY2 = centerY;
     public static double goalY = centerY;
@@ -122,6 +130,8 @@ public class Robot {
     //double centerX = redX, centerY = goalY;
     double rightWallX = centerX - 7, rightWallY = centerY;  // right wall center
     double frontWallX = centerX, frontWallY = centerY - 7;
+
+    public static double airsortOffset = 300; //rpm
 
 
     double maxDist = 72;
@@ -263,10 +273,11 @@ public class Robot {
         turret = new Turret(hw, telemetry);
         hood = new Hood(hw, telemetry);
         intake = new Intake(hw, telemetry);
+        pto = new PTO(hw, telemetry);
         //led = new LED(hw, telemetry);
 
         autoDrive = new AutoDriving(follower, telemetry);
-        //limelight = new Limelight(hw, telemetry);
+        limelight = new Limelight(hw, telemetry);
         //limelight.update();
 
         //aInitLoop = false;
@@ -376,6 +387,7 @@ public class Robot {
         g1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(new InstantCommand(() -> {
             Aim.fudgeFactor -= 2.5;
         })); */
+        /*
         g1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
             resetPose(3);
         }));
@@ -390,7 +402,7 @@ public class Robot {
 
         g1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
             resetPose(1);
-        }));
+        })); */
 
         g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             //Aim.fudgeFactor = 0;
@@ -414,7 +426,18 @@ public class Robot {
             autoDrive.toShoot();
         }));
         g1.getGamepadButton(GamepadKeys.Button.TRIANGLE).whenPressed(new InstantCommand(() -> {
-            autoDrive.off();
+            Pose p = limelight.getRobotPosFromTarget();
+            if (p.getX() != 0.0 ) {
+                follower.setPose(limelight.getRobotPosFromTarget());
+                TelePOP.rumble = true;
+            }
+            //autoDrive.off();
+        }));
+        g1.getGamepadButton(GamepadKeys.Button.TRIANGLE).whenReleased(new InstantCommand(() -> {
+            TelePOP.rumble = false;
+        }));
+        g1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whenPressed(new InstantCommand(() -> {
+            keepShooterOn = !keepShooterOn;
         }));
 
 
@@ -601,14 +624,20 @@ public class Robot {
     }
 
     public void updateShooting() {
-        if (!manualFlightTime)
-            flightTime = k.getFlightTime();
         double d;
-        //if (launcher.teleop) {
-        //KinematicsCalculator.y_target_in = KinematicsCalculator.targetTele;
-        d = getDistanceFromGoal();
+        if (true || follower.isTeleopDrive() || !follower.isBusy() || follower.getCurrentPathChain() == null)
+            d = getDistanceFromGoal();
+        else {
+            Pose pathEnd = follower.getCurrentPathChain().endPose();
+            double tempX = pathEnd.getX();
+            double tempY = pathEnd.getY();
+            tempTurretX = tempX - turretOffset * Math.cos(pathEnd.getHeading());
+            tempTurretY = tempY - turretOffset * Math.sin(pathEnd.getHeading());
+            turret.updateAiming(goalX, goalY, new Pose(tempTurretX, tempTurretY, pathEnd.getHeading()));
+        }
 
-        if (KinematicsCalculator.airsort) {
+
+        if (airsort) {
             hoodAdjustment = true;
             int n = getNumBallsWhileShooting();
             boolean b;
@@ -631,32 +660,30 @@ public class Robot {
                 default:
                     b = false;
             }
-            k.lob = b;
+            if (b) {
+                hood.setTarget(Hood.airsort_lobHood);
+            }
+            else
+                hood.setTarget(Hood.airsort_straightHood);
         }
 
-        k.setDistance(d * r);
+        ShooterLookup.ShotPoint shot = getShot(d);
 
-        if (!manualRPM)
-            Launcher.tele_target = k.getRPM();
+        if (!manualRPM) {
+            Launcher.tele_target = shot.rpm;
+            Launcher.auto_target = shot.rpm;
+        }//k.getRPM();
         /*
         else
             Launcher.tele_target = Launcher.target_velocity; */
-        Launcher.auto_target = k.getRPM();
-        double hoodPos = k.getHood(launcher.current_velocity);
-        if (hoodPos > 0 ) {
-            //validLaunch = true;
-            if (!shotStarted || hoodAdjustment) {
-                if (!TwentyOne.sotm || Launcher.teleop) {
-                    hood.setTarget(hoodPos);
-                }
-                else {
-                    hood.setTarget(hoodPos - .1);
-                }
-            }
-        } else {
-            //validLaunch = false;
+        double hoodPos = shot.hood;//k.getHood(launcher.current_velocity);
+        double diff = shot.rpm - launcher.current_velocity;
+        if (!airsort) {
+            if (!hoodComp)
+                hood.setTarget(hoodPos);
+            else
+                hood.setTarget(hoodPos, diff);
         }
-
         validLaunch = launcher.getValidLaunch();
 
     }
@@ -694,8 +721,8 @@ public class Robot {
         goalY = centerY;
         double vx = turret.getVx();
         double vy = turret.getVy();
-        double dx = goalX - turretX - vx * flightTime;
-        double dy = goalY - turretY - vy * flightTime;
+        double dx = goalX - turretX - 0;
+        double dy = goalY - turretY - 0;
 
         return Math.sqrt(dx * dx + dy * dy);
     }
@@ -709,8 +736,8 @@ public class Robot {
         }
         else {
             Turret.sotm = false;
-            redX = 63;//72;
-            blueX = farZoneXBlue;
+            redX = farZoneX;//72;
+            blueX = -farZoneX;
             goalY = 67;//72;
         }
 
@@ -720,7 +747,7 @@ public class Robot {
         else {
             goalX = blueX;
         }
-        if (follower.isTeleopDrive())
+        if (follower.isTeleopDrive() || !follower.isBusy() || follower.getCurrentPathChain() == null)
             turret.updateAiming(goalX, goalY, new Pose(turretX, turretY, follower.getHeading()));
         else {
             Pose pathEnd = follower.getCurrentPathChain().endPose();
@@ -802,15 +829,9 @@ public class Robot {
     }
 
     public int getNumBallsWhileShooting() {
-        /*
-        if (intake.uptake.getCurrent(CurrentUnit.AMPS) > threeBallUptake)
-            return 3;
-        else if (intake.uptake.getCurrent(CurrentUnit.AMPS) > twoBallUptake)
-            return 2;
-        else if (intake.uptake.getCurrent(CurrentUnit.AMPS) > oneBallUptake)
-            return 1;
-        else return 0; */
-        return intake.num();
+        if (changedState())
+            numLeft--;
+        return numLeft;
     }
 
     public boolean intakeDone() {
@@ -839,13 +860,18 @@ public class Robot {
     }
 
     public boolean changedState() {
-        if (shotStarted) {
-        if (timer.getElapsedTimeSeconds() > timeThreshold) {
-            lastNumBalls = intake.num();
+        boolean curr = intake.bb1.getState();
+        if(!curr && lastState) {
             timer.reset();
+            stateChange = true;
         }
+        else if (stateChange && timer.getElapsedTimeSeconds() > timeThreshold) {
+            stateChange = false;
+            lastState = curr;
+            return true;
         }
-        return intake.num() == lastNumBalls;
+        lastState = curr;
+        return false;
     }
 
 

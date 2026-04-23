@@ -15,7 +15,7 @@ public class VisionBall {
     // Constants for Distance Math
     public static final double REAL_BALL_WIDTH_MM = 89.0; // Approx FTC Game Element size
     public static final double FOCAL_LENGTH_PIXELS = 317.0; //FocalLength = (realDistance * pixelW) / RealWidth
-    public static  double CAMERA_HEIGHT_MM = 258;   // measure this
+    public static  double CAMERA_HEIGHT_MM = 185;   // measure this
     public static  double TARGET_HEIGHT_MM = 0.0;     // floor contact approximation
     public static double CAMERA_PITCH_DEG = 0.0;    // positive if tilted downward
 

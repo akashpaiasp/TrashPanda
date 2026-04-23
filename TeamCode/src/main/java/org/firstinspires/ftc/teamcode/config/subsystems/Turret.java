@@ -55,19 +55,21 @@ public class Turret extends SubsystemBase {
     private double targetY;
     private Pose botPose;
     public static double fudgeFactor = 0;
-    public static boolean useTurret = false;
+    public static boolean useTurret = true;
 
-    public static double zeroPos = 0.405;
-    public static double ninetyPos = 0.62;
+    public static double zeroPos = .485;
+    public static double oneEightyPos = 0.86;
     /*
     public static double leftPos = .5;
     public static double rightPos = .5; */
     public static double pos = .5;
+    public static double lashFix = 0.025;
+    public static double lashOffset = 0;
 
 
 
-    public static  double MIN_ANGLE = -105; // turret left limit
-    public static  double MAX_ANGLE = 105;  // turret right limit
+    public static  double MIN_ANGLE = -181; // turret left limit
+    public static  double MAX_ANGLE = 181;  // turret right limit
     public static double autoFudge = 3;
     public double current;
 
@@ -79,8 +81,8 @@ public class Turret extends SubsystemBase {
     public static double targetRange = 3;
     //public Servo spin;
 
-    public static double weight = 1.25067;
-    public static double velWeight = 1.25;
+    public static double weight = .3;
+    public static double velWeight = .3;
 
     public static boolean sotm = true;
     public double vx, vy = 0;
@@ -89,7 +91,7 @@ public class Turret extends SubsystemBase {
     public boolean poseMode = false;
 
     public static boolean power1 = true, power2 = true, power3 = true, power4 = true;
-    public static boolean rev1 = true, rev2 = true, rev3 = false, rev4 = false;
+    public static boolean rev1 = false, rev2 = false, rev3 = false, rev4 = false;
 
 
     public Turret(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -100,6 +102,8 @@ public class Turret extends SubsystemBase {
             spin.getC().setDirection(DcMotorSimple.Direction.REVERSE);
             spin2 = hardwareMap.get(CRServo.class, "sh0");
             spin2.setDirection(DcMotorSimple.Direction.REVERSE);
+            //this is the reverse of the other thing
+
         }
         else {
             left = hardwareMap.get(Servo.class, "es4");
@@ -149,8 +153,8 @@ public class Turret extends SubsystemBase {
         else {
             double b = getPos();
             if (!testLash) {
-                left.setPosition(b);
-                right.setPosition(b);
+                left.setPosition(b + lashFix);
+                right.setPosition(b - lashFix);
                 middle.setPosition(b);
                 other.setPosition(b);
             }
@@ -185,9 +189,9 @@ public class Turret extends SubsystemBase {
         else {
             if (!testLash) {
                 if (power1)
-                    left.setPosition(pos);
+                    left.setPosition(pos + lashFix);
                 if (power2)
-                    right.setPosition(pos);
+                    right.setPosition(pos - lashFix);
                 if (power3)
                     middle.setPosition(pos);
                 if (power4)
@@ -231,8 +235,8 @@ public class Turret extends SubsystemBase {
         else {
             double b = getPos();
             if (!testLash) {
-                left.setPosition(b);
-                right.setPosition(b);
+                left.setPosition(b + lashFix);
+                right.setPosition(b - lashFix);
                 middle.setPosition(b);
                 other.setPosition(b);
             }
@@ -300,7 +304,7 @@ public class Turret extends SubsystemBase {
     }
 
     public void setTargetDegrees(double targetDeg) {
-        target = targetDeg;
+        target = targetDeg + lashOffset;
         turretOffAuto = true;
     }
 
@@ -311,7 +315,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getPos() {
-        return zeroPos + (target / 90.0) * (ninetyPos - zeroPos);
+        return zeroPos + (target / 180.0) * (oneEightyPos - zeroPos);
     }
 
 
@@ -340,6 +344,8 @@ public class Turret extends SubsystemBase {
         } else {
             vx = 0;
             vy = 0;
+            dvx = 0;
+            dvy = 0;
         }
 
         double dx;
@@ -347,8 +353,8 @@ public class Turret extends SubsystemBase {
 
         double x = botPose.getX();
         double y = botPose.getY();
-        dx = targetX - x - vx * flightTime;
-        dy = targetY - y - vy * flightTime;
+        dx = targetX - x - vx;
+        dy = targetY - y - vy;
         double robotHeading = Math.toDegrees(botPose.getHeading());
 
         double angleToTargetField = Math.toDegrees(Math.atan2(dy, dx));
@@ -361,9 +367,9 @@ public class Turret extends SubsystemBase {
         if (useTurret) {
             if (Launcher.teleop || !turretOffAuto) {
                 if (continuousMode)
-                    target = -turretRelativeAngle;
+                    setTargetDegrees(turretRelativeAngle);
                 else
-                    target = turretRelativeAngle;
+                    setTargetDegrees(turretRelativeAngle);
             }
         }
         else

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.opmode.telePOP;
 
 import static org.firstinspires.ftc.teamcode.config.core.Robot.*;
 
+import androidx.core.app.NotificationCompat;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -29,10 +31,10 @@ public class TelePOP extends LinearOpMode {
     private double scaleFactor = 1;
     public Timer loopTimer = new Timer();
     private double lastTime = 0, currentTime = 0;
-    public static boolean manualMode = true;
+    public static boolean manualMode = false;
     public boolean pressingC = false;
     public boolean pressingRT = false;
-    public boolean rumble = false;
+    public static boolean rumble = false;
     public int shotNum = 0;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -75,16 +77,9 @@ public class TelePOP extends LinearOpMode {
                 robot.intakeOff = false;
                 robot.intake.setGateState(Intake.GateState.CLOSED);
                 robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
-                if (!robot.intakeDone()) {
                     robot.intake.setUptakeState(Intake.UptakeState.SLOW);
                     robot.uptakeOff = false;
                     robot.rev = false;
-                }
-                else {
-                    robot.intake.setUptakeState(Intake.UptakeState.OFF);
-                    robot.uptakeOff = true;
-                    robot.rev = true;
-                }
             }
 
             else if (gamepad1.left_trigger > 0.3) {
@@ -104,7 +99,9 @@ public class TelePOP extends LinearOpMode {
 
             if(!gamepad1.left_bumper && !gamepad1.right_bumper && ! (gamepad1.right_trigger > 0.3) && ! (gamepad1.left_trigger > 0.3) && !gamepad1.square && !(autoShoot && robot.isInLaunchZone())) {
                 robot.intakeOff = true;
-                robot.uptakeOff = true;
+
+                if (!gamepad1.dpad_down && !gamepad1.dpad_up)
+                    robot.uptakeOff = true;
             }
 
             if (gamepad2.square) {
@@ -156,17 +153,49 @@ public class TelePOP extends LinearOpMode {
             }
             robot.update = !(gamepad2.left_trigger > .3);
 
+            if (gamepad1.dpad_down) {
+                robot.pto.setState(PTO.PTOState.ON);
+                robot.uptakeOff = false;
+                robot.intake.setUptakeState(Intake.UptakeState.ON);
+            }
+            else if (gamepad1.dpad_up) {
+                robot.uptakeOff = false;
+                robot.pto.setState(PTO.PTOState.ON);
+                robot.intake.setUptakeState(Intake.UptakeState.BACK);
+            }
+            else if (gamepad1.dpad_left) {
+                robot.pto.setState(PTO.PTOState.OFF);
+            }
+            if (!gamepad1.left_bumper && !gamepad2.right_bumper)
+                robot.numLeft = 3;
+
+
+
             if ((gamepad2.right_bumper || gamepad1.left_bumper || ((autoShoot && robot.isInLaunchZone())))) {
                 rumble = false;
                 //&& (robot.validLaunch || robot.shotStarted))) {
                 //change this value to add wait for RPM in far launch
-                if (true || (robot.notMoving() && robot.turret.atTarget())) {
+                if (robot.getDistanceFromGoal() < 100 || rapidFireFar) {
                         robot.turret.lockTurret = true;
                         robot.intake.setUptakeState(Intake.UptakeState.ON);
                         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                         robot.intakeOff = false;
                         robot.uptakeOff = false;
                     }
+                else {
+                    if (robot.launcher.atTarget()) {
+                        robot.intake.setUptakeState(Intake.UptakeState.ON);
+                        robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
+                        robot.intakeOff = false;
+                        robot.uptakeOff = false;
+                    }
+                    else {
+                        robot.intake.setUptakeState(Intake.UptakeState.SLOWOUTTAKE);
+                        robot.intake.setIntakeState(Intake.IntakeState.OFF);
+                        robot.intakeOff = true;
+                        robot.uptakeOff = true;
+                    }
+                }
             }
             else {
                 robot.turret.lockTurret = false;
@@ -257,9 +286,9 @@ public class TelePOP extends LinearOpMode {
                 telemetry.addData("x", robot.getFollower().getPose().getX());
                 telemetry.addData("y", robot.getFollower().getPose().getY());
                 telemetry.addData("heading", robot.getFollower().getPose().getHeading());
-                //telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
-                //telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
-                //telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
+                telemetry.addData("LL x", robot.limelight.getRobotPosFromTarget().getX());
+                telemetry.addData("LL y", robot.limelight.getRobotPosFromTarget().getY());
+                telemetry.addData("LL heading", robot.limelight.getRobotPosFromTarget().getHeading());
                 telemetry.addData("GoalX", redX);
                 telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
                 telemetry.addData("Robot zone", zone);

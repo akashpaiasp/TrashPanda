@@ -5,15 +5,19 @@ import static org.firstinspires.ftc.teamcode.config.core.Robot.showTelemetry;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.broadcom.BroadcomColorSensorImpl;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.config.util.logging.LogType;
 import org.firstinspires.ftc.teamcode.config.util.logging.Logger;
 
@@ -25,12 +29,14 @@ public class Intake extends SubsystemBase {
     private Servo gate;
     public DcMotorEx intake, uptake;
     public DigitalChannel bb1, bb2, bb3;
+    public RevColorSensorV3 bottom, middle, top;
     //larger number = further from shooter
+    public static boolean useColor = true;
 
     public static double launchIntake = 1;
     public static double launchUptake = 1;
-    public static double intakeUptake = .7;
-    public static double outtake1Power = -.26;
+    public static double intakeUptake = 1;
+    public static double outtake1Power = -.7;
 
     public static boolean manual = false;
 
@@ -38,8 +44,8 @@ public class Intake extends SubsystemBase {
 
     public static boolean autoOuttake = true;
     private static double
-            open = .7,
-            closed = 0.95;
+            open = .5,
+            closed = .75;
 
     public enum IntakeState {
         OUTTAKE,
@@ -53,7 +59,8 @@ public class Intake extends SubsystemBase {
         ON,
         OFF,
         SLOW,
-        BACK
+        BACK,
+        SLOWOUTTAKE
     }
     public enum GateState {
         OPEN,
@@ -82,9 +89,13 @@ public class Intake extends SubsystemBase {
         uptake = hardwareMap.get(DcMotorEx.class, "em2");
 
 
-        bb1 = hardwareMap.get(DigitalChannel.class, "ed0");
+        bb1 = hardwareMap.get(DigitalChannel.class, "cd1");
         bb2 = hardwareMap.get(DigitalChannel.class, "ed1");
         bb3 = hardwareMap.get(DigitalChannel.class, "ed6");
+
+        middle = hardwareMap.get(RevColorSensorV3.class, "ci3");
+        top = hardwareMap.get(RevColorSensorV3.class, "ci2");
+        bottom = hardwareMap.get(RevColorSensorV3.class, "ei1");
 
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -148,6 +159,9 @@ public class Intake extends SubsystemBase {
                 break;
             case BACK:
                 uptake.setPower(-1);
+                break;
+            case SLOWOUTTAKE:
+                uptake.setPower(outtake1Power);
         }
         if(manual) {
             gate.setPosition(gatePos);
@@ -168,21 +182,37 @@ public class Intake extends SubsystemBase {
             telemetry.addData("Intake amps", intake.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("Uptake amps", uptake.getCurrent(CurrentUnit.AMPS));
 
-            telemetry.addData("bb1", bb1.getState());
-            telemetry.addData("bb2", bb2.getState());
-            telemetry.addData("bb3", bb3.getState());
+            if (!useColor) {
+                telemetry.addData("bb1", bb1.getState());
+                telemetry.addData("bb2", bb2.getState());
+                telemetry.addData("bb3", bb3.getState());
+            }
+            else {
+                telemetry.addData("bb1", bb1.getState());
+                telemetry.addData("bottom in", bottom.getDistance(DistanceUnit.INCH));
+                telemetry.addData("bottom color", toString(bottom));
+                telemetry.addData("middle in", middle.getDistance(DistanceUnit.INCH));
+                telemetry.addData("middle color", toString(middle));
+                telemetry.addData("top in", top.getDistance(DistanceUnit.INCH));
+                telemetry.addData("top color", toString(top));
+            }
         }
+    }
+    public String toString(RevColorSensorV3 b) {
+        return "R: " + b.red() + ", G:" + b.green() + ", B: " + b.blue() + ", A: " + b.alpha();
     }
 
     public boolean has3() {
-        return !bb1.getState() && !bb2.getState() && !bb3.getState();
+        return false && (!bb1.getState() && !bb2.getState() && !bb3.getState());
     }
 
     public boolean none() {
-        return bb1.getState() && bb2.getState() && bb3.getState();
+        return bb1.getState() && bb2.getState() && bb3.getState() && false;
     }
 
     public int num() {
+        if (true)
+            return 0;
         if (!bb1.getState()) {
             if (!bb2.getState()) {
                 if (!bb3.getState())

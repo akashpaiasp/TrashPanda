@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.config.core.paths.autonomous.FarAut
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.teamcode.config.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.config.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.config.util.Timer;
 
-
+@Disabled
 @Autonomous (name = "Far")
 @Config
 //@Configurable

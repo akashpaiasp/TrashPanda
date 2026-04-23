@@ -19,8 +19,8 @@ public class Vision {
     // Measure these physically on your robot (in millimeters or inches, just keep it consistent with REAL_BALL_WIDTH_MM)
     // Assuming Y is forward, X is right relative to the center of the robot.
     public static final double CAMERA_OFFSET_X = 0; // Example: Camera is 150mm to the right of center
-    public static final double CAMERA_OFFSET_Y = 150.0; // Example: Camera is 200mm forward of center
-    public static  double CAMERA_ANGLE_OFFSET = -2.8; // Example: Camera faces perfectly forward (0 degrees)
+    public static final double CAMERA_OFFSET_Y = 200.0; // Example: Camera is 200mm forward of center
+    public static  double CAMERA_ANGLE_OFFSET = 0.0; // Example: Camera faces perfectly forward (0 degrees)
     public static  double INTAKE_REACH = 8.0; // inches, measure from robot center to intake contact point
     public static VisionBall ball1, ball2, ball3;
 
