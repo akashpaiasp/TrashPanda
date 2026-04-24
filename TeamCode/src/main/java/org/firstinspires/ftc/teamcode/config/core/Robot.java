@@ -729,7 +729,7 @@ public class Robot {
 
     public void updateGoalCoords() {
         if (getDistanceFromGoal() < 105) {
-            Turret.sotm = Launcher.teleop;
+            Turret.sotm = false;//Launcher.teleop;
             redX = 67;
             blueX = -67;
             goalY = 67;
