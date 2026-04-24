@@ -259,7 +259,7 @@ public class Launcher extends SubsystemBase {
                 pdfl = controller.run();
             } */
         // 4) Set Power (steady state)
-        if (target_velocity == 0) pdfl = 0;
+        if (target_velocity == 0 || pdfl < 0) pdfl = 0;
         if (!(current == LauncherState.STOP)) {
             if (!boomBoom) {
                 launcher1.setPower(pdfl);

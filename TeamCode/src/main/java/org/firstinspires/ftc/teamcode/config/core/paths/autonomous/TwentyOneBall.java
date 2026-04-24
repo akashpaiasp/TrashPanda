@@ -19,7 +19,7 @@ public class TwentyOneBall {
     public static final Pose shootPose3 = new Pose(13.4, 14.18, -.71); //after first spike
     public static final Pose shootPoseThirdPickup = new Pose(13, 38, -1.34);
 
-    public static final Pose shootPose4 = new Pose(11, 10, startPose.getHeading());
+    public static final Pose shootPose4 = new Pose(11, 10, 0.7525);
 
     private static final Pose moveToShoot = new Pose(30, 0, Math.toRadians(0));
     private static final Pose secondSpikeStrafe = new Pose(20, -12, 0);
@@ -32,7 +32,7 @@ public class TwentyOneBall {
     public static final Pose gateKlutch = new Pose(53, 9, 0);
 
     public static final Pose strafeGate = new Pose(49.2, -14, .7);
-    public static final Pose gate = new Pose(58.5, -14.5, .641);
+    public static final Pose gate = new Pose(58.8, -14.5, .641);
 
     private static final Pose thirdSpikeStrafe = new Pose(17, -36, 0);
 

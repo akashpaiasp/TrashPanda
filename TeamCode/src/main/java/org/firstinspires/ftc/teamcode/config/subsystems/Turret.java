@@ -68,8 +68,8 @@ public class Turret extends SubsystemBase {
 
 
 
-    public static  double MIN_ANGLE = -181; // turret left limit
-    public static  double MAX_ANGLE = 181;  // turret right limit
+    public static  double MIN_ANGLE = -125; // turret left limit
+    public static  double MAX_ANGLE = 140;  // turret right limit
     public static double autoFudge = 3;
     public double current;
 
@@ -84,7 +84,7 @@ public class Turret extends SubsystemBase {
     public static double weight = .3;
     public static double velWeight = .3;
 
-    public static boolean sotm = true;
+    public static boolean sotm = false;
     public double vx, vy = 0;
     public double prevX = 0, prevY = 0;
     public double dvx, dvy = 0;

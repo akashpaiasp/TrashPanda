@@ -841,7 +841,7 @@ public class Robot {
         return intake.uptake.getCurrent(CurrentUnit.AMPS) < .8 && intake.intake.getCurrent(CurrentUnit.AMPS) < 1.8;
     }
     public boolean has4() {
-        return  intake.has3();
+        return  false;//intake.has3();
     }
     public boolean notMoving() {
         return follower.getVelocity().getXComponent() < .2 && follower.getVelocity().getYComponent() < .2 && follower.getAngularVelocity() < .1;

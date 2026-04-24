@@ -37,10 +37,16 @@ public class Intake extends SubsystemBase {
     public static double launchUptake = 1;
     public static double intakeUptake = 1;
     public static double outtake1Power = -.7;
+    public static double uptakeThreshold = 2.1;
+    public static double intakeThreshold = 1.1;
 
     public static boolean manual = false;
 
     public static double gatePos = 0.5;
+
+    public static double bottomThreshold = 1;  //3, 1, 2
+    public static double middleThreshold = 2.25;
+    public static double topThreshold = 2.25;
 
     public static boolean autoOuttake = true;
     private static double
@@ -114,13 +120,6 @@ public class Intake extends SubsystemBase {
     The telemetry gets updated constantly so you can see the status of the subsystems */
 
     public void setIntakeState(IntakeState intakeState) {
-        if (autoOuttake) {
-            if ((intakeState == IntakeState.INTAKE || intakeState == IntakeState.OFF) && has3()) {
-                currentIntake = IntakeState.SLOWOUTTAKE;
-            }
-            else currentIntake = intakeState;
-        }
-        else
             currentIntake = intakeState;
     }
     public void setUptakeState(UptakeState uptakeState) {
@@ -203,11 +202,11 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean has3() {
-        return false && (!bb1.getState() && !bb2.getState() && !bb3.getState());
+        return bottom.getDistance(DistanceUnit.INCH) < bottomThreshold && middle.getDistance(DistanceUnit.INCH) < middleThreshold && top.getDistance(DistanceUnit.INCH) < topThreshold;
     }
 
     public boolean none() {
-        return bb1.getState() && bb2.getState() && bb3.getState() && false;
+        return bottom.getDistance(DistanceUnit.INCH) > bottomThreshold && middle.getDistance(DistanceUnit.INCH) > middleThreshold && top.getDistance(DistanceUnit.INCH) > topThreshold;
     }
 
     public int num() {
