@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.config.util.Timer;
 @Autonomous(name = "fake 24")
 @Config
 //@Configurable
+//Same as 21, 1 extra gate cycle
 public class TwentyFour extends OpMode {
     //private MultipleTelemetry telemetry;
     private Timer pathTimer, actionTimer, opmodeTimer;
