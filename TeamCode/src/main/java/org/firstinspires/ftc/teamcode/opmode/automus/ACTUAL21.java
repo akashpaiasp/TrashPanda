@@ -73,7 +73,7 @@ public class ACTUAL21 extends OpMode {
         robot.aPeriodic();
 
         switch (pathState) {
-            case 00: //preload & set max power
+            case 00:
                 robot.getFollower().setMaxPower(1);
                 setPathState(10);
                 robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
@@ -81,87 +81,68 @@ public class ACTUAL21 extends OpMode {
 
             case 10:
                 followPath(robot.getAlliance() == Alliance.RED ? shoot1(robot.getFollower()) : shoot1Blue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(12025);
+                if (shootPath()) setPathState(12025);
                 break;
 
             case 12025:
-                followPath(robot.getAlliance() == Alliance.RED ? secondSpike(robot.getFollower()) : pickup1Blue(robot.getFollower()), true);
-                if (intakePath(false))
-                    setPathState(1204);
+                followPath(robot.getAlliance() == Alliance.RED ? secondSpike(robot.getFollower()) : secondSpikeBlue(robot.getFollower()), true);
+                if (intakePath(false)) setPathState(1204);
                 break;
 
             case 1204:
                 followPath(robot.getAlliance() == Alliance.RED ? shoot2(robot.getFollower()) : shoot2Blue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(1301);
+                if (shootPath()) setPathState(1301);
                 break;
 
             case 1301:
                 followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickupBlue(robot.getFollower()), true);
-                if (intakePath(true))
-                    setPathState(1302);
+                if (intakePath(true)) setPathState(1302);
                 break;
 
             case 1302:
                 followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGateBlue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(12);
+                if (shootPath()) setPathState(12);
                 break;
 
             case 12:
                 followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickupBlue(robot.getFollower()), true);
-                if (intakePath(true))
-                    setPathState(13);
+                if (intakePath(true)) setPathState(13);
                 break;
-
 
             case 13:
                 followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGateBlue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(1452);
+                if (shootPath()) setPathState(1452);
                 break;
-
 
             case 1452:
-                followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickup2Blue(robot.getFollower()), true);
-                if (intakePath(true))
-                    setPathState(1453);
+                followPath(robot.getAlliance() == Alliance.RED ? gatePickup(robot.getFollower()) : gatePickupBlue(robot.getFollower()), true);
+                if (intakePath(true)) setPathState(1453);
                 break;
 
-
             case 1453:
-                followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGate2Blue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(1456);
+                followPath(robot.getAlliance() == Alliance.RED ? shootGate(robot.getFollower()) : shootGateBlue(robot.getFollower()), true);
+                if (shootPath()) setPathState(1456);
                 break;
 
             case 1456:
-                followPath(robot.getAlliance() == Alliance.RED ? pickupFirstSpike(robot.getFollower()) : pickup2Blue(robot.getFollower()), true);
-                if (intakePath(false))
-                    setPathState(19);
+                followPath(robot.getAlliance() == Alliance.RED ? pickupFirstSpike(robot.getFollower()) : pickupFirstSpikeBlue(robot.getFollower()), true);
+                if (intakePath(false)) setPathState(19);
                 break;
 
             case 19:
                 followPath(robot.getAlliance() == Alliance.RED ? shoot3(robot.getFollower()) : shoot3Blue(robot.getFollower()), false);
-                if (shootPath())
-                    setPathState(24);
+                if (shootPath()) setPathState(24);
                 break;
 
             case 24:
-                followPath(robot.getAlliance() == Alliance.RED ? thirdSpike(robot.getFollower()) : pickup3Blue(robot.getFollower()), true);
-                if (intakePath(false))
-                    setPathState(271);
+                followPath(robot.getAlliance() == Alliance.RED ? thirdSpike(robot.getFollower()) : thirdSpikeBlue(robot.getFollower()), true);
+                if (intakePath(false)) setPathState(271);
                 break;
-
 
             case 271:
                 followPath(robot.getAlliance() == Alliance.RED ? shoot4(robot.getFollower()) : shoot4Blue(robot.getFollower()), true);
-                if (shootPath())
-                    setPathState(28);
+                if (shootPath()) setPathState(28);
                 break;
-
-
 
             case 28:
                 setPathState(28);
@@ -169,7 +150,6 @@ public class ACTUAL21 extends OpMode {
 
             case 99999:
                 break;
-
         }
 
 

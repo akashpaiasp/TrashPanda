@@ -57,8 +57,10 @@ public class Turret extends SubsystemBase {
     public static double fudgeFactor = 0;
     public static boolean useTurret = true;
 
-    public static double zeroPos = .485;
+    public static double zeroPos = 0.492;
     public static double oneEightyPos = 0.86;
+    public static double ninetyPos = .68;
+    public static double negativeNinetyPos = 0.307;
     /*
     public static double leftPos = .5;
     public static double rightPos = .5; */
@@ -315,7 +317,10 @@ public class Turret extends SubsystemBase {
     }
 
     public double getPos() {
-        return zeroPos + (target / 180.0) * (oneEightyPos - zeroPos);
+        if (target >= 0)
+            return zeroPos + (target / 90.0) * (ninetyPos - zeroPos);
+        else
+            return zeroPos + (target / -90.0) * (negativeNinetyPos - zeroPos);
     }
 
 

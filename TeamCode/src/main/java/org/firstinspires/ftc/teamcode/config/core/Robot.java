@@ -57,7 +57,7 @@ public class Robot {
     public static boolean showLoopTimes = false;
     public static boolean hoodAdjustment = false;
     public static boolean hoodComp = false;
-    public static boolean rapidFireFar = false;
+    public static boolean rapidFireFar = true;
     public static double farLaunchR = 1;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
@@ -380,6 +380,8 @@ public class Robot {
         //robotCentric = true;
         //g1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(this::resetPose));
         g2.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(this::flipAlliance));
+        g1.getGamepadButton(GamepadKeys.Button.SQUARE).whenPressed(new InstantCommand(this::flipAlliance));
+
 
         /*g1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whenPressed(new InstantCommand(() -> {
             Aim.fudgeFactor += 2.5;
@@ -419,12 +421,12 @@ public class Robot {
         g2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(new InstantCommand(() -> {
             KinematicsCalculator.multiplier /= 1.0125;
         }));
-        g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
+       /* g1.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
             autoDrive.toGate();
         }));
         g1.getGamepadButton(GamepadKeys.Button.X).whenPressed(new InstantCommand(() -> {
             autoDrive.toShoot();
-        }));
+        })); */
         g1.getGamepadButton(GamepadKeys.Button.TRIANGLE).whenPressed(new InstantCommand(() -> {
             Pose p = limelight.getRobotPosFromTarget();
             if (p.getX() != 0.0 ) {

@@ -21,6 +21,8 @@ public class FarAuto {
 
     // ---------------- BLUE POSES ----------------
 
+    // ---------------- BLUE POSES ----------------
+
     public static final Pose startPoseBlue = convertToBlue(startPose);
     public static final Pose shootPoseBlue = convertToBlue(shootPose);
     public static final Pose humanPlayerBlue = convertToBlue(humanPlayer);
@@ -28,7 +30,7 @@ public class FarAuto {
 
     private static final Pose strafeBlue = convertToBlue(strafe);
     private static final Pose thirdSpikeBlue = convertToBlue(thirdSpike);
-    public static final Pose parkBlue = convertToBlue(park);
+    public static final Pose parkBluePose = convertToBlue(park);
 
     // ---------------- RED PATHS ----------------
 
@@ -69,7 +71,7 @@ public class FarAuto {
 
     public static PathChain ballCVIntake(Follower f, double ballY) {
         return f.pathBuilder()
-                .addPath(new BezierCurve(shootPose, new Pose(humanPlayer.getX() - 10, ballY, humanPlayer.getHeading()), new Pose(humanPlayer.getX(), ballY, humanPlayer.getHeading())))
+                .addPath(new BezierCurve(shootPose, new Pose(humanPlayer.getX(), ballY, humanPlayer.getHeading()), new Pose(humanPlayer.getX(), ballY, humanPlayer.getHeading())))
                 .setTangentHeadingInterpolation()
                 .build();
     }
@@ -85,6 +87,8 @@ public class FarAuto {
                 .setLinearHeadingInterpolation(humanPlayer.getHeading(), park.getHeading())
                 .build();
     }
+
+    // ---------------- BLUE PATHS ----------------
 
     // ---------------- BLUE PATHS ----------------
 
@@ -104,7 +108,7 @@ public class FarAuto {
 
     public static PathChain shootHumanPlayerBlue(Follower f) {
         return f.pathBuilder()
-                .addPath(new BezierLine(turnBlue, shootPoseBlue))
+                .addPath(new BezierLine(humanPlayerBlue, shootPoseBlue))
                 .setConstantHeadingInterpolation(shootPoseBlue.getHeading())
                 .build();
     }
@@ -123,10 +127,16 @@ public class FarAuto {
                 .build();
     }
 
-    public static PathChain parkBlue(Follower f) {
+    public static PathChain ballCVIntakeBlue(Follower f, double ballY) {
         return f.pathBuilder()
-                .addPath(new BezierLine(humanPlayerBlue, parkBlue))
-                .setLinearHeadingInterpolation(humanPlayerBlue.getHeading(), parkBlue.getHeading())
+                .addPath(new BezierCurve(shootPoseBlue, new Pose(humanPlayerBlue.getX(), ballY, humanPlayerBlue.getHeading()), new Pose(humanPlayerBlue.getX(), ballY, humanPlayerBlue.getHeading())))
+                .setTangentHeadingInterpolation()
+                .build();
+    }
+    public static PathChain ballCVShootBlue(Follower f, Pose currentPose) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(currentPose, shootPoseBlue))
+                .setLinearHeadingInterpolation(currentPose.getHeading(), shootPoseBlue.getHeading())
                 .build();
     }
 

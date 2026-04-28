@@ -8,18 +8,18 @@ public class ShooterLookup {
     // Add your own distances, hood positions, and RPMs here.
     // Make sure distances are in increasing order.
     private static final ShotPoint[] table = {
-            new ShotPoint(37, .73, 2150),
-            new ShotPoint(46, .76, 2280),
-            new ShotPoint(57, 0.775, 2300),
-            new ShotPoint(66.5, 0.795, 2600),
-            new ShotPoint(76.7, 0.81, 2850),
-            new ShotPoint(86.5, 0.83, 3000),
-            new ShotPoint(97.9, 0.83, 3150),
-            new ShotPoint(105.3, 0.83, 3300),
-            new ShotPoint(115.9, 0.84, 3620),
-            new ShotPoint(126, 0.84, 3700),
-            new ShotPoint(136, 0.84, 3800),
-            new ShotPoint(147, 0.84, 3900)
+            new ShotPoint(37, .76, 2150),
+            new ShotPoint(47, 0.78, 2350),
+            new ShotPoint(58, .78, 2420),
+            new ShotPoint(65.5, .81, 2600),
+            new ShotPoint(77.3, 0.846, 2870),
+            new ShotPoint(88.5, 0.85, 3100),
+            //new ShotPoint(97.9, 0.83, 3150),
+            new ShotPoint(104, 0.87, 3400),
+            new ShotPoint(108, 0.885, 3800),
+            new ShotPoint(122, 0.89, 4000),
+            new ShotPoint(136, 0.86, 4000),
+            new ShotPoint(147, 0.855, 4100)
 
 
 
