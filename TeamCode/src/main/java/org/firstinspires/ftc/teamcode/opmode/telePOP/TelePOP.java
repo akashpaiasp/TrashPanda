@@ -175,7 +175,7 @@ public class TelePOP extends LinearOpMode {
                 rumble = false;
                 //&& (robot.validLaunch || robot.shotStarted))) {
                 //change this value to add wait for RPM in far launch
-                if (robot.getDistanceFromGoal() < 100 || rapidFireFar) {
+                if (robot.getDistanceFromGoal() < 110 || rapidFireFar) {
                         robot.turret.lockTurret = true;
                         robot.intake.setUptakeState(Intake.UptakeState.ON);
                         robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
@@ -293,7 +293,6 @@ public class TelePOP extends LinearOpMode {
                 telemetry.addData("GoalY", alliance == Alliance.RED ? goalY : goalY);
                 telemetry.addData("Robot zone", zone);
                 telemetry.addData("X vel", robot.getFollower().getVelocity().getXComponent());
-                telemetry.addData("Num", robot.intake.num());
                 telemetry.addData("voltage", robot.getFollower().getDrivetrain().getVoltage());
             }
         }

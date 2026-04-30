@@ -94,7 +94,7 @@ public class Launcher extends SubsystemBase {
     private boolean inAggressive = false;
     public static boolean teleop = false;
     public boolean validLaunch = false;
-    public static double threshold = 150.0;
+    public static double threshold = 120.0;
 
     public enum LauncherState {
         IN,

@@ -57,7 +57,7 @@ public class Robot {
     public static boolean showLoopTimes = false;
     public static boolean hoodAdjustment = false;
     public static boolean hoodComp = false;
-    public static boolean rapidFireFar = true;
+    public static boolean rapidFireFar = false;
     public static double farLaunchR = 1;
     public static boolean autoShoot = false;
     public static boolean keepShooterOn = true;
@@ -726,22 +726,22 @@ public class Robot {
         double dx = goalX - turretX - 0;
         double dy = goalY - turretY - 0;
 
+        if (follower.isTeleopDrive() || !follower.isBusy() || follower.getCurrentPathChain() == null) {
+
+        }
+        else {
+            dx = goalX - tempTurretX - 0;
+            dy = goalY - tempTurretY - 0;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
         return Math.sqrt(dx * dx + dy * dy);
     }
 
     public void updateGoalCoords() {
-        if (getDistanceFromGoal() < 105) {
             Turret.sotm = false;//Launcher.teleop;
             redX = 67;
             blueX = -67;
             goalY = 67;
-        }
-        else {
-            Turret.sotm = false;
-            redX = farZoneX;//72;
-            blueX = -farZoneX;
-            goalY = 67;//72;
-        }
 
         if (alliance == Alliance.RED) {
             goalX = redX;

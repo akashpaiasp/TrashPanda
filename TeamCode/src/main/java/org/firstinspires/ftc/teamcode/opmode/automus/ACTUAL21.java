@@ -29,9 +29,9 @@ public class ACTUAL21 extends OpMode {
     double onThreshold = 0;
     double onThresholdTwo = 0.4;
     // 6767 - Julian
-    double offThreshold = 0.03;
-    double moveThreshold = 1.67;
-    double moveIntakeThreshold = 2.5;
+    double offThreshold = 0;
+    double moveThreshold = .52;
+    double moveIntakeThreshold = 1.5;
     public static boolean firstCouple = true;
     boolean doneOff = false;
     double doneNum = 0;
@@ -50,8 +50,7 @@ public class ACTUAL21 extends OpMode {
     public static boolean sotm = false;
     public static boolean twentyOne = false;
     public static double tValue = .3;
-    //public static double stopIntakeTValue = .
-    public static double shootTValue = .97;
+    public static double shootTValue = 1;
     public boolean dontChangeTurret = false;
 
 
@@ -134,6 +133,7 @@ public class ACTUAL21 extends OpMode {
                 if (shootPath()) setPathState(24);
                 break;
 
+                // hey reader, sixty seven 67's - Julian
             case 24:
                 followPath(robot.getAlliance() == Alliance.RED ? thirdSpike(robot.getFollower()) : thirdSpikeBlue(robot.getFollower()), true);
                 if (intakePath(false)) setPathState(271);
@@ -283,7 +283,7 @@ public class ACTUAL21 extends OpMode {
     private boolean shootPath() {
         if (pathDone(true)) {
             telemetry.addData("Path done", true);
-            if (pathTimer.getElapsedTimeSeconds() >= onThreshold) {
+            if (pathTimer.getElapsedTimeSeconds() > onThreshold) {
                 robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                 robot.intake.setUptakeState(Intake.UptakeState.ON);
                 robot.shotStarted = true;

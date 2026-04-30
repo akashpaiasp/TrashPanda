@@ -26,7 +26,7 @@ public class NoThird extends OpMode {
     private int pathState;
     private Robot robot;
     int done = 0;
-    boolean two = false;
+    boolean two = true;
     double onThreshold = 0;
     double onThresholdTwo = 0.4;
     // 6767 - Julian
@@ -54,7 +54,6 @@ public class NoThird extends OpMode {
     public static double shootTValue = 1;
     public boolean dontChangeTurret = false;
 
-
     public void autonomousPathUpdate() {
 
         if (aimTurret || true) {
@@ -78,6 +77,7 @@ public class NoThird extends OpMode {
                 robot.getFollower().setMaxPower(1);
                 setPathState(10);
                 robot.launcher.setLauncherState(Launcher.LauncherState.SHOOT);
+                robot.intake.setIntakeState(Intake.IntakeState.INTAKE);
                 break;
 
             case 10:
@@ -97,6 +97,7 @@ public class NoThird extends OpMode {
                 break;
 
             case 1204:
+                two = false;
                 followPath(robot.getAlliance() == Alliance.RED
                         ? shoot2(robot.getFollower())
                         : shoot2Blue(robot.getFollower()), true);
@@ -113,6 +114,7 @@ public class NoThird extends OpMode {
                 break;
 
             case 1302:
+                two = true;
                 followPath(robot.getAlliance() == Alliance.RED
                         ? shootGate(robot.getFollower())
                         : shootGateBlue(robot.getFollower()), true);
@@ -149,7 +151,7 @@ public class NoThird extends OpMode {
                         ? shootGate(robot.getFollower())
                         : shootGateBlue(robot.getFollower()), true);
                 if (shootPath())
-                    setPathState(1454);
+                    setPathState(1456);
                 break;
 
             case 1454:
@@ -157,15 +159,15 @@ public class NoThird extends OpMode {
                         ? gatePickup(robot.getFollower())
                         : gatePickupBlue(robot.getFollower()), true);
                 if (intakePath(true))
-                    setPathState(1453);
+                    setPathState(1455);
                 break;
 
             case 1455:
                 followPath(robot.getAlliance() == Alliance.RED
-                        ? shootGate(robot.getFollower())
-                        : shootGateBlue(robot.getFollower()), true);
+                        ? shoot4Alliance(robot.getFollower())
+                        : shoot4AllianceBlue(robot.getFollower()), true);
                 if (shootPath())
-                    setPathState(1456);
+                    setPathState(24);
                 break;
 
             case 1456:
@@ -177,11 +179,12 @@ public class NoThird extends OpMode {
                 break;
 
             case 19:
+                two = false;
                 followPath(robot.getAlliance() == Alliance.RED
-                        ? shoot4(robot.getFollower())
+                        ? shoot3(robot.getFollower())
                         : shoot3Blue(robot.getFollower()), false);
                 if (shootPath())
-                    setPathState(24);
+                    setPathState(1454);
                 break;
 
             case 24:

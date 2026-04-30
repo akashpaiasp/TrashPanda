@@ -46,12 +46,11 @@ public class Intake extends SubsystemBase {
 
     public static double bottomThreshold = 1;  //3, 1, 2
     public static double middleThreshold = 2.25;
-    public static double topThreshold = 2.25;
-
+    public static double topThreshold = .96;
     public static boolean autoOuttake = true;
-    private static double
-            open = .5,
-            closed = .75;
+    public static double
+            open = 0.35,
+            closed = .53;
 
     public enum IntakeState {
         OUTTAKE,
@@ -206,7 +205,7 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean none() {
-        return bottom.getDistance(DistanceUnit.INCH) > bottomThreshold && middle.getDistance(DistanceUnit.INCH) > middleThreshold && top.getDistance(DistanceUnit.INCH) > topThreshold;
+        return false && bottom.getDistance(DistanceUnit.INCH) > bottomThreshold && middle.getDistance(DistanceUnit.INCH) > middleThreshold && top.getDistance(DistanceUnit.INCH) > topThreshold;
     }
 
     public int num() {

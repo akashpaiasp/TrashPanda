@@ -11,7 +11,7 @@ public class TwentyOneBall {
 
     // ---------------- RED POSES ----------------
 
-    public static final Pose startPose = new Pose(40.3, 58.4, 1.557);
+    public static final Pose startPose = new Pose(38, 58.7, Math.PI - 1.569);
 
     private static final Pose shootPose1 = new Pose(15, 17.3, -0.219); //initial
     //public static final Pose shootPose2 = new Pose(18.6, 8.5, Math.toRadians(-.4)); //before gate intakes
@@ -32,7 +32,7 @@ public class TwentyOneBall {
     public static final Pose gateKlutch = new Pose(53, 9, 0);
 
     public static final Pose strafeGate = new Pose(49.2, -14, .7);
-    public static final Pose gate = new Pose(58.8, -14.5, .641);
+    public static final Pose gate = new Pose(57.5, -12.38, Math.PI - 2.624 );
 
     private static final Pose thirdSpikeStrafe = new Pose(17, -36, 0);
 
@@ -131,6 +131,15 @@ public class TwentyOneBall {
                 .build();
     }
 
+    public static PathChain shoot3NoThird(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(firstSpike, shootPoseThirdPickup))
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
+                .build();
+    }
+
     public static PathChain thirdSpike (Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierCurve(shootPose3, thirdSpikeStrafe, thirdSpike))
@@ -141,6 +150,15 @@ public class TwentyOneBall {
     public static PathChain shoot4(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(thirdSpike, shootPoseThirdPickup))
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
+                .build();
+    }
+
+    public static PathChain shoot4Alliance(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(gate, shootPoseThirdPickup))
                 .setReversed()
                 .setTangentHeadingInterpolation()
                 .setReversed()
@@ -203,6 +221,14 @@ public class TwentyOneBall {
                 .setReversed()
                 .build();
     }
+    public static PathChain shoot3NoThirdBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(firstSpikeBlue, shootPoseThirdPickupBlue))
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
+                .build();
+    }
 
     public static PathChain thirdSpikeBlue(Follower f) {
         return f.pathBuilder()
@@ -214,6 +240,14 @@ public class TwentyOneBall {
     public static PathChain shoot4Blue(Follower f) {
         return f.pathBuilder()
                 .addPath(new BezierLine(thirdSpikeBlue, shootPoseThirdPickupBlue))
+                .setReversed()
+                .setTangentHeadingInterpolation()
+                .setReversed()
+                .build();
+    }
+    public static PathChain shoot4AllianceBlue(Follower f) {
+        return f.pathBuilder()
+                .addPath(new BezierLine(gateBlue, shootPoseThirdPickupBlue))
                 .setReversed()
                 .setTangentHeadingInterpolation()
                 .setReversed()

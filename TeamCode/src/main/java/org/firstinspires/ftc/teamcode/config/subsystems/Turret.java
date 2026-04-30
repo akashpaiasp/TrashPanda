@@ -65,8 +65,8 @@ public class Turret extends SubsystemBase {
     public static double leftPos = .5;
     public static double rightPos = .5; */
     public static double pos = .5;
-    public static double lashFix = 0.025;
-    public static double lashOffset = 0;
+    public static double lashFix = 0.05;
+    public static double lashOffset = -7;
 
 
 
